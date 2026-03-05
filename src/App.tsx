@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Creators from "./pages/Creators";
 import CreatorProfile from "./pages/CreatorProfile";
 import Opportunities from "./pages/Opportunities";
+import OpportunityDetail from "./pages/OpportunityDetail";
+import PostOpportunity from "./pages/PostOpportunity";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/creators" element={<Creators />} />
           <Route path="/creators/:id" element={<CreatorProfile />} />
           <Route path="/opportunities" element={<Opportunities />} />
+          <Route path="/opportunities/:id" element={<OpportunityDetail />} />
+          <Route path="/post-opportunity" element={<PostOpportunity />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
