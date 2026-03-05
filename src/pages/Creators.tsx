@@ -4,21 +4,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-const allCreators = [
-  { id: 1, name: "Mia Chen", role: "UGC Creator", location: "Los Angeles, CA", rating: 4.9, tags: ["Lifestyle", "Fashion", "Beauty"], bio: "Creating authentic content that converts. 3+ years of UGC experience.", portfolio: 24 },
-  { id: 2, name: "Jordan Blake", role: "Photographer", location: "New York, NY", rating: 4.8, tags: ["Product", "Food", "Flat Lay"], bio: "Specializing in product photography that tells your brand story.", portfolio: 48 },
-  { id: 3, name: "Aisha Koroma", role: "Social Media Manager", location: "London, UK", rating: 5.0, tags: ["TikTok", "Reels", "Strategy"], bio: "Growing brands through viral short-form content and strategy.", portfolio: 15 },
-  { id: 4, name: "Leo Martinez", role: "Videographer", location: "Miami, FL", rating: 4.7, tags: ["Brand Films", "Ads", "Documentary"], bio: "Cinematic storytelling for brands that want to stand out.", portfolio: 32 },
-  { id: 5, name: "Priya Sharma", role: "Graphic Designer", location: "Toronto, CA", rating: 4.9, tags: ["Branding", "Social Media", "Illustration"], bio: "Crafting visual identities that resonate with your audience.", portfolio: 56 },
-  { id: 6, name: "Marcus Johnson", role: "Copywriter", location: "Austin, TX", rating: 4.6, tags: ["Email", "Web Copy", "Ads"], bio: "Words that sell. Conversion-focused copy for modern brands.", portfolio: 20 },
-  { id: 7, name: "Sakura Tanaka", role: "Influencer", location: "Tokyo, JP", rating: 4.8, tags: ["Beauty", "Skincare", "Wellness"], bio: "150K+ followers. Authentic reviews and sponsored content.", portfolio: 40 },
-  { id: 8, name: "Daniel Osei", role: "Motion Designer", location: "Berlin, DE", rating: 4.9, tags: ["Animation", "Motion Graphics", "3D"], bio: "Bringing brands to life with dynamic motion design.", portfolio: 28 },
-];
+import { creators } from "@/lib/data";
 
 const Creators = () => {
   const [search, setSearch] = useState("");
-  const filtered = allCreators.filter(
+  const filtered = creators.filter(
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.role.toLowerCase().includes(search.toLowerCase()) ||
@@ -53,7 +43,9 @@ const Creators = () => {
             className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
           >
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-accent" />
+              <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center text-xs font-semibold text-accent-foreground">
+                {creator.name.split(" ").map(n => n[0]).join("")}
+              </div>
               <div>
                 <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">{creator.name}</h3>
                 <p className="text-xs text-muted-foreground">{creator.role}</p>
