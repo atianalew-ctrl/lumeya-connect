@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { to: "/", label: "Home" },
@@ -15,10 +16,11 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="font-display text-2xl font-bold tracking-tight text-foreground">
-          Lumeya
+        <Link to="/" className="flex items-center gap-2.5">
+          <img src={logo} alt="Lumeya" className="h-8 w-8 rounded-full object-cover" />
+          <span className="font-display text-xl text-foreground">Lumeya</span>
         </Link>
 
         {/* Desktop */}
@@ -27,9 +29,9 @@ const Navbar = () => {
             <Link
               key={link.to}
               to={link.to}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-4 py-2 text-sm font-medium transition-colors ${
                 location.pathname === link.to
-                  ? "bg-primary/10 text-primary"
+                  ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -57,7 +59,7 @@ const Navbar = () => {
               key={link.to}
               to={link.to}
               onClick={() => setMobileOpen(false)}
-              className="block rounded-lg px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               {link.label}
             </Link>

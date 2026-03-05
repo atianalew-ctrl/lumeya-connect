@@ -17,13 +17,12 @@ interface Conversation {
   role: string;
   lastMessage: string;
   unread: number;
-  color: string;
   messages: Message[];
 }
 
 const conversations: Conversation[] = [
   {
-    id: 1, name: "GlowCo", role: "Skincare Brand", lastMessage: "Sounds great! Let's schedule a call.", unread: 2, color: "bg-peach",
+    id: 1, name: "GlowCo", role: "Skincare Brand", lastMessage: "Sounds great! Let's schedule a call.", unread: 2,
     messages: [
       { id: 1, text: "Hi! We loved your portfolio. Would you be interested in creating UGC for our new serum?", sender: "them", time: "10:30 AM" },
       { id: 2, text: "Thank you! I'd love to learn more about the project. What's the timeline?", sender: "me", time: "10:45 AM" },
@@ -33,7 +32,7 @@ const conversations: Conversation[] = [
     ],
   },
   {
-    id: 2, name: "FitPulse", role: "Fitness App", lastMessage: "Can you send over your rates?", unread: 0, color: "bg-lavender",
+    id: 2, name: "FitPulse", role: "Fitness App", lastMessage: "Can you send over your rates?", unread: 0,
     messages: [
       { id: 1, text: "Hey! We're looking for a TikTok content manager. Interested?", sender: "them", time: "Yesterday" },
       { id: 2, text: "Absolutely! I have experience managing fitness accounts.", sender: "me", time: "Yesterday" },
@@ -41,7 +40,7 @@ const conversations: Conversation[] = [
     ],
   },
   {
-    id: 3, name: "Wanderlust Travel", role: "Travel Company", lastMessage: "The Bali shoot sounds amazing!", unread: 1, color: "bg-secondary",
+    id: 3, name: "Wanderlust Travel", role: "Travel Company", lastMessage: "The Bali shoot sounds amazing!", unread: 1,
     messages: [
       { id: 1, text: "We have an exciting brand film opportunity in Bali. Would you be available in April?", sender: "them", time: "2 days ago" },
       { id: 2, text: "The Bali shoot sounds amazing!", sender: "me", time: "2 days ago" },
@@ -78,20 +77,15 @@ const Messages = () => {
 
   return (
     <div className="container py-6">
-      <div className="overflow-hidden rounded-2xl border border-border bg-card" style={{ height: "calc(100vh - 140px)" }}>
-        <div className="grid h-full md:grid-cols-[320px_1fr]">
+      <div className="overflow-hidden rounded-lg border border-border bg-card" style={{ height: "calc(100vh - 140px)" }}>
+        <div className="grid h-full md:grid-cols-[300px_1fr]">
           {/* Sidebar */}
           <div className="border-r border-border flex flex-col">
             <div className="border-b border-border p-4">
-              <h2 className="text-lg font-bold">Messages</h2>
+              <h2 className="font-display text-lg">Messages</h2>
               <div className="relative mt-3">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search conversations..."
-                  className="pl-8 text-sm"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                <Input placeholder="Search..." className="pl-8 text-sm" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
               </div>
             </div>
             <ScrollArea className="flex-1">
@@ -103,12 +97,12 @@ const Messages = () => {
                     activeConvo.id === convo.id ? "bg-muted" : ""
                   }`}
                 >
-                  <div className={`h-10 w-10 shrink-0 rounded-full ${convo.color}`} />
+                  <div className="h-9 w-9 shrink-0 rounded-full bg-accent" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold">{convo.name}</span>
+                      <span className="text-sm font-medium">{convo.name}</span>
                       {convo.unread > 0 && (
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground">
                           {convo.unread}
                         </span>
                       )}
@@ -124,25 +118,22 @@ const Messages = () => {
           {/* Chat area */}
           <div className="flex flex-col">
             <div className="border-b border-border p-4 flex items-center gap-3">
-              <div className={`h-9 w-9 rounded-full ${activeConvo.color}`} />
+              <div className="h-8 w-8 rounded-full bg-accent" />
               <div>
-                <h3 className="text-sm font-semibold">{activeConvo.name}</h3>
+                <h3 className="text-sm font-medium">{activeConvo.name}</h3>
                 <p className="text-xs text-muted-foreground">{activeConvo.role}</p>
               </div>
             </div>
 
             <ScrollArea className="flex-1 p-4">
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2.5">
                 {(localMessages[activeConvo.id] || []).map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}
-                  >
+                  <div key={msg.id} className={`flex ${msg.sender === "me" ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm ${
                         msg.sender === "me"
-                          ? "bg-primary text-primary-foreground rounded-br-md"
-                          : "bg-muted text-foreground rounded-bl-md"
+                          ? "bg-primary text-primary-foreground rounded-br-sm"
+                          : "bg-muted text-foreground rounded-bl-sm"
                       }`}
                     >
                       <p>{msg.text}</p>
@@ -156,16 +147,8 @@ const Messages = () => {
             </ScrollArea>
 
             <div className="border-t border-border p-4">
-              <form
-                onSubmit={(e) => { e.preventDefault(); handleSend(); }}
-                className="flex gap-2"
-              >
-                <Input
-                  placeholder="Type a message..."
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  className="flex-1"
-                />
+              <form onSubmit={(e) => { e.preventDefault(); handleSend(); }} className="flex gap-2">
+                <Input placeholder="Type a message..." value={newMessage} onChange={(e) => setNewMessage(e.target.value)} className="flex-1" />
                 <Button type="submit" size="icon">
                   <Send size={16} />
                 </Button>

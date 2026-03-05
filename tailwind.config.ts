@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["Space Grotesk", "sans-serif"],
-        body: ["Inter", "sans-serif"],
+        display: ["DM Serif Display", "serif"],
+        body: ["DM Sans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -51,12 +51,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        coral: "hsl(var(--coral))",
-        sage: "hsl(var(--sage))",
-        lavender: "hsl(var(--lavender))",
-        cream: "hsl(var(--cream))",
-        navy: "hsl(var(--navy))",
-        peach: "hsl(var(--peach))",
+        signature: "hsl(var(--signature))",
+        "signature-light": "hsl(var(--signature-light))",
+        "warm-gray": "hsl(var(--warm-gray))",
+        sand: "hsl(var(--sand))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -83,7 +81,7 @@ export default {
           to: { height: "0" },
         },
         "fade-up": {
-          from: { opacity: "0", transform: "translateY(30px)" },
+          from: { opacity: "0", transform: "translateY(20px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
         "fade-in": {
