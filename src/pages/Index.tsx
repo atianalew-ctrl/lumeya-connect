@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Users, Briefcase, MessageCircle } from "lucide-react";
+import { ArrowRight, Users, Briefcase, MessageCircle, DollarSign, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +25,12 @@ const featuredCreators = [
   { name: "Leo Martinez", role: "Videographer", tags: ["Brand Films", "Ads"] },
 ];
 
+const trendingOpportunities = [
+  { title: "UGC Creator for Skincare Brand", brand: "GlowCo", budget: "$500–$1,000", deadline: "Mar 15" },
+  { title: "Product Photographer Needed", brand: "Brew & Co.", budget: "$800–$1,500", deadline: "Mar 20" },
+  { title: "TikTok Content Manager", brand: "FitPulse", budget: "$2,000/mo", deadline: "Ongoing" },
+];
+
 const Index = () => {
   return (
     <div>
@@ -37,10 +43,10 @@ const Index = () => {
             animate="visible"
             variants={fadeUp}
             custom={1}
-            className="mt-8 max-w-2xl text-4xl font-normal leading-tight md:text-6xl"
+            className="mt-8 max-w-3xl text-4xl font-normal leading-tight md:text-6xl"
           >
-            Connect with creators{" "}
-            <span className="italic">and opportunities</span>.
+            The platform where creators{" "}
+            <span className="italic">and brands</span> collaborate.
           </motion.h1>
 
           <motion.p
@@ -48,9 +54,9 @@ const Index = () => {
             animate="visible"
             variants={fadeUp}
             custom={2}
-            className="mt-6 max-w-md text-lg text-muted-foreground leading-relaxed"
+            className="mt-6 max-w-lg text-lg text-muted-foreground leading-relaxed"
           >
-            Lumeya bridges the gap between talented creators and brands looking for collaborations.
+            Discover creators, post opportunities, and start collaborations — all in one place.
           </motion.p>
 
           <motion.div
@@ -66,7 +72,9 @@ const Index = () => {
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild>
-              <Link to="/opportunities">Post an Opportunity</Link>
+              <Link to="/opportunities">
+                Post an Opportunity <ArrowRight size={16} className="ml-2" />
+              </Link>
             </Button>
           </motion.div>
         </div>
@@ -140,6 +148,50 @@ const Index = () => {
                       {tag}
                     </span>
                   ))}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trending Opportunities */}
+      <section className="border-t border-border py-24">
+        <div className="container">
+          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+            <div>
+              <p className="text-sm uppercase tracking-widest text-muted-foreground">Trending</p>
+              <h2 className="mt-2 text-3xl md:text-4xl">Opportunities right now</h2>
+            </div>
+            <Button variant="outline" asChild>
+              <Link to="/opportunities">View all</Link>
+            </Button>
+          </div>
+
+          <div className="mt-12 flex flex-col gap-4">
+            {trendingOpportunities.map((opp, i) => (
+              <motion.div
+                key={opp.title}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+                className="group flex flex-col gap-4 rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30 md:flex-row md:items-center md:justify-between"
+              >
+                <div>
+                  <h3 className="font-body text-base font-semibold group-hover:text-primary transition-colors">{opp.title}</h3>
+                  <p className="mt-1 text-xs text-muted-foreground">by {opp.brand}</p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center gap-1 text-sm font-medium">
+                    <DollarSign size={13} className="text-primary" />{opp.budget}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock size={11} />{opp.deadline}
+                  </span>
+                  <Button size="sm" variant="outline" className="text-xs h-8" asChild>
+                    <Link to="/opportunities">View</Link>
+                  </Button>
                 </div>
               </motion.div>
             ))}
