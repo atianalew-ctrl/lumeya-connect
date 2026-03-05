@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Users, Briefcase, MessageCircle } from "lucide-react";
+import { ArrowRight, Users, Briefcase, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import heroBg from "@/assets/hero-bg.jpg";
+import logo from "@/assets/logo.png";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1, y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: "easeOut" as const },
+    transition: { delay: i * 0.12, duration: 0.5, ease: "easeOut" as const },
   }),
 };
 
@@ -19,42 +19,36 @@ const steps = [
 ];
 
 const featuredCreators = [
-  { name: "Mia Chen", role: "UGC Creator", tags: ["Lifestyle", "Fashion"], color: "bg-peach" },
-  { name: "Jordan Blake", role: "Photographer", tags: ["Product", "Food"], color: "bg-lavender" },
-  { name: "Aisha Koroma", role: "Social Media", tags: ["TikTok", "Reels"], color: "bg-secondary" },
-  { name: "Leo Martinez", role: "Videographer", tags: ["Brand Films", "Ads"], color: "bg-peach" },
+  { name: "Mia Chen", role: "UGC Creator", tags: ["Lifestyle", "Fashion"] },
+  { name: "Jordan Blake", role: "Photographer", tags: ["Product", "Food"] },
+  { name: "Aisha Koroma", role: "Social Media", tags: ["TikTok", "Reels"] },
+  { name: "Leo Martinez", role: "Videographer", tags: ["Brand Films", "Ads"] },
 ];
 
 const Index = () => {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${heroBg})` }}
-        />
-        <div className="relative container flex flex-col items-center py-28 text-center md:py-40">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            custom={0}
-            className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm font-medium text-muted-foreground"
-          >
-            <Sparkles size={14} className="text-primary" />
-            The creator marketplace
-          </motion.div>
+      <section className="relative py-32 md:py-44">
+        <div className="container flex flex-col items-center text-center">
+          <motion.img
+            src={logo}
+            alt="Lumeya logo"
+            className="h-20 w-20 rounded-full object-cover"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          />
 
           <motion.h1
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             custom={1}
-            className="mt-6 max-w-3xl text-5xl font-bold leading-tight tracking-tight md:text-7xl"
+            className="mt-8 max-w-2xl text-4xl font-normal leading-tight md:text-6xl"
           >
-            Connect with creators and{" "}
-            <span className="text-primary">opportunities</span>.
+            Connect with creators{" "}
+            <span className="italic">and opportunities</span>.
           </motion.h1>
 
           <motion.p
@@ -62,9 +56,9 @@ const Index = () => {
             animate="visible"
             variants={fadeUp}
             custom={2}
-            className="mt-6 max-w-xl text-lg text-muted-foreground"
+            className="mt-6 max-w-md text-lg text-muted-foreground leading-relaxed"
           >
-            Lumeya bridges the gap between talented creators and brands looking for collaborations, content, and growth.
+            Lumeya bridges the gap between talented creators and brands looking for collaborations.
           </motion.p>
 
           <motion.div
@@ -72,7 +66,7 @@ const Index = () => {
             animate="visible"
             variants={fadeUp}
             custom={3}
-            className="mt-8 flex flex-wrap justify-center gap-4"
+            className="mt-10 flex flex-wrap justify-center gap-4"
           >
             <Button size="lg" asChild>
               <Link to="/creators">
@@ -95,26 +89,24 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-center"
           >
-            <h2 className="text-3xl font-bold md:text-4xl">How Lumeya works</h2>
-            <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-              Whether you're a creator or a brand, getting started takes minutes.
-            </p>
+            <p className="text-sm uppercase tracking-widest text-muted-foreground">How it works</p>
+            <h2 className="mt-3 text-3xl md:text-4xl">Simple by design</h2>
           </motion.div>
 
-          <div className="mt-16 grid gap-8 md:grid-cols-3">
+          <div className="mt-16 grid gap-12 md:grid-cols-3">
             {steps.map((step, i) => (
               <motion.div
                 key={step.title}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="rounded-2xl border border-border bg-card p-8 text-center"
+                transition={{ delay: i * 0.12 }}
+                className="text-center"
               >
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
-                  <step.icon size={24} className="text-primary" />
+                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-accent">
+                  <step.icon size={20} className="text-accent-foreground" />
                 </div>
-                <h3 className="mt-5 text-xl font-semibold">{step.title}</h3>
+                <h3 className="mt-5 text-lg font-body font-semibold">{step.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
               </motion.div>
             ))}
@@ -123,15 +115,15 @@ const Index = () => {
       </section>
 
       {/* Featured creators */}
-      <section className="border-t border-border bg-muted/30 py-24">
+      <section className="border-t border-border py-24">
         <div className="container">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div>
-              <h2 className="text-3xl font-bold md:text-4xl">Featured creators</h2>
-              <p className="mt-2 text-muted-foreground">Discover talented creators ready to collaborate.</p>
+              <p className="text-sm uppercase tracking-widest text-muted-foreground">Featured</p>
+              <h2 className="mt-2 text-3xl md:text-4xl">Creators to watch</h2>
             </div>
             <Button variant="outline" asChild>
-              <Link to="/creators">View all creators</Link>
+              <Link to="/creators">View all</Link>
             </Button>
           </div>
 
@@ -139,20 +131,20 @@ const Index = () => {
             {featuredCreators.map((creator, i) => (
               <motion.div
                 key={creator.name}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="group cursor-pointer rounded-2xl border border-border bg-card p-6 transition-shadow hover:shadow-lg"
+                transition={{ delay: i * 0.08 }}
+                className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
               >
-                <div className={`h-32 w-full rounded-xl ${creator.color}`} />
-                <h3 className="mt-4 text-lg font-semibold group-hover:text-primary transition-colors">
+                <div className="h-10 w-10 rounded-full bg-accent" />
+                <h3 className="mt-4 font-body text-base font-semibold group-hover:text-primary transition-colors">
                   {creator.name}
                 </h3>
                 <p className="text-sm text-muted-foreground">{creator.role}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {creator.tags.map((tag) => (
-                    <span key={tag} className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+                    <span key={tag} className="text-xs text-muted-foreground">
                       {tag}
                     </span>
                   ))}
@@ -167,14 +159,14 @@ const Index = () => {
       <section className="border-t border-border py-24">
         <div className="container text-center">
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="mx-auto max-w-2xl rounded-3xl bg-primary/5 border border-primary/20 p-12"
+            className="mx-auto max-w-lg"
           >
-            <h2 className="text-3xl font-bold md:text-4xl">Ready to start?</h2>
+            <h2 className="text-3xl md:text-4xl">Ready to start?</h2>
             <p className="mt-4 text-muted-foreground">
-              Join thousands of creators and brands already collaborating on Lumeya.
+              Join creators and brands already collaborating on Lumeya.
             </p>
             <Button size="lg" className="mt-8">
               Get Started Free <ArrowRight size={16} className="ml-2" />
