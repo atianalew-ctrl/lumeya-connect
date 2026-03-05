@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Users, Briefcase, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/logo.png";
+
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -31,14 +31,6 @@ const Index = () => {
       {/* Hero */}
       <section className="relative py-32 md:py-44">
         <div className="container flex flex-col items-center text-center">
-          <motion.img
-            src={logo}
-            alt="Lumeya logo"
-            className="h-20 w-20 rounded-full object-cover"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          />
 
           <motion.h1
             initial="hidden"
