@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Index from "./pages/Index";
 import Creators from "./pages/Creators";
+import CreatorProfile from "./pages/CreatorProfile";
 import Opportunities from "./pages/Opportunities";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
@@ -23,6 +24,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/creators" element={<Creators />} />
+          <Route path="/creators/:id" element={<CreatorProfile />} />
           <Route path="/opportunities" element={<Opportunities />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="*" element={<NotFound />} />

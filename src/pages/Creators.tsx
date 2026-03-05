@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Search, MapPin, Star } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -72,7 +73,9 @@ const Creators = () => {
             </div>
             <div className="mt-4 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">{creator.portfolio} works</span>
-              <Button size="sm" variant="outline" className="text-xs h-7">View</Button>
+              <Button size="sm" variant="outline" className="text-xs h-7" asChild>
+                <Link to={`/creators/${creator.id}`}>View</Link>
+              </Button>
             </div>
           </motion.div>
         ))}
