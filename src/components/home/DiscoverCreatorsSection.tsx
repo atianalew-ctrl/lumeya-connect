@@ -1,19 +1,9 @@
 import { motion } from "framer-motion";
-import { MapPin, Play } from "lucide-react";
+import { MapPin, Play, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useRef } from "react";
-
-const creators = [
-  { id: 1, name: "Anna Johnson", role: "UGC Creator", location: "London, UK", color: "from-pink-200 to-purple-200" },
-  { id: 2, name: "Leo Martinez", role: "Videographer", location: "Miami, FL", color: "from-amber-200 to-orange-200" },
-  { id: 3, name: "Priya Sharma", role: "Graphic Designer", location: "Toronto, CA", color: "from-cyan-200 to-blue-200" },
-  { id: 4, name: "Aisha Koroma", role: "Social Media Manager", location: "London, UK", color: "from-emerald-200 to-teal-200" },
-  { id: 5, name: "Jordan Blake", role: "Photographer", location: "New York, NY", color: "from-violet-200 to-indigo-200" },
-  { id: 6, name: "Sakura Tanaka", role: "Influencer", location: "Tokyo, JP", color: "from-rose-200 to-pink-200" },
-  { id: 7, name: "Marcus Johnson", role: "Copywriter", location: "Austin, TX", color: "from-yellow-200 to-amber-200" },
-  { id: 8, name: "Daniel Osei", role: "Motion Designer", location: "Berlin, DE", color: "from-sky-200 to-cyan-200" },
-];
+import { useRef, useState } from "react";
+import { creators } from "@/lib/data";
 
 const DiscoverCreatorsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -41,41 +31,88 @@ const DiscoverCreatorsSection = () => {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {creators.map((creator, i) => (
-          <motion.div
-            key={creator.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.06 }}
-            className="group flex-shrink-0 w-[220px] cursor-pointer"
-          >
-            {/* Video preview placeholder */}
-            <div className={`relative aspect-[9/16] w-full rounded-xl bg-gradient-to-br ${creator.color} overflow-hidden`}>
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-foreground/10 backdrop-blur-sm">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card/90 shadow-lg">
-                  <Play size={18} className="text-foreground ml-0.5" />
-                </div>
-              </div>
-              {/* Gradient overlay at bottom */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-foreground/40 to-transparent" />
-              <div className="absolute bottom-3 left-3 right-3">
-                <p className="text-sm font-semibold text-primary-foreground drop-shadow-sm">{creator.name}</p>
-                <p className="text-xs text-primary-foreground/80">{creator.role}</p>
-              </div>
-            </div>
-
-            <div className="mt-3 flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin size={10} />
-              {creator.location}
-            </div>
-
-            <Button size="sm" variant="outline" className="mt-2 w-full text-xs h-8" asChild>
-              <Link to={`/creators/${creator.id}`}>View Profile</Link>
-            </Button>
-          </motion.div>
+          <CreatorVideoCard key={creator.id} creator={creator} index={i} />
         ))}
       </div>
     </section>
+  );
+};
+
+const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; index: number }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsHovering(true);
+    videoRef.current?.play();
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovering(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.06 }}
+      className="group flex-shrink-0 w-[220px]"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Video preview */}
+      <div className={`relative aspect-[9/16] w-full rounded-xl bg-gradient-to-br ${creator.color} overflow-hidden`}>
+        <video
+          ref={videoRef}
+          src={creator.videoUrl}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+
+        {/* Play icon overlay */}
+        <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${isHovering ? "opacity-0" : "opacity-100"} bg-foreground/5`}>
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card/80 shadow-lg backdrop-blur-sm">
+            <Play size={18} className="text-foreground ml-0.5" />
+          </div>
+        </div>
+
+        {/* Bottom gradient + info */}
+        <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-foreground/60 to-transparent" />
+        <div className="absolute bottom-3 left-3 right-3">
+          <p className="text-sm font-semibold text-primary-foreground drop-shadow-sm">{creator.name}</p>
+          <p className="text-xs text-primary-foreground/80">{creator.role}</p>
+          <div className="mt-1.5 flex items-center gap-1 text-[10px] text-primary-foreground/70">
+            <MapPin size={9} />
+            {creator.location}
+          </div>
+        </div>
+      </div>
+
+      {/* Niche tags */}
+      <div className="mt-3 flex flex-wrap gap-1">
+        {creator.tags.slice(0, 3).map((tag) => (
+          <span key={tag} className="rounded-full bg-accent px-2 py-0.5 text-[10px] text-accent-foreground">{tag}</span>
+        ))}
+      </div>
+
+      {/* Action buttons */}
+      <div className="mt-2 flex gap-1.5">
+        <Button size="sm" variant="outline" className="flex-1 text-xs h-8" asChild>
+          <Link to={`/creators/${creator.id}`}>View Profile</Link>
+        </Button>
+        <Button size="sm" variant="ghost" className="text-xs h-8 px-2" asChild>
+          <Link to="/post-opportunity"><Send size={12} /></Link>
+        </Button>
+      </div>
+    </motion.div>
   );
 };
 
