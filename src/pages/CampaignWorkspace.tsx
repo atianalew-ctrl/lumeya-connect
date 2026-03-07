@@ -153,26 +153,28 @@ const CampaignWorkspace = () => {
               {freshCampaign.payment.status === "awaiting" ? (
                 <p className="text-sm text-muted-foreground italic">Campaign must be funded before content can be submitted.</p>
               ) : (
-                <Input
-                  placeholder="File name (e.g. skincare-video-v1.mp4)"
-                  value={submitFile}
-                  onChange={(e) => setSubmitFile(e.target.value)}
-                />
-                <Textarea
-                  placeholder="Add a caption or notes for this submission..."
-                  rows={2}
-                  value={submitCaption}
-                  onChange={(e) => setSubmitCaption(e.target.value)}
-                />
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-xs">
-                    <Upload size={13} className="mr-1" /> Upload content
-                  </Button>
-                  <Button size="sm" className="text-xs" onClick={handleSubmitContent} disabled={!submitFile.trim()}>
-                    Submit for review
-                  </Button>
+                <div className="space-y-3">
+                  <Input
+                    placeholder="File name (e.g. skincare-video-v1.mp4)"
+                    value={submitFile}
+                    onChange={(e) => setSubmitFile(e.target.value)}
+                  />
+                  <Textarea
+                    placeholder="Add a caption or notes for this submission..."
+                    rows={2}
+                    value={submitCaption}
+                    onChange={(e) => setSubmitCaption(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="text-xs">
+                      <Upload size={13} className="mr-1" /> Upload content
+                    </Button>
+                    <Button size="sm" className="text-xs" onClick={handleSubmitContent} disabled={!submitFile.trim()}>
+                      Submit for review
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
 
             {/* Submissions list + Brand Review */}
