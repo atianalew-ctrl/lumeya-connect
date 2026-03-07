@@ -73,6 +73,11 @@ const CampaignWorkspace = () => {
     rerender();
   };
 
+  const handleFundCampaign = () => {
+    fundCampaign(id!);
+    rerender();
+  };
+
   // Re-fetch after mutations
   const freshCampaign = getCampaign(id!)!;
 
