@@ -150,7 +150,9 @@ const CampaignWorkspace = () => {
             {/* Content Submission */}
             <section className="rounded-xl border border-border bg-card p-6">
               <h2 className="text-base font-semibold mb-4">Submit Content</h2>
-              <div className="space-y-3">
+              {freshCampaign.payment.status === "awaiting" ? (
+                <p className="text-sm text-muted-foreground italic">Campaign must be funded before content can be submitted.</p>
+              ) : (
                 <Input
                   placeholder="File name (e.g. skincare-video-v1.mp4)"
                   value={submitFile}
@@ -192,9 +194,11 @@ const CampaignWorkspace = () => {
             )}
           </div>
 
-          {/* Right column: Chat */}
-          <div className="lg:col-span-1">
-            <section className="rounded-xl border border-border bg-card p-5 sticky top-20">
+          <div className="lg:col-span-1 space-y-6">
+            {/* Payment Card */}
+            <PaymentCard payment={freshCampaign.payment} onFund={handleFundCampaign} />
+
+            {/* Chat */}
               <h2 className="text-base font-semibold mb-4">Chat</h2>
               <div className="flex flex-col h-80">
                 <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
