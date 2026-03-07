@@ -43,9 +43,7 @@ const Creators = () => {
             className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
           >
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center text-xs font-semibold text-accent-foreground">
-                {creator.name.split(" ").map(n => n[0]).join("")}
-              </div>
+              <img src={creator.avatar} alt={creator.name} className="h-10 w-10 rounded-full bg-accent" />
               <div>
                 <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">{creator.name}</h3>
                 <p className="text-xs text-muted-foreground">{creator.role}</p>
