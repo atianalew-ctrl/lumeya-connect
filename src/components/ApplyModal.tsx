@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { DollarSign, Clock, CheckCircle } from "lucide-react";
+import { addApplication } from "@/lib/campaign-store";
 
 interface ApplyModalProps {
   open: boolean;
@@ -23,6 +24,19 @@ const ApplyModal = ({ open, onOpenChange, opportunity }: ApplyModalProps) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (opportunity) {
+      addApplication({
+        opportunityId: 0,
+        opportunityTitle: opportunity.title,
+        brand: opportunity.brand,
+        creatorId: 0,
+        creatorName: form.name,
+        creatorRole: "Creator",
+        creatorAvatar: `https://api.dicebear.com/9.x/avataaars/svg?seed=${form.name}`,
+        portfolioLink: form.portfolio,
+        message: form.message,
+      });
+    }
     setSubmitted(true);
   };
 

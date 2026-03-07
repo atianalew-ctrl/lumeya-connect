@@ -12,6 +12,8 @@ import Opportunities from "./pages/Opportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
 import PostOpportunity from "./pages/PostOpportunity";
 import Messages from "./pages/Messages";
+import BrandDashboard from "./pages/BrandDashboard";
+import CampaignWorkspace from "./pages/CampaignWorkspace";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,8 @@ const App = () => (
           <Route path="/opportunities/:id" element={<OpportunityDetail />} />
           <Route path="/post-opportunity" element={<PostOpportunity />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/dashboard" element={<BrandDashboard />} />
+          <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
