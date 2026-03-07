@@ -154,6 +154,11 @@ export function updateApplicationStatus(appId: string, status: "accepted" | "dec
 
 // Campaigns
 function createCampaignFromApplication(app: Application) {
+  const budget = 800; // Default budget, would come from opportunity in real app
+  const platformFeePercent = 20;
+  const platformFee = budget * (platformFeePercent / 100);
+  const creatorPayout = budget - platformFee;
+
   const campaign: Campaign = {
     id: `camp-${Date.now()}`,
     opportunityTitle: app.opportunityTitle,
@@ -174,10 +179,17 @@ function createCampaignFromApplication(app: Application) {
         id: `msg-${Date.now()}`,
         sender: "brand",
         senderName: app.brand,
-        text: `Welcome ${app.creatorName}! Excited to work with you on this project. Let's get started!`,
+        text: `Welcome ${app.creatorName}! Excited to work with you on this project. Please fund the campaign to get started!`,
         timestamp: new Date().toISOString(),
       },
     ],
+    payment: {
+      budget,
+      platformFeePercent,
+      platformFee,
+      creatorPayout,
+      status: "awaiting",
+    },
   };
   campaigns.push(campaign);
 }
