@@ -17,8 +17,8 @@ const CollaborationsSection = () => (
         viewport={{ once: true }}
         className="text-center"
       >
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">Proven results</p>
-        <h2 className="mt-3 text-3xl md:text-4xl">Successful Collaborations</h2>
+        <p className="text-sm uppercase tracking-widest text-muted-foreground">Community stories</p>
+        <h2 className="mt-3 text-3xl md:text-4xl">Recent Collaborations</h2>
       </motion.div>
 
       <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

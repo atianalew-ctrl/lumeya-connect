@@ -6,12 +6,16 @@ import OpportunitiesSection from "@/components/home/OpportunitiesSection";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import CollaborationsSection from "@/components/home/CollaborationsSection";
 import TrendingCreatorsSection from "@/components/home/TrendingCreatorsSection";
+import CreatorCommunitySection from "@/components/home/CreatorCommunitySection";
+import CreatorSpotlightSection from "@/components/home/CreatorSpotlightSection";
 import CTASection from "@/components/home/CTASection";
 
 const Index = () => (
   <div>
     <HeroSection />
+    <CreatorCommunitySection />
     <DiscoverCreatorsSection />
+    <CreatorSpotlightSection />
     <CategoriesSection />
     <SearchFilterSection />
     <OpportunitiesSection />
