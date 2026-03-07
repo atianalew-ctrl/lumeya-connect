@@ -11,8 +11,11 @@ import {
   addChatMessage,
   addSubmission,
   reviewSubmission,
+  fundCampaign,
   type ContentSubmission,
 } from "@/lib/campaign-store";
+import { PaymentCard } from "@/components/campaign/PaymentCard";
+import { PaymentStatusBadge } from "@/components/campaign/PaymentStatusBadge";
 import {
   Send,
   Upload,
