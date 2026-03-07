@@ -233,9 +233,21 @@ export function reviewSubmission(campaignId: string, subId: string, action: "app
       sub.status = action;
       sub.comment = comment;
     }
-    // Check if all approved → mark campaign complete
+    // Check if all approved → mark campaign complete & release payment
     if (campaign.submissions.length > 0 && campaign.submissions.every((s) => s.status === "approved")) {
       campaign.status = "completed";
+      if (campaign.payment.status === "secured") {
+        campaign.payment.status = "released";
+        campaign.payment.releasedAt = new Date().toISOString();
+      }
     }
+  }
+}
+
+export function fundCampaign(campaignId: string) {
+  const campaign = campaigns.find((c) => c.id === campaignId);
+  if (campaign && campaign.payment.status === "awaiting") {
+    campaign.payment.status = "secured";
+    campaign.payment.fundedAt = new Date().toISOString();
   }
 }
