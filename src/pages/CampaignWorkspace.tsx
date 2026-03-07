@@ -11,8 +11,11 @@ import {
   addChatMessage,
   addSubmission,
   reviewSubmission,
+  fundCampaign,
   type ContentSubmission,
 } from "@/lib/campaign-store";
+import { PaymentCard } from "@/components/campaign/PaymentCard";
+import { PaymentStatusBadge } from "@/components/campaign/PaymentStatusBadge";
 import {
   Send,
   Upload,
@@ -70,6 +73,11 @@ const CampaignWorkspace = () => {
     rerender();
   };
 
+  const handleFundCampaign = () => {
+    fundCampaign(id!);
+    rerender();
+  };
+
   // Re-fetch after mutations
   const freshCampaign = getCampaign(id!)!;
 
@@ -112,10 +120,11 @@ const CampaignWorkspace = () => {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <Badge variant={freshCampaign.status === "completed" ? "default" : "secondary"} className="text-xs capitalize">
               {freshCampaign.status}
             </Badge>
+            <PaymentStatusBadge status={freshCampaign.payment.status} />
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock size={12} /> {freshCampaign.deadline}
             </span>
@@ -141,27 +150,31 @@ const CampaignWorkspace = () => {
             {/* Content Submission */}
             <section className="rounded-xl border border-border bg-card p-6">
               <h2 className="text-base font-semibold mb-4">Submit Content</h2>
-              <div className="space-y-3">
-                <Input
-                  placeholder="File name (e.g. skincare-video-v1.mp4)"
-                  value={submitFile}
-                  onChange={(e) => setSubmitFile(e.target.value)}
-                />
-                <Textarea
-                  placeholder="Add a caption or notes for this submission..."
-                  rows={2}
-                  value={submitCaption}
-                  onChange={(e) => setSubmitCaption(e.target.value)}
-                />
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="text-xs">
-                    <Upload size={13} className="mr-1" /> Upload content
-                  </Button>
-                  <Button size="sm" className="text-xs" onClick={handleSubmitContent} disabled={!submitFile.trim()}>
-                    Submit for review
-                  </Button>
+              {freshCampaign.payment.status === "awaiting" ? (
+                <p className="text-sm text-muted-foreground italic">Campaign must be funded before content can be submitted.</p>
+              ) : (
+                <div className="space-y-3">
+                  <Input
+                    placeholder="File name (e.g. skincare-video-v1.mp4)"
+                    value={submitFile}
+                    onChange={(e) => setSubmitFile(e.target.value)}
+                  />
+                  <Textarea
+                    placeholder="Add a caption or notes for this submission..."
+                    rows={2}
+                    value={submitCaption}
+                    onChange={(e) => setSubmitCaption(e.target.value)}
+                  />
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="text-xs">
+                      <Upload size={13} className="mr-1" /> Upload content
+                    </Button>
+                    <Button size="sm" className="text-xs" onClick={handleSubmitContent} disabled={!submitFile.trim()}>
+                      Submit for review
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </section>
 
             {/* Submissions list + Brand Review */}
@@ -183,8 +196,11 @@ const CampaignWorkspace = () => {
             )}
           </div>
 
-          {/* Right column: Chat */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-1 space-y-6">
+            {/* Payment Card */}
+            <PaymentCard payment={freshCampaign.payment} onFund={handleFundCampaign} />
+
+            {/* Chat */}
             <section className="rounded-xl border border-border bg-card p-5 sticky top-20">
               <h2 className="text-base font-semibold mb-4">Chat</h2>
               <div className="flex flex-col h-80">

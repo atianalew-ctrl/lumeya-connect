@@ -33,6 +33,18 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export type PaymentStatus = "awaiting" | "secured" | "released";
+
+export interface PaymentInfo {
+  budget: number;
+  platformFeePercent: number;
+  platformFee: number;
+  creatorPayout: number;
+  status: PaymentStatus;
+  fundedAt?: string;
+  releasedAt?: string;
+}
+
 export interface Campaign {
   id: string;
   opportunityTitle: string;
@@ -44,6 +56,7 @@ export interface Campaign {
   status: "active" | "completed";
   submissions: ContentSubmission[];
   messages: ChatMessage[];
+  payment: PaymentInfo;
 }
 
 // In-memory state
@@ -141,6 +154,11 @@ export function updateApplicationStatus(appId: string, status: "accepted" | "dec
 
 // Campaigns
 function createCampaignFromApplication(app: Application) {
+  const budget = 800; // Default budget, would come from opportunity in real app
+  const platformFeePercent = 20;
+  const platformFee = budget * (platformFeePercent / 100);
+  const creatorPayout = budget - platformFee;
+
   const campaign: Campaign = {
     id: `camp-${Date.now()}`,
     opportunityTitle: app.opportunityTitle,
@@ -161,10 +179,17 @@ function createCampaignFromApplication(app: Application) {
         id: `msg-${Date.now()}`,
         sender: "brand",
         senderName: app.brand,
-        text: `Welcome ${app.creatorName}! Excited to work with you on this project. Let's get started!`,
+        text: `Welcome ${app.creatorName}! Excited to work with you on this project. Please fund the campaign to get started!`,
         timestamp: new Date().toISOString(),
       },
     ],
+    payment: {
+      budget,
+      platformFeePercent,
+      platformFee,
+      creatorPayout,
+      status: "awaiting",
+    },
   };
   campaigns.push(campaign);
 }
@@ -208,9 +233,21 @@ export function reviewSubmission(campaignId: string, subId: string, action: "app
       sub.status = action;
       sub.comment = comment;
     }
-    // Check if all approved → mark campaign complete
+    // Check if all approved → mark campaign complete & release payment
     if (campaign.submissions.length > 0 && campaign.submissions.every((s) => s.status === "approved")) {
       campaign.status = "completed";
+      if (campaign.payment.status === "secured") {
+        campaign.payment.status = "released";
+        campaign.payment.releasedAt = new Date().toISOString();
+      }
     }
+  }
+}
+
+export function fundCampaign(campaignId: string) {
+  const campaign = campaigns.find((c) => c.id === campaignId);
+  if (campaign && campaign.payment.status === "awaiting") {
+    campaign.payment.status = "secured";
+    campaign.payment.fundedAt = new Date().toISOString();
   }
 }
