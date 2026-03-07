@@ -13,8 +13,13 @@ const fadeUp = {
 };
 
 const HeroSection = () => (
-  <section className="relative py-32 md:py-44">
-    <div className="container flex flex-col items-center text-center">
+  <section className="relative py-32 md:py-44 overflow-hidden">
+    <div
+      className="absolute inset-0 bg-cover bg-center opacity-30"
+      style={{ backgroundImage: `url(${heroBg})` }}
+    />
+    <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
+    <div className="container relative z-10 flex flex-col items-center text-center">
       <motion.div
         initial="hidden"
         animate="visible"
