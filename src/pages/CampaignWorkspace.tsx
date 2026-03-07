@@ -201,6 +201,7 @@ const CampaignWorkspace = () => {
             <PaymentCard payment={freshCampaign.payment} onFund={handleFundCampaign} />
 
             {/* Chat */}
+            <section className="rounded-xl border border-border bg-card p-5 sticky top-20">
               <h2 className="text-base font-semibold mb-4">Chat</h2>
               <div className="flex flex-col h-80">
                 <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-1">
