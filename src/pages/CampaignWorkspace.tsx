@@ -120,10 +120,11 @@ const CampaignWorkspace = () => {
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <Badge variant={freshCampaign.status === "completed" ? "default" : "secondary"} className="text-xs capitalize">
               {freshCampaign.status}
             </Badge>
+            <PaymentStatusBadge status={freshCampaign.payment.status} />
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock size={12} /> {freshCampaign.deadline}
             </span>
