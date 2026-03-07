@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { CheckCircle, XCircle, MessageSquare, ExternalLink, Briefcase, Clock } from "lucide-react";
+import { PaymentStatusBadge } from "@/components/campaign/PaymentStatusBadge";
 import { opportunities } from "@/lib/data";
 import {
   getApplicationsByOpportunity,
@@ -61,6 +62,7 @@ const BrandDashboard = () => {
                     <Badge variant={c.status === "completed" ? "default" : "secondary"} className="text-xs">
                       {c.status === "completed" ? "Completed" : "Active"}
                     </Badge>
+                    <PaymentStatusBadge status={c.payment.status} />
                     <span className="flex items-center gap-1">
                       <Clock size={11} /> {c.deadline}
                     </span>
