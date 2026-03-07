@@ -33,6 +33,18 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export type PaymentStatus = "awaiting" | "secured" | "released";
+
+export interface PaymentInfo {
+  budget: number;
+  platformFeePercent: number;
+  platformFee: number;
+  creatorPayout: number;
+  status: PaymentStatus;
+  fundedAt?: string;
+  releasedAt?: string;
+}
+
 export interface Campaign {
   id: string;
   opportunityTitle: string;
@@ -44,6 +56,7 @@ export interface Campaign {
   status: "active" | "completed";
   submissions: ContentSubmission[];
   messages: ChatMessage[];
+  payment: PaymentInfo;
 }
 
 // In-memory state
