@@ -86,12 +86,15 @@ const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; ind
 
         {/* Bottom gradient + info */}
         <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-foreground/60 to-transparent" />
-        <div className="absolute bottom-3 left-3 right-3">
-          <p className="text-sm font-semibold text-primary-foreground drop-shadow-sm">{creator.name}</p>
-          <p className="text-xs text-primary-foreground/80">{creator.role}</p>
-          <div className="mt-1.5 flex items-center gap-1 text-[10px] text-primary-foreground/70">
-            <MapPin size={9} />
-            {creator.location}
+        <div className="absolute bottom-3 left-3 right-3 flex items-center gap-2">
+          <img src={creator.avatar} alt={creator.name} className="h-8 w-8 rounded-full border-2 border-primary-foreground/40 bg-accent flex-shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-primary-foreground drop-shadow-sm">{creator.name}</p>
+            <p className="text-xs text-primary-foreground/80">{creator.role}</p>
+            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-primary-foreground/70">
+              <MapPin size={9} />
+              {creator.location}
+            </div>
           </div>
         </div>
       </div>

@@ -3,13 +3,15 @@ import { TrendingUp, Star, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
+import { creators } from "@/lib/data";
+
 const trending = [
-  { id: 1, name: "Anna Johnson", role: "UGC Creator", location: "London, UK", rating: 4.9, projects: 24, growth: "+18%" },
-  { id: 3, name: "Priya Sharma", role: "Graphic Designer", location: "Toronto, CA", rating: 4.9, projects: 56, growth: "+25%" },
-  { id: 4, name: "Aisha Koroma", role: "Social Media Manager", location: "London, UK", rating: 5.0, projects: 15, growth: "+32%" },
-  { id: 8, name: "Daniel Osei", role: "Motion Designer", location: "Berlin, DE", rating: 4.9, projects: 28, growth: "+21%" },
-  { id: 2, name: "Leo Martinez", role: "Videographer", location: "Miami, FL", rating: 4.7, projects: 32, growth: "+15%" },
-  { id: 7, name: "Sakura Tanaka", role: "Influencer", location: "Tokyo, JP", rating: 4.8, projects: 40, growth: "+28%" },
+  { ...creators[0], growth: "+18%" },
+  { ...creators[4], growth: "+25%" },
+  { ...creators[2], growth: "+32%" },
+  { ...creators[7], growth: "+21%" },
+  { ...creators[3], growth: "+15%" },
+  { ...creators[6], growth: "+28%" },
 ];
 
 const TrendingCreatorsSection = () => (
@@ -37,9 +39,7 @@ const TrendingCreatorsSection = () => (
             transition={{ delay: i * 0.06 }}
             className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/30"
           >
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-accent-foreground">
-              {creator.name.split(" ").map(n => n[0]).join("")}
-            </div>
+            <img src={creator.avatar} alt={creator.name} className="h-12 w-12 flex-shrink-0 rounded-full bg-accent" />
             <div className="flex-1 min-w-0">
               <h3 className="text-sm font-semibold group-hover:text-primary transition-colors truncate">
                 {creator.name}

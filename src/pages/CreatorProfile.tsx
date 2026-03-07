@@ -30,9 +30,7 @@ const CreatorProfile = () => {
         {/* Sidebar */}
         <div className="w-full rounded-lg border border-border bg-card p-8 lg:max-w-xs space-y-6">
           <div>
-            <div className={`mx-auto h-24 w-24 rounded-full bg-gradient-to-br ${creator.color} flex items-center justify-center text-2xl font-semibold text-foreground/70`}>
-              {creator.name.split(" ").map(n => n[0]).join("")}
-            </div>
+            <img src={creator.avatar} alt={creator.name} className="mx-auto h-24 w-24 rounded-full bg-accent" />
             <h1 className="mt-5 text-center text-2xl font-display">{creator.name}</h1>
             <p className="mt-1 text-center text-sm text-muted-foreground">{creator.role}</p>
           </div>
