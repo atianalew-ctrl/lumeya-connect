@@ -11,12 +11,12 @@ const CTASection = () => (
         viewport={{ once: true }}
         className="mx-auto max-w-lg"
       >
-        <h2 className="text-3xl md:text-4xl">Ready to start collaborating?</h2>
+        <h2 className="text-3xl md:text-4xl">Be part of the community</h2>
         <p className="mt-4 text-muted-foreground">
-          Join creators and brands already connecting on Lumeya.
+          Join Lumeya and become part of a global creator community where brands discover new talent and creators find real opportunities.
         </p>
         <Button size="lg" className="mt-8">
-          Get Started Free <ArrowRight size={16} className="ml-2" />
+          Join the Community <ArrowRight size={16} className="ml-2" />
         </Button>
       </motion.div>
     </div>

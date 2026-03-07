@@ -22,7 +22,7 @@ const HeroSection = () => (
         className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-xs font-medium text-muted-foreground"
       >
         <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-        Platform for creators & brands
+        The creator community & collaboration network
       </motion.div>
 
       <motion.h1
@@ -32,8 +32,8 @@ const HeroSection = () => (
         custom={1}
         className="mt-8 max-w-3xl text-4xl font-normal leading-tight md:text-6xl"
       >
-        Connect with creators{" "}
-        <span className="italic">and opportunities.</span>
+        Where creators and brands{" "}
+        <span className="italic">build together.</span>
       </motion.h1>
 
       <motion.p
@@ -43,7 +43,7 @@ const HeroSection = () => (
         custom={2}
         className="mt-6 max-w-lg text-lg text-muted-foreground leading-relaxed"
       >
-        Lumeya helps brands discover talented creators and collaborate on content, campaigns, and social media projects.
+        Join a growing community of creators and brands collaborating on content, campaigns, and creative projects — together.
       </motion.p>
 
       <motion.div
@@ -55,7 +55,7 @@ const HeroSection = () => (
       >
         <Button size="lg" asChild>
           <Link to="/creators">
-            Explore Creators <ArrowRight size={16} className="ml-2" />
+            Join the Community <ArrowRight size={16} className="ml-2" />
           </Link>
         </Button>
         <Button size="lg" variant="outline" asChild>
@@ -81,7 +81,7 @@ const HeroSection = () => (
         </span>
         <span className="h-4 w-px bg-border" />
         <span className="flex items-center gap-1.5">
-          <span className="font-semibold text-foreground">1,200+</span> Collabs
+          <span className="font-semibold text-foreground">1,200+</span> Collaborations
         </span>
       </motion.div>
     </div>

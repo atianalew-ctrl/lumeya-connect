@@ -5,20 +5,20 @@ const steps = [
   {
     icon: Users,
     step: "01",
-    title: "Create your profile",
-    desc: "Showcase your skills, portfolio, and experience so brands can discover you.",
+    title: "Join the community",
+    desc: "Create your profile, showcase your portfolio, and become part of the Lumeya creator network.",
   },
   {
     icon: Briefcase,
     step: "02",
-    title: "Browse opportunities",
-    desc: "Find collaborations that match your niche — UGC, photography, social media, and more.",
+    title: "Discover collaborations",
+    desc: "Browse campaigns and opportunities that match your creative niche and skills.",
   },
   {
     icon: MessageCircle,
     step: "03",
-    title: "Connect and collaborate",
-    desc: "Message brands directly, agree on terms, and start creating.",
+    title: "Collaborate and create",
+    desc: "Connect with brands, work together on projects, and grow as part of the community.",
   },
 ];
 
