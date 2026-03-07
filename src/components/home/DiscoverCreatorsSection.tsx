@@ -91,11 +91,10 @@ const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; ind
           <div>
             <p className="text-sm font-semibold text-primary-foreground drop-shadow-sm">{creator.name}</p>
             <p className="text-xs text-primary-foreground/80">{creator.role}</p>
-          </div>
-          <div className="mt-1.5 flex items-center gap-1 text-[10px] text-primary-foreground/70">
-            <MapPin size={9} />
-            {creator.location}
-          </div>
+            <div className="mt-0.5 flex items-center gap-1 text-[10px] text-primary-foreground/70">
+              <MapPin size={9} />
+              {creator.location}
+            </div>
           </div>
         </div>
       </div>
