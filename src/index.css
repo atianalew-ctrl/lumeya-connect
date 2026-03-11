@@ -51,6 +51,10 @@
     --warm-gray: 35 5% 91%;
     --sand: 38 18% 94%;
     --linen: 38 22% 96%;
+    --terracotta: 16 62% 58%;
+    --terracotta-light: 16 50% 92%;
+    --clay: 24 30% 72%;
+    --olive: 80 12% 52%;
   }
 
   .dark {
@@ -101,4 +105,17 @@
   .text-balance {
     text-wrap: balance;
   }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

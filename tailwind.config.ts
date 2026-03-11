@@ -59,6 +59,12 @@ export default {
         "warm-gray": "hsl(var(--warm-gray))",
         sand: "hsl(var(--sand))",
         linen: "hsl(var(--linen))",
+        terracotta: {
+          DEFAULT: "hsl(var(--terracotta))",
+          light: "hsl(var(--terracotta-light))",
+        },
+        clay: "hsl(var(--clay))",
+        olive: "hsl(var(--olive))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
