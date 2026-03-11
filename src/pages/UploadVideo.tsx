@@ -76,8 +76,8 @@ const UploadVideo = () => {
       setDone(true);
       toast.success("Video uploaded successfully!");
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Upload failed");
+      console.error("Upload error details:", err);
+      toast.error(err.message || "Upload failed — try a smaller file or check your connection.");
     } finally {
       setUploading(false);
     }
