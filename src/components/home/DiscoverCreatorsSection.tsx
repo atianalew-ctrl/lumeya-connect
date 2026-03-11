@@ -115,7 +115,7 @@ const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeo
         {isVisible && (
           <video
             ref={videoRef}
-            src={creator.videoUrl}
+            src={uploadedVideoUrl || creator.videoUrl}
             muted
             loop
             playsInline
