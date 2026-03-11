@@ -153,7 +153,7 @@ const UploadVideo = () => {
               ) : (
                 <>
                   <Upload size={28} className="text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Click to select a video (max 50MB)</p>
+                   <p className="text-sm text-muted-foreground">Click to select a video (max 20MB)</p>
                   <p className="text-xs text-muted-foreground">MP4, MOV, WEBM</p>
                 </>
               )}
