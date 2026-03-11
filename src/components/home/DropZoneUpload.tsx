@@ -155,7 +155,7 @@ const DropZoneUpload = () => {
               <p className="text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">Drop a video here</span> or click to browse
               </p>
-              <p className="text-xs text-muted-foreground">MP4, MOV, WEBM · Max 20MB</p>
+              <p className="text-xs text-muted-foreground">MP4, MOV, WEBM · Max 50MB</p>
             </motion.div>
           ) : (
             <motion.div
