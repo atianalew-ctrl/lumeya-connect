@@ -8,6 +8,15 @@ import { useAllCreatorVideos } from "@/hooks/use-creator-videos";
 
 const DiscoverCreatorsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { data: uploadedVideos } = useAllCreatorVideos();
+
+  // Build a map of creatorId -> featured video URL from DB
+  const videoMap = new Map<number, string>();
+  uploadedVideos?.forEach((v) => {
+    if (!videoMap.has(v.creator_id)) {
+      videoMap.set(v.creator_id, v.video_url);
+    }
+  });
 
   return (
     <section className="border-t border-border py-24">
@@ -20,9 +29,14 @@ const DiscoverCreatorsSection = () => {
               Browse real content from creators ready to collaborate with brands.
             </p>
           </div>
-          <Button variant="outline" asChild>
-            <Link to="/creators">View all creators</Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/upload-video">Upload Video</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/creators">View all creators</Link>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -32,7 +46,12 @@ const DiscoverCreatorsSection = () => {
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {creators.map((creator, i) => (
-          <CreatorVideoCard key={creator.id} creator={creator} index={i} />
+          <CreatorVideoCard
+            key={creator.id}
+            creator={creator}
+            index={i}
+            uploadedVideoUrl={videoMap.get(creator.id)}
+          />
         ))}
       </div>
     </section>
