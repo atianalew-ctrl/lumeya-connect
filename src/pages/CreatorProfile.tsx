@@ -9,6 +9,7 @@ import { useRef, useState } from "react";
 const CreatorProfile = () => {
   const { id } = useParams();
   const creator = creators.find((c) => c.id === Number(id));
+  const { data: uploadedVideos } = useCreatorVideos(Number(id));
 
   if (!creator) {
     return (
