@@ -49,9 +49,20 @@ const DropZoneUpload = () => {
       const ext = file.name.split(".").pop();
       const fileName = `${creatorId}/${Date.now()}.${ext}`;
 
+      // Create an AbortController with a 60s timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
       const { error: uploadError } = await supabase.storage
         .from("creator-videos")
-        .upload(fileName, file, { contentType: file.type, upsert: false });
+        .upload(fileName, file, {
+          contentType: file.type,
+          upsert: false,
+          // @ts-ignore - signal is supported but not in types
+          signal: controller.signal,
+        });
+
+      clearTimeout(timeoutId);
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage
