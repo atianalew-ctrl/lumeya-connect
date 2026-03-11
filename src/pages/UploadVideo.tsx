@@ -24,8 +24,8 @@ const UploadVideo = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (selected) {
-      if (selected.size > 50 * 1024 * 1024) {
-        toast.error("File too large. Max 50MB.");
+      if (selected.size > 20 * 1024 * 1024) {
+        toast.error("File too large. Max 20MB.");
         return;
       }
       if (!selected.type.startsWith("video/")) {
@@ -76,8 +76,8 @@ const UploadVideo = () => {
       setDone(true);
       toast.success("Video uploaded successfully!");
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Upload failed");
+      console.error("Upload error details:", err);
+      toast.error(err.message || "Upload failed — try a smaller file or check your connection.");
     } finally {
       setUploading(false);
     }
@@ -153,7 +153,7 @@ const UploadVideo = () => {
               ) : (
                 <>
                   <Upload size={28} className="text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Click to select a video (max 50MB)</p>
+                   <p className="text-sm text-muted-foreground">Click to select a video (max 20MB)</p>
                   <p className="text-xs text-muted-foreground">MP4, MOV, WEBM</p>
                 </>
               )}
