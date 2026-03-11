@@ -15,6 +15,7 @@ import Messages from "./pages/Messages";
 import BrandDashboard from "./pages/BrandDashboard";
 import CampaignWorkspace from "./pages/CampaignWorkspace";
 import Community from "./pages/Community";
+import UploadVideo from "./pages/UploadVideo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/community" element={<Community />} />
           <Route path="/dashboard" element={<BrandDashboard />} />
           <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
+          <Route path="/upload-video" element={<UploadVideo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
