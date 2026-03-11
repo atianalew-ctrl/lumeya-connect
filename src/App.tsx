@@ -38,6 +38,7 @@ const App = () => (
           <Route path="/community" element={<Community />} />
           <Route path="/dashboard" element={<BrandDashboard />} />
           <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
+          <Route path="/upload-video" element={<UploadVideo />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
