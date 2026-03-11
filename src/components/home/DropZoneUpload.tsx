@@ -20,8 +20,8 @@ const DropZoneUpload = () => {
   const [done, setDone] = useState(false);
 
   const handleFile = useCallback((f: File) => {
-    if (f.size > 20 * 1024 * 1024) {
-      toast.error("Max 20MB. Try a shorter clip.");
+    if (f.size > 50 * 1024 * 1024) {
+      toast.error("Max 50MB. Try a shorter clip or compress it first.");
       return;
     }
     if (!f.type.startsWith("video/")) {
