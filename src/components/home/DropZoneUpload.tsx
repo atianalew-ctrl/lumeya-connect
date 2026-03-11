@@ -20,8 +20,8 @@ const DropZoneUpload = () => {
   const [done, setDone] = useState(false);
 
   const handleFile = useCallback((f: File) => {
-    if (f.size > 20 * 1024 * 1024) {
-      toast.error("Max 20MB. Try a shorter clip.");
+    if (f.size > 50 * 1024 * 1024) {
+      toast.error("Max 50MB. Try a shorter clip or compress it first.");
       return;
     }
     if (!f.type.startsWith("video/")) {
@@ -49,9 +49,20 @@ const DropZoneUpload = () => {
       const ext = file.name.split(".").pop();
       const fileName = `${creatorId}/${Date.now()}.${ext}`;
 
+      // Create an AbortController with a 60s timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+
       const { error: uploadError } = await supabase.storage
         .from("creator-videos")
-        .upload(fileName, file, { contentType: file.type, upsert: false });
+        .upload(fileName, file, {
+          contentType: file.type,
+          upsert: false,
+          // @ts-ignore - signal is supported but not in types
+          signal: controller.signal,
+        });
+
+      clearTimeout(timeoutId);
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage
@@ -74,7 +85,11 @@ const DropZoneUpload = () => {
       queryClient.invalidateQueries({ queryKey: ["creator-videos"] });
     } catch (err: any) {
       console.error("Upload error:", err);
-      toast.error(err.message || "Upload failed — try a smaller file.");
+      if (err?.name === "AbortError" || err?.message?.includes("abort")) {
+        toast.error("Upload timed out — try a smaller file (under 20MB works best).");
+      } else {
+        toast.error(err.message || "Upload failed — try a smaller file.");
+      }
     } finally {
       setUploading(false);
     }
@@ -140,7 +155,7 @@ const DropZoneUpload = () => {
               <p className="text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">Drop a video here</span> or click to browse
               </p>
-              <p className="text-xs text-muted-foreground">MP4, MOV, WEBM · Max 20MB</p>
+              <p className="text-xs text-muted-foreground">MP4, MOV, WEBM · Max 50MB</p>
             </motion.div>
           ) : (
             <motion.div
