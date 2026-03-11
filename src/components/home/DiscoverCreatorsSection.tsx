@@ -66,8 +66,9 @@ const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeo
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
   const previewTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const videoSrc = uploadedVideoUrl || creator.videoUrl;
 
   // Lazy load: only load video src when card enters viewport
   useEffect(() => {
@@ -83,10 +84,9 @@ const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeo
 
   const handleMouseEnter = () => {
     setIsHovering(true);
-    if (videoRef.current && videoLoaded) {
+    if (videoRef.current) {
       videoRef.current.currentTime = 0;
-      videoRef.current.play();
-      // Cap preview to 5 seconds
+      videoRef.current.play().catch(() => {}); // play() returns a promise; ignore autoplay errors
       previewTimeout.current = setTimeout(() => {
         if (videoRef.current) { videoRef.current.pause(); }
       }, 5000);
