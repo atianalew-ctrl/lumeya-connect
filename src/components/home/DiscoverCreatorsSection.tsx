@@ -55,6 +55,8 @@ const DiscoverCreatorsSection = () => {
           />
         ))}
       </div>
+
+      <DropZoneUpload />
     </section>
   );
 };
