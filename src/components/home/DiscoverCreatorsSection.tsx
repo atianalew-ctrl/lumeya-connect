@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { creators } from "@/lib/data";
 import { useAllCreatorVideos } from "@/hooks/use-creator-videos";
+import DropZoneUpload from "./DropZoneUpload";
 
 const DiscoverCreatorsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
