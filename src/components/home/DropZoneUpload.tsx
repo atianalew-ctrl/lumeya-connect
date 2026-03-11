@@ -85,7 +85,11 @@ const DropZoneUpload = () => {
       queryClient.invalidateQueries({ queryKey: ["creator-videos"] });
     } catch (err: any) {
       console.error("Upload error:", err);
-      toast.error(err.message || "Upload failed — try a smaller file.");
+      if (err?.name === "AbortError" || err?.message?.includes("abort")) {
+        toast.error("Upload timed out — try a smaller file (under 20MB works best).");
+      } else {
+        toast.error(err.message || "Upload failed — try a smaller file.");
+      }
     } finally {
       setUploading(false);
     }
