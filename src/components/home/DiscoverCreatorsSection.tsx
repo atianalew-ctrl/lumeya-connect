@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { MapPin, Play, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { creators } from "@/lib/data";
 
 const DiscoverCreatorsSection = () => {
@@ -40,15 +40,39 @@ const DiscoverCreatorsSection = () => {
 
 const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; index: number }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+  const previewTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  // Lazy load: only load video src when card enters viewport
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
-    videoRef.current?.play();
+    if (videoRef.current && videoLoaded) {
+      videoRef.current.currentTime = 0;
+      videoRef.current.play();
+      // Cap preview to 5 seconds
+      previewTimeout.current = setTimeout(() => {
+        if (videoRef.current) { videoRef.current.pause(); }
+      }, 5000);
+    }
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
+    clearTimeout(previewTimeout.current);
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -57,6 +81,7 @@ const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; ind
 
   return (
     <motion.div
+      ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -67,15 +92,18 @@ const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; ind
     >
       {/* Video preview */}
       <div className={`relative aspect-[9/16] w-full rounded-xl bg-gradient-to-br ${creator.color} overflow-hidden`}>
-        <video
-          ref={videoRef}
-          src={creator.videoUrl}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        {isVisible && (
+          <video
+            ref={videoRef}
+            src={creator.videoUrl}
+            muted
+            loop
+            playsInline
+            preload="none"
+            onCanPlayThrough={() => setVideoLoaded(true)}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
 
         {/* Play icon overlay */}
         <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${isHovering ? "opacity-0" : "opacity-100"} bg-foreground/5`}>

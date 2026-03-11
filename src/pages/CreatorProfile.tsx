@@ -169,7 +169,7 @@ const VideoPlayer = ({ src }: { src: string }) => {
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         className="absolute inset-0 h-full w-full object-cover"
       />
       {!playing && (
