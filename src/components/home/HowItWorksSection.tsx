@@ -23,7 +23,7 @@ const steps = [
 ];
 
 const HowItWorksSection = () => (
-  <section className="border-t border-border py-24">
+  <section className="py-28">
     <div className="container">
       <motion.div
         initial={{ opacity: 0 }}
@@ -31,27 +31,27 @@ const HowItWorksSection = () => (
         viewport={{ once: true }}
         className="text-center"
       >
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">Simple process</p>
-        <h2 className="mt-3 text-3xl md:text-4xl">How Lumeya Works</h2>
+        <p className="text-[11px] uppercase tracking-scandi text-muted-foreground">Simple process</p>
+        <h2 className="mt-4 text-3xl md:text-4xl">How Lumeya works</h2>
       </motion.div>
 
-      <div className="mt-16 grid gap-12 md:grid-cols-3">
+      <div className="mt-18 grid gap-16 md:grid-cols-3 mt-16">
         {steps.map((step, i) => (
           <motion.div
             key={step.title}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.12 }}
             className="text-center"
           >
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-accent">
-              <step.icon size={22} className="text-accent-foreground" />
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/[0.06]">
+              <step.icon size={20} className="text-primary" />
             </div>
-            <span className="mt-5 inline-block text-xs font-medium uppercase tracking-widest text-primary">
+            <span className="mt-6 inline-block text-[10px] font-medium uppercase tracking-scandi text-primary">
               Step {step.step}
             </span>
-            <h3 className="mt-2 text-lg font-body font-semibold">{step.title}</h3>
+            <h3 className="mt-2 text-base font-body font-medium">{step.title}</h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{step.desc}</p>
           </motion.div>
         ))}
