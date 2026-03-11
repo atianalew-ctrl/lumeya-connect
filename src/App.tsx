@@ -34,6 +34,7 @@ const App = () => (
           <Route path="/opportunities/:id" element={<OpportunityDetail />} />
           <Route path="/post-opportunity" element={<PostOpportunity />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/community" element={<Community />} />
           <Route path="/dashboard" element={<BrandDashboard />} />
           <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
           <Route path="*" element={<NotFound />} />
