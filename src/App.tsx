@@ -14,6 +14,7 @@ import PostOpportunity from "./pages/PostOpportunity";
 import Messages from "./pages/Messages";
 import BrandDashboard from "./pages/BrandDashboard";
 import CampaignWorkspace from "./pages/CampaignWorkspace";
+import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
