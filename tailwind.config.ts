@@ -58,6 +58,7 @@ export default {
         "signature-light": "hsl(var(--signature-light))",
         "warm-gray": "hsl(var(--warm-gray))",
         sand: "hsl(var(--sand))",
+        linen: "hsl(var(--linen))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
