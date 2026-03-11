@@ -58,7 +58,7 @@ const DiscoverCreatorsSection = () => {
   );
 };
 
-const CreatorVideoCard = ({ creator, index }: { creator: typeof creators[0]; index: number }) => {
+const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeof creators[0]; index: number; uploadedVideoUrl?: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
