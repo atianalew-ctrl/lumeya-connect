@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { MapPin, Play, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { creators } from "@/lib/data";
 
 const DiscoverCreatorsSection = () => {
