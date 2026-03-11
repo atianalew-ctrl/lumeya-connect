@@ -1,5 +1,4 @@
 import HeroSection from "@/components/home/HeroSection";
-import MarqueeStrip from "@/components/home/MarqueeStrip";
 import DiscoverCreatorsSection from "@/components/home/DiscoverCreatorsSection";
 import CategoriesSection from "@/components/home/CategoriesSection";
 import SearchFilterSection from "@/components/home/SearchFilterSection";
@@ -14,7 +13,6 @@ import CTASection from "@/components/home/CTASection";
 const Index = () => (
   <div>
     <HeroSection />
-    <MarqueeStrip />
     <CreatorCommunitySection />
     <DiscoverCreatorsSection />
     <CreatorSpotlightSection />
@@ -22,7 +20,6 @@ const Index = () => (
     <SearchFilterSection />
     <OpportunitiesSection />
     <HowItWorksSection />
-    <MarqueeStrip variant="muted" />
     <CollaborationsSection />
     <TrendingCreatorsSection />
     <CTASection />
