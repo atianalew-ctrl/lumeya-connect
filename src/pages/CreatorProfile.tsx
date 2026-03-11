@@ -35,9 +35,29 @@ const CreatorProfile = () => {
             <p className="mt-1 text-center text-sm text-muted-foreground">{creator.role}</p>
           </div>
 
-          <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-            <span className="flex items-center gap-1"><MapPin size={12} />{creator.location}</span>
-            <span className="flex items-center gap-1"><Star size={12} className="text-primary" />{creator.rating}</span>
+          <div className="flex flex-col items-center gap-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1"><MapPin size={12} />{creator.location}</span>
+              <span className="flex items-center gap-1"><Star size={12} className="text-primary" />{creator.rating}</span>
+            </div>
+            <div className="flex items-center gap-3 text-xs">
+              <span className="flex items-center gap-1"><Globe size={11} />{creator.region}</span>
+              {creator.availableForRemote && (
+                <span className="flex items-center gap-1 text-primary"><Wifi size={11} />Remote OK</span>
+              )}
+            </div>
+          </div>
+
+          {/* Languages */}
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+              <Languages size={11} /> Languages
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {creator.languages.map((lang) => (
+                <span key={lang} className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground">{lang}</span>
+              ))}
+            </div>
           </div>
 
           {/* Bio */}
