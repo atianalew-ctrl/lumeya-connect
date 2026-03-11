@@ -116,13 +116,29 @@ const CreatorProfile = () => {
           </div>
         </div>
 
-        {/* Main content */}
         <div className="flex-1 space-y-6">
-          {/* Featured Video */}
+          {/* Featured Video - prefer uploaded, fallback to hardcoded */}
           <div className="rounded-lg border border-border bg-card p-6">
             <h2 className="text-lg font-display mb-4">Featured Video</h2>
-            <VideoPlayer src={creator.videoUrl} />
+            <VideoPlayer src={
+              uploadedVideos?.find(v => v.is_featured)?.video_url || creator.videoUrl
+            } />
           </div>
+
+          {/* Additional uploaded videos */}
+          {uploadedVideos && uploadedVideos.filter(v => !v.is_featured).length > 0 && (
+            <div className="rounded-lg border border-border bg-card p-6">
+              <h2 className="text-lg font-display mb-4">More Videos</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {uploadedVideos.filter(v => !v.is_featured).map((video) => (
+                  <div key={video.id}>
+                    <VideoPlayer src={video.video_url} />
+                    {video.title && <p className="mt-2 text-sm text-muted-foreground">{video.title}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Portfolio Grid */}
           <div className="rounded-lg border border-border bg-card p-8">
