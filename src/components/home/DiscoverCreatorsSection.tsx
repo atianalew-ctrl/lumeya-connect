@@ -118,12 +118,11 @@ const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeo
         {isVisible && (
           <video
             ref={videoRef}
-            src={uploadedVideoUrl || creator.videoUrl}
+            src={videoSrc}
             muted
             loop
             playsInline
-            preload="none"
-            onCanPlayThrough={() => setVideoLoaded(true)}
+            preload="metadata"
             className="absolute inset-0 h-full w-full object-cover"
           />
         )}
