@@ -18,20 +18,20 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
-      <div className="container flex h-16 items-center justify-between">
+    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="container flex h-[4.25rem] items-center justify-between">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="Lumeya" className="h-8 w-8 rounded-full object-cover" />
-          <span className="font-display text-xl text-foreground">Lumeya</span>
+          <img src={logo} alt="Lumeya" className="h-7 w-7 rounded-full object-cover" />
+          <span className="font-display text-lg text-foreground tracking-tight">Lumeya</span>
         </Link>
 
         {/* Desktop */}
-        <div className="hidden items-center gap-1 md:flex">
+        <div className="hidden items-center gap-0.5 md:flex">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className={`px-4 py-2 text-sm font-medium transition-colors ${
+              className={`px-3.5 py-2 text-[13px] font-medium tracking-wide transition-colors rounded-lg ${
                 location.pathname === link.to
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
@@ -42,33 +42,33 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
-          <Button variant="ghost" size="sm">Log in</Button>
-          <Button size="sm">Get Started</Button>
+        <div className="hidden items-center gap-2.5 md:flex">
+          <Button variant="ghost" size="sm" className="text-[13px] rounded-full px-5">Log in</Button>
+          <Button size="sm" className="text-[13px] rounded-full px-5">Get Started</Button>
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+        <button className="md:hidden p-1" onClick={() => setMobileOpen(!mobileOpen)}>
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t border-border bg-background px-4 pb-4 md:hidden">
+        <div className="border-t border-border/50 bg-background px-4 pb-5 md:hidden">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
               onClick={() => setMobileOpen(false)}
-              className="block px-4 py-3 text-sm font-medium text-muted-foreground hover:text-foreground"
+              className="block px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
             </Link>
           ))}
-          <div className="mt-3 flex gap-2">
-            <Button variant="ghost" size="sm" className="flex-1">Log in</Button>
-            <Button size="sm" className="flex-1">Get Started</Button>
+          <div className="mt-4 flex gap-2">
+            <Button variant="ghost" size="sm" className="flex-1 rounded-full">Log in</Button>
+            <Button size="sm" className="flex-1 rounded-full">Get Started</Button>
           </div>
         </div>
       )}

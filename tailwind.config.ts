@@ -14,8 +14,11 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["DM Serif Display", "serif"],
-        body: ["DM Sans", "sans-serif"],
+        display: ["DM Serif Display", "Georgia", "serif"],
+        body: ["DM Sans", "system-ui", "sans-serif"],
+      },
+      letterSpacing: {
+        "scandi": "0.08em",
       },
       colors: {
         border: "hsl(var(--border))",
@@ -55,6 +58,7 @@ export default {
         "signature-light": "hsl(var(--signature-light))",
         "warm-gray": "hsl(var(--warm-gray))",
         sand: "hsl(var(--sand))",
+        linen: "hsl(var(--linen))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
