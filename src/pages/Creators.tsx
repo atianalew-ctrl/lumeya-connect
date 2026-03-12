@@ -8,7 +8,7 @@ import { creators, type Region } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
 const categories = ["UGC", "Photography", "Videography", "Social Media", "Design", "Writing", "Influencer", "Motion Design"];
-const regions: Region[] = ["Scandinavia", "Europe", "Southeast Asia", "Asia Pacific"];
+const regions: Region[] = ["Scandinavia", "Europe", "Southeast Asia"];
 const languages = ["English", "Japanese", "Indonesian", "Spanish", "Danish", "German", "French", "Polish", "Vietnamese"];
 
 const Creators = () => {
