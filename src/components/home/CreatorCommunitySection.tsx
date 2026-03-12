@@ -2,9 +2,9 @@ import { motion } from "framer-motion";
 import { Users, Sparkles, Globe } from "lucide-react";
 
 const pillars = [
-  { icon: Sparkles, title: "Showcase your work", desc: "Build your portfolio and let your content speak for itself." },
-  { icon: Globe, title: "Discover opportunities", desc: "Find campaigns and collaborations that match your creative niche." },
-  { icon: Users, title: "Connect with brands", desc: "Build lasting relationships with brands seeking authentic content." },
+  { icon: Sparkles, title: "Build your portfolio", desc: "Create a profile that showcases your best work and attracts the right brands." },
+  { icon: Globe, title: "Get discovered", desc: "Be found by brands looking for creators in your niche." },
+  { icon: Users, title: "Collaborate with brands", desc: "Turn your content into real partnerships and campaigns." },
 ];
 
 const CreatorCommunitySection = () => (
