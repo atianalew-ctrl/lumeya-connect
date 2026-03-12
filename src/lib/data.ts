@@ -1,4 +1,4 @@
-export type Region = "Europe" | "North America" | "Asia Pacific" | "Southeast Asia" | "Middle East" | "Latin America" | "Africa" | "Scandinavia" | "\n";
+export type Region = "Europe" | "North America" | "Asia Pacific" | "Southeast Asia" | "Middle East" | "Latin America" | "Africa" | "Scandinavia" | "Bali / Southeast Asia" | "Global";
 
 export interface Creator {
   id: number;
