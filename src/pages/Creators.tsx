@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { creators, type Region } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
-const categories = ["UGC", "Photography", "Videography", "Social Media", "Design", "Writing", "Influencer", "Motion Design"];
-const regions: Region[] = ["Scandinavia", "Europe", "Southeast Asia"];
+const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "Influencer", "Motion Design"];
+const regions: Region[] = ["\n", "Europe", "Southeast Asia"];
 const languages = ["English", "Japanese", "Indonesian", "Spanish", "Danish", "German", "French", "Polish", "Vietnamese"];
 
 const Creators = () => {
@@ -152,7 +152,7 @@ const Creators = () => {
 
           {/* Category */}
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Category</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">LOCATION</p>
             <div className="flex flex-wrap gap-1.5">
               {categories.map((c) => (
                 <button
