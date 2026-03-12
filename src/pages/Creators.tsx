@@ -36,6 +36,7 @@ const Creators = () => {
     setSelectedRegions([]);
     setSelectedCategories([]);
     setSelectedLanguages([]);
+    setSelectedContentTypes([]);
     setRemoteOnly(false);
     setSearch("");
   };
