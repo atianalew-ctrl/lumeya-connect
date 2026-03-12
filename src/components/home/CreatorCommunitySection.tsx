@@ -17,9 +17,9 @@ const CreatorCommunitySection = () => (
         className="mx-auto max-w-xl text-center"
       >
         <p className="text-[11px] uppercase tracking-scandi text-muted-foreground">Our community</p>
-        <h2 className="mt-4 text-3xl md:text-4xl leading-tight">A community built on trust and creativity</h2>
+        <h2 className="mt-4 text-3xl md:text-4xl leading-tight">Where creators get discovered.</h2>
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">
-          Lumeya is a growing community of creators and brands collaborating on content, campaigns, and creative projects — together.
+          Lumeya connects creators and brands to collaborate on content, campaigns, and creative projects.
         </p>
       </motion.div>
 
