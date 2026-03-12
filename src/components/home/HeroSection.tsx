@@ -12,7 +12,7 @@ const fadeUp = {
 };
 
 const HeroSection = () =>
-<section className="relative py-36 md:py-52 overflow-hidden">
+<section className="relative py-20 md:py-28 overflow-hidden">
     {/* Soft abstract gradient — no image needed for Scandi feel */}
     <div className="absolute inset-0 bg-gradient-to-b from-sand via-background to-background" />
     <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-primary/[0.04] blur-3xl -translate-y-1/2 translate-x-1/4" />
