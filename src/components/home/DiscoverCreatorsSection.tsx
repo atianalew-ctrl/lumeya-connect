@@ -20,7 +20,7 @@ const DiscoverCreatorsSection = () => {
   });
 
   return (
-    <section className="border-t border-border py-12">
+    <section className="border-t border-border py-6">
       <div className="container">
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
           <div>

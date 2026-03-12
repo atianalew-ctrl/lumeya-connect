@@ -75,7 +75,7 @@ const HeroSection = () =>
       animate="visible"
       variants={fadeUp}
       custom={4}
-      className="mt-16 flex items-center gap-8 text-sm text-muted-foreground">
+      className="mt-10 flex items-center gap-8 text-sm text-muted-foreground">
       
         <span className="flex items-center gap-1.5">
           <span className="font-medium text-foreground">500+</span> Creators
