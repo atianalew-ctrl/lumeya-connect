@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi } from "lucide-react";
+import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { creators, type Region } from "@/lib/data";
+import { creators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
 const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "POLAND", "GERMANY"];
