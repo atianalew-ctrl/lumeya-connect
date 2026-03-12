@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPin, Star, ArrowLeft, MessageCircle, Send, DollarSign, Play, Building2, Languages, Globe, Wifi } from "lucide-react";
+import { MapPin, Star, ArrowLeft, MessageCircle, Send, DollarSign, Play, Building2, Languages, Globe, Wifi, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { creators } from "@/lib/data";
 import { useCreatorVideos } from "@/hooks/use-creator-videos";
