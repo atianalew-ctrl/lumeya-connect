@@ -66,11 +66,15 @@ const Creators = () => {
         selectedLanguages.length === 0 ||
         selectedLanguages.some((lang) => c.languages.includes(lang));
 
+      const matchesContentType =
+        selectedContentTypes.length === 0 ||
+        selectedContentTypes.some((ct) => c.contentTypes.includes(ct as UGCContentType));
+
       const matchesRemote = !remoteOnly || c.availableForRemote;
 
-      return matchesSearch && matchesRegion && matchesCategory && matchesLanguage && matchesRemote;
+      return matchesSearch && matchesRegion && matchesCategory && matchesLanguage && matchesContentType && matchesRemote;
     });
-  }, [search, selectedRegions, selectedCategories, selectedLanguages, remoteOnly]);
+  }, [search, selectedRegions, selectedCategories, selectedLanguages, selectedContentTypes, remoteOnly]);
 
   return (
     <div className="container py-16">
