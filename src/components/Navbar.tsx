@@ -1,7 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
@@ -9,13 +10,28 @@ const navLinks = [
   { to: "/creators", label: "Creators" },
   { to: "/opportunities", label: "Opportunities" },
   { to: "/community", label: "Community" },
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/messages", label: "Messages" },
+];
+
+const authNavLinks = [
+  { to: "/dashboard", label: "Dashboard", roles: ["brand"] },
+  { to: "/messages", label: "Messages", roles: ["creator", "brand"] },
 ];
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, role, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const visibleLinks = [
+    ...navLinks,
+    ...authNavLinks.filter((l) => user && role && l.roles.includes(role)),
+  ];
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
@@ -25,9 +41,9 @@ const Navbar = () => {
           <span className="font-display text-lg text-foreground tracking-tight">Lumeya</span>
         </Link>
 
-        {/* Desktop */}
+        {/* Desktop nav */}
         <div className="hidden items-center gap-0.5 md:flex">
-          {navLinks.map((link) => (
+          {visibleLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
@@ -42,9 +58,28 @@ const Navbar = () => {
           ))}
         </div>
 
+        {/* Desktop auth buttons */}
         <div className="hidden items-center gap-2.5 md:flex">
-          <Button variant="ghost" size="sm" className="text-[13px] rounded-full px-5">Log in</Button>
-          <Button size="sm" className="text-[13px] rounded-full px-5">Get Started</Button>
+          {user ? (
+            <>
+              <span className="text-xs text-muted-foreground capitalize">{role}</span>
+              <Button variant="ghost" size="sm" className="text-[13px] rounded-full px-4 gap-1.5" onClick={handleSignOut}>
+                <LogOut size={13} /> Sign out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="sm" className="text-[13px] rounded-full px-5" asChild>
+                <Link to="/creator-signup">Become a Creator</Link>
+              </Button>
+              <Button variant="outline" size="sm" className="text-[13px] rounded-full px-5" asChild>
+                <Link to="/brand-login">Login as a Brand</Link>
+              </Button>
+              <Button size="sm" className="text-[13px] rounded-full px-5" asChild>
+                <Link to="/brand-login">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -56,7 +91,7 @@ const Navbar = () => {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="border-t border-border/50 bg-background px-4 pb-5 md:hidden">
-          {navLinks.map((link) => (
+          {visibleLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
@@ -66,9 +101,24 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
-          <div className="mt-4 flex gap-2">
-            <Button variant="ghost" size="sm" className="flex-1 rounded-full">Log in</Button>
-            <Button size="sm" className="flex-1 rounded-full">Get Started</Button>
+          <div className="mt-4 flex flex-col gap-2">
+            {user ? (
+              <Button variant="ghost" size="sm" className="rounded-full gap-1.5" onClick={handleSignOut}>
+                <LogOut size={13} /> Sign out
+              </Button>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" className="rounded-full" asChild>
+                  <Link to="/creator-signup" onClick={() => setMobileOpen(false)}>Become a Creator</Link>
+                </Button>
+                <Button variant="outline" size="sm" className="rounded-full" asChild>
+                  <Link to="/brand-login" onClick={() => setMobileOpen(false)}>Login as a Brand</Link>
+                </Button>
+                <Button size="sm" className="rounded-full" asChild>
+                  <Link to="/brand-login" onClick={() => setMobileOpen(false)}>Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}
