@@ -22,6 +22,7 @@ const Creators = () => {
     initialCategory ? [initialCategory] : []
   );
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
 
