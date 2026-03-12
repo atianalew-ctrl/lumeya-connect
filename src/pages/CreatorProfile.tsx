@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { MapPin, Star, ArrowLeft, MessageCircle, Send, DollarSign, Play, Building2, Languages, Globe, Wifi } from "lucide-react";
+import { MapPin, Star, ArrowLeft, MessageCircle, Send, DollarSign, Play, Building2, Languages, Globe, Wifi, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { creators } from "@/lib/data";
 import { useCreatorVideos } from "@/hooks/use-creator-videos";
@@ -85,7 +85,20 @@ const CreatorProfile = () => {
             </div>
           </div>
 
-          {/* Rates */}
+          {/* UGC Content Types */}
+          {creator.contentTypes && creator.contentTypes.length > 0 && (
+            <div>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                <Video size={11} /> UGC Content Types
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {creator.contentTypes.map((ct) => (
+                  <span key={ct} className="rounded-full border border-primary/20 bg-primary/[0.06] px-2.5 py-0.5 text-[11px] text-primary font-medium">{ct}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="rounded-lg bg-muted/50 p-4">
             <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Price Range</p>
             <p className="text-sm font-medium flex items-center gap-1"><DollarSign size={13} className="text-primary" />{creator.rates}</p>

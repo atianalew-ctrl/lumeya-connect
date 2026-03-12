@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi } from "lucide-react";
+import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { creators, type Region } from "@/lib/data";
+import { creators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
 const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "POLAND", "GERMANY"];
@@ -22,6 +22,7 @@ const Creators = () => {
     initialCategory ? [initialCategory] : []
   );
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
 
@@ -29,12 +30,13 @@ const Creators = () => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
   };
 
-  const activeFilterCount = selectedRegions.length + selectedCategories.length + selectedLanguages.length + (remoteOnly ? 1 : 0);
+  const activeFilterCount = selectedRegions.length + selectedCategories.length + selectedLanguages.length + selectedContentTypes.length + (remoteOnly ? 1 : 0);
 
   const clearAll = () => {
     setSelectedRegions([]);
     setSelectedCategories([]);
     setSelectedLanguages([]);
+    setSelectedContentTypes([]);
     setRemoteOnly(false);
     setSearch("");
   };
@@ -64,11 +66,15 @@ const Creators = () => {
         selectedLanguages.length === 0 ||
         selectedLanguages.some((lang) => c.languages.includes(lang));
 
+      const matchesContentType =
+        selectedContentTypes.length === 0 ||
+        selectedContentTypes.some((ct) => c.contentTypes.includes(ct as UGCContentType));
+
       const matchesRemote = !remoteOnly || c.availableForRemote;
 
-      return matchesSearch && matchesRegion && matchesCategory && matchesLanguage && matchesRemote;
+      return matchesSearch && matchesRegion && matchesCategory && matchesLanguage && matchesContentType && matchesRemote;
     });
-  }, [search, selectedRegions, selectedCategories, selectedLanguages, remoteOnly]);
+  }, [search, selectedRegions, selectedCategories, selectedLanguages, selectedContentTypes, remoteOnly]);
 
   return (
     <div className="container py-16">
@@ -192,7 +198,28 @@ const Creators = () => {
             </div>
           </div>
 
-          {/* Remote toggle */}
+          {/* UGC Content Type */}
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+              <Video size={11} /> UGC Content Type
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {UGC_CONTENT_TYPES.map((ct) => (
+                <button
+                  key={ct}
+                  onClick={() => toggleFilter(selectedContentTypes, ct, setSelectedContentTypes)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                    selectedContentTypes.includes(ct)
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                  }`}
+                >
+                  {ct}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <button
               onClick={() => setRemoteOnly(!remoteOnly)}
@@ -228,6 +255,12 @@ const Creators = () => {
             <span key={l} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
               {l}
               <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedLanguages, l, setSelectedLanguages)} />
+            </span>
+          ))}
+          {selectedContentTypes.map((ct) => (
+            <span key={ct} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
+              {ct}
+              <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedContentTypes, ct, setSelectedContentTypes)} />
             </span>
           ))}
           {remoteOnly && (
