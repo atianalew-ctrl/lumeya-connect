@@ -1,1 +1,4 @@
 project_id = "pjullgneardbcpjjrbvd"
+
+[functions.ai-brief]
+verify_jwt = false
