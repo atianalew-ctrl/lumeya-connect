@@ -198,7 +198,28 @@ const Creators = () => {
             </div>
           </div>
 
-          {/* Remote toggle */}
+          {/* UGC Content Type */}
+          <div>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+              <Video size={11} /> UGC Content Type
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {UGC_CONTENT_TYPES.map((ct) => (
+                <button
+                  key={ct}
+                  onClick={() => toggleFilter(selectedContentTypes, ct, setSelectedContentTypes)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+                    selectedContentTypes.includes(ct)
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                  }`}
+                >
+                  {ct}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <button
               onClick={() => setRemoteOnly(!remoteOnly)}
