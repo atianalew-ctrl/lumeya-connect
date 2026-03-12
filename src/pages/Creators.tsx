@@ -257,6 +257,12 @@ const Creators = () => {
               <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedLanguages, l, setSelectedLanguages)} />
             </span>
           ))}
+          {selectedContentTypes.map((ct) => (
+            <span key={ct} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
+              {ct}
+              <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedContentTypes, ct, setSelectedContentTypes)} />
+            </span>
+          ))}
           {remoteOnly && (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
               Remote
