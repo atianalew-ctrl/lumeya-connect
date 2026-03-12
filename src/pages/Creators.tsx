@@ -152,7 +152,7 @@ const Creators = () => {
 
           {/* Category */}
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Category</p>
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">LOCATION</p>
             <div className="flex flex-wrap gap-1.5">
               {categories.map((c) => (
                 <button
