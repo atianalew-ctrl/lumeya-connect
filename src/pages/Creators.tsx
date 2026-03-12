@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { creators, type Region } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 
-const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "Influencer", "GERMANY"];
+const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "POLAND", "GERMANY"];
 const regions: Region[] = ["Scandinavia", "Europe", "Bali / Southeast Asia", "Global"];
 const languages = ["English", "Japanese", "Indonesian", "Spanish", "Danish", "German", "French", "Polish", "Vietnamese"];
 
