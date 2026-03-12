@@ -14,8 +14,8 @@ import CTASection from "@/components/home/CTASection";
 const Index = () => (
   <div>
     <HeroSection />
-    <DiscoverCreatorsSection />
     <BrandLogoBar />
+    <DiscoverCreatorsSection />
     <CreatorCommunitySection />
     <CreatorSpotlightSection />
     <CategoriesSection />
