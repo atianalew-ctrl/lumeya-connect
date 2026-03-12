@@ -82,11 +82,13 @@ const HowItWorksSection = () => (
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="mx-auto mt-16 max-w-lg rounded-2xl bg-primary px-8 py-6 text-center text-primary-foreground"
+        className="mx-auto mt-20 max-w-md border border-border/60 rounded-2xl bg-card px-10 py-8 text-center"
       >
-        <p className="text-base font-medium">⭐ Satisfaction Guarantee</p>
-        <p className="mt-2 text-sm opacity-90 leading-relaxed">
-          If you're not happy with the creators who apply, we'll work with you until you find the right match.
+        <span className="text-xl">✦</span>
+        <p className="mt-3 text-[11px] uppercase tracking-scandi text-muted-foreground">Our promise</p>
+        <h3 className="mt-2 text-base font-medium text-foreground">Satisfaction Guarantee</h3>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          Not happy with the creators who apply? We'll work with you until you find the perfect match.
         </p>
       </motion.div>
     </div>
