@@ -154,23 +154,59 @@ const Creators = () => {
             </div>
           </div>
 
-          {/* Category */}
+          {/* Location */}
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">LOCATION</p>
-            <div className="flex flex-wrap gap-1.5">
-              {categories.map((c) => (
-                <button
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+              <MapPin size={11} /> Location
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                    <MapPin size={12} />
+                    {selectedCountries.length > 0
+                      ? `${selectedCountries.length} selected`
+                      : "Select countries"}
+                    <ChevronDown size={12} className="text-muted-foreground" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search countries..." />
+                    <CommandList>
+                      <CommandEmpty>No country found.</CommandEmpty>
+                      <CommandGroup>
+                        {allCountries.map((country) => (
+                          <CommandItem
+                            key={country}
+                            onSelect={() => toggleFilter(selectedCountries, country, setSelectedCountries)}
+                            className="text-xs"
+                          >
+                            <Check
+                              size={14}
+                              className={`mr-2 ${
+                                selectedCountries.includes(country) ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {country}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              {selectedCountries.map((c) => (
+                <span
                   key={c}
-                  onClick={() => toggleFilter(selectedCategories, c, setSelectedCategories)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
-                    selectedCategories.includes(c)
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                  }`}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary"
                 >
                   {c}
-                </button>
+                  <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedCountries, c, setSelectedCountries)} />
+                </span>
               ))}
+
               <button
                 onClick={() => setRemoteOnly(!remoteOnly)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition-all flex items-center gap-1.5 ${
