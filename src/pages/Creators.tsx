@@ -27,6 +27,7 @@ const Creators = () => {
   const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const [locationOpen, setLocationOpen] = useState(false);
 
   const toggleFilter = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
