@@ -276,10 +276,10 @@ const Creators = () => {
               <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedRegions, r, setSelectedRegions)} />
             </span>
           ))}
-          {selectedCategories.map((c) => (
+          {selectedCountries.map((c) => (
             <span key={c} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
               {c}
-              <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedCategories, c, setSelectedCategories)} />
+              <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedCountries, c, setSelectedCountries)} />
             </span>
           ))}
           {selectedLanguages.map((l) => (
