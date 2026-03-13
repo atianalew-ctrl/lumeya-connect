@@ -56,14 +56,9 @@ const Creators = () => {
 
       const matchesRegion = selectedRegions.length === 0 || selectedRegions.includes(c.region);
 
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.some(
-          (cat) =>
-            c.role.toLowerCase().includes(cat.toLowerCase()) ||
-            c.tags.some((t) => t.toLowerCase().includes(cat.toLowerCase())) ||
-            c.skills.some((s) => s.toLowerCase().includes(cat.toLowerCase()))
-        );
+      const matchesCountry =
+        selectedCountries.length === 0 ||
+        selectedCountries.includes(c.country);
 
       const matchesLanguage =
         selectedLanguages.length === 0 ||
