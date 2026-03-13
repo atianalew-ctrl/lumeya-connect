@@ -33,7 +33,7 @@ const Creators = () => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
   };
 
-  const activeFilterCount = selectedRegions.length + selectedCategories.length + selectedLanguages.length + selectedContentTypes.length + (remoteOnly ? 1 : 0);
+  const activeFilterCount = selectedRegions.length + selectedCountries.length + selectedLanguages.length + selectedContentTypes.length + (remoteOnly ? 1 : 0);
 
   const clearAll = () => {
     setSelectedRegions([]);
