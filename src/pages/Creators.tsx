@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
-import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video } from "lucide-react";
+import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { creators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
-const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "POLAND", "GERMANY"];
+const allCountries = [...new Set(creators.map((c) => c.country))].sort();
 const regions: Region[] = ["Scandinavia", "Europe", "Bali / Southeast Asia", "Global"];
 const languages = ["English", "Japanese", "Indonesian", "Spanish", "Danish", "German", "French", "Polish", "Vietnamese"];
 
@@ -18,23 +20,24 @@ const Creators = () => {
 
   const [search, setSearch] = useState(initialSearch);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+  const [selectedCountries, setSelectedCountries] = useState<string[]>(
     initialCategory ? [initialCategory] : []
   );
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
   const [selectedContentTypes, setSelectedContentTypes] = useState<string[]>([]);
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
+  const [locationOpen, setLocationOpen] = useState(false);
 
   const toggleFilter = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
   };
 
-  const activeFilterCount = selectedRegions.length + selectedCategories.length + selectedLanguages.length + selectedContentTypes.length + (remoteOnly ? 1 : 0);
+  const activeFilterCount = selectedRegions.length + selectedCountries.length + selectedLanguages.length + selectedContentTypes.length + (remoteOnly ? 1 : 0);
 
   const clearAll = () => {
     setSelectedRegions([]);
-    setSelectedCategories([]);
+    setSelectedCountries([]);
     setSelectedLanguages([]);
     setSelectedContentTypes([]);
     setRemoteOnly(false);
@@ -53,14 +56,9 @@ const Creators = () => {
 
       const matchesRegion = selectedRegions.length === 0 || selectedRegions.includes(c.region);
 
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.some(
-          (cat) =>
-            c.role.toLowerCase().includes(cat.toLowerCase()) ||
-            c.tags.some((t) => t.toLowerCase().includes(cat.toLowerCase())) ||
-            c.skills.some((s) => s.toLowerCase().includes(cat.toLowerCase()))
-        );
+      const matchesCountry =
+        selectedCountries.length === 0 ||
+        selectedCountries.includes(c.country);
 
       const matchesLanguage =
         selectedLanguages.length === 0 ||
@@ -72,9 +70,9 @@ const Creators = () => {
 
       const matchesRemote = !remoteOnly || c.availableForRemote;
 
-      return matchesSearch && matchesRegion && matchesCategory && matchesLanguage && matchesContentType && matchesRemote;
+      return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote;
     });
-  }, [search, selectedRegions, selectedCategories, selectedLanguages, selectedContentTypes, remoteOnly]);
+  }, [search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly]);
 
   return (
     <div className="container py-16">
@@ -156,23 +154,59 @@ const Creators = () => {
             </div>
           </div>
 
-          {/* Category */}
+          {/* Location */}
           <div>
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2">LOCATION</p>
-            <div className="flex flex-wrap gap-1.5">
-              {categories.map((c) => (
-                <button
+            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+              <MapPin size={11} /> Location
+            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+                    <MapPin size={12} />
+                    {selectedCountries.length > 0
+                      ? `${selectedCountries.length} selected`
+                      : "Select countries"}
+                    <ChevronDown size={12} className="text-muted-foreground" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56 p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search countries..." />
+                    <CommandList>
+                      <CommandEmpty>No country found.</CommandEmpty>
+                      <CommandGroup>
+                        {allCountries.map((country) => (
+                          <CommandItem
+                            key={country}
+                            onSelect={() => toggleFilter(selectedCountries, country, setSelectedCountries)}
+                            className="text-xs"
+                          >
+                            <Check
+                              size={14}
+                              className={`mr-2 ${
+                                selectedCountries.includes(country) ? "opacity-100" : "opacity-0"
+                              }`}
+                            />
+                            {country}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              {selectedCountries.map((c) => (
+                <span
                   key={c}
-                  onClick={() => toggleFilter(selectedCategories, c, setSelectedCategories)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
-                    selectedCategories.includes(c)
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
-                  }`}
+                  className="inline-flex items-center gap-1 rounded-full border border-primary bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary"
                 >
                   {c}
-                </button>
+                  <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedCountries, c, setSelectedCountries)} />
+                </span>
               ))}
+
               <button
                 onClick={() => setRemoteOnly(!remoteOnly)}
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition-all flex items-center gap-1.5 ${
@@ -242,10 +276,10 @@ const Creators = () => {
               <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedRegions, r, setSelectedRegions)} />
             </span>
           ))}
-          {selectedCategories.map((c) => (
+          {selectedCountries.map((c) => (
             <span key={c} className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] text-primary">
               {c}
-              <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedCategories, c, setSelectedCategories)} />
+              <X size={10} className="cursor-pointer hover:text-primary/70" onClick={() => toggleFilter(selectedCountries, c, setSelectedCountries)} />
             </span>
           ))}
           {selectedLanguages.map((l) => (
