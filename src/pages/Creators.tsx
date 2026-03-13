@@ -173,6 +173,16 @@ const Creators = () => {
                   {c}
                 </button>
               ))}
+              <button
+                onClick={() => setRemoteOnly(!remoteOnly)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  remoteOnly
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30 hover:text-foreground"
+                }`}
+              >
+                <Wifi size={11} /> Remote
+              </button>
             </div>
           </div>
 
