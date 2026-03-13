@@ -37,7 +37,7 @@ const Creators = () => {
 
   const clearAll = () => {
     setSelectedRegions([]);
-    setSelectedCategories([]);
+    setSelectedCountries([]);
     setSelectedLanguages([]);
     setSelectedContentTypes([]);
     setRemoteOnly(false);
