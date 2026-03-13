@@ -36,9 +36,8 @@ const HeroSection = () =>
       variants={fadeUp}
       custom={1}
       className="mt-10 max-w-2xl text-4xl font-normal leading-[1.15] md:text-[3.5rem] text-balance">
-      
-        Where creators and brands{" "}
-        <span className="italic text-primary/80">build together.</span>
+        Discover creators{" "}
+        <span className="italic text-primary/80">Launch Collaborations.</span>
       </motion.h1>
 
       <motion.p
