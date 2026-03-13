@@ -70,9 +70,9 @@ const Creators = () => {
 
       const matchesRemote = !remoteOnly || c.availableForRemote;
 
-      return matchesSearch && matchesRegion && matchesCategory && matchesLanguage && matchesContentType && matchesRemote;
+      return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote;
     });
-  }, [search, selectedRegions, selectedCategories, selectedLanguages, selectedContentTypes, remoteOnly]);
+  }, [search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly]);
 
   return (
     <div className="container py-16">
