@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
-import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video } from "lucide-react";
+import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check } from "lucide-react";
 import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { creators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
-const categories = ["DENMARK", "NORWAY", "SWEDEN", "BALI", "UK", "FRANCE", "POLAND", "GERMANY"];
+const allCountries = [...new Set(creators.map((c) => c.country))].sort();
 const regions: Region[] = ["Scandinavia", "Europe", "Bali / Southeast Asia", "Global"];
 const languages = ["English", "Japanese", "Indonesian", "Spanish", "Danish", "German", "French", "Polish", "Vietnamese"];
 
