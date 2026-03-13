@@ -20,7 +20,7 @@ const Creators = () => {
 
   const [search, setSearch] = useState(initialSearch);
   const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+  const [selectedCountries, setSelectedCountries] = useState<string[]>(
     initialCategory ? [initialCategory] : []
   );
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
