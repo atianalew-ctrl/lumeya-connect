@@ -50,7 +50,7 @@ const communityPosts: Post[] = [
   },
   {
     id: 2,
-    author: { name: "Sara Lee", role: "UGC Creator", avatar: "/lovable-uploads/45d7dcc1-eb95-4a25-b50d-87bc5730e1c5.jpg", location: "Copenhagen, DK" },
+    author: { name: "Ronja Aaslund", role: "UGC Creator", avatar: "/lovable-uploads/45d7dcc1-eb95-4a25-b50d-87bc5730e1c5.jpg", location: "Stockholm, SE" },
     content: "Tip for fellow UGC creators: when working with international brands, always establish a shared mood board before production. It bridges language gaps and aligns creative vision faster than any brief. Tools I use: Milanote + Loom for async walkthroughs.",
     tags: ["UGC Tips", "Remote Work", "Workflow"],
     likes: 67,
