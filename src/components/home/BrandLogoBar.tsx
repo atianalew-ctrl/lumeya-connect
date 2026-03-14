@@ -2,11 +2,11 @@ import { motion } from "framer-motion";
 
 const brands = [
   { name: "L'Oréal", logo: "/brand-logos/loreal.png" },
-  { name: "Ritual", logo: "/brand-logos/ritual.svg" },
+  { name: "Ritual", logo: "/brand-logos/ritual.png" },
   { name: "Oatly", logo: "/brand-logos/oatly.png" },
   { name: "Glossier", logo: "/brand-logos/glossier.png" },
   { name: "L'Oréal", logo: "/brand-logos/loreal.png" },
-  { name: "Ritual", logo: "/brand-logos/ritual.svg" },
+  { name: "Ritual", logo: "/brand-logos/ritual.png" },
   { name: "Oatly", logo: "/brand-logos/oatly.png" },
   { name: "Glossier", logo: "/brand-logos/glossier.png" },
 ];
