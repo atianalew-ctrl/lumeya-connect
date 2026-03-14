@@ -37,7 +37,7 @@ const CreatorSpotlightSection = () => (
             <img
               src={c.avatar}
               alt={c.name}
-              className="mx-auto h-20 w-20 rounded-full bg-accent border-2 border-primary/20"
+              className="mx-auto h-20 w-20 rounded-full bg-accent border-2 border-primary/20 object-cover"
             />
             <h3 className="mt-4 text-base font-semibold">{c.name}</h3>
             <p className="text-xs text-primary font-medium">{c.role}</p>
