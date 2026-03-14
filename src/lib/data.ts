@@ -44,6 +44,7 @@ export interface Creator {
   avatar: string;
   availableForRemote: boolean;
   contentTypes: UGCContentType[];
+  instagram?: string;
 }
 
 export const creators: Creator[] = [
