@@ -16,7 +16,7 @@ const HeroSection = () =>
     {/* Subtle hero background photo */}
     <div className="absolute inset-0">
       <img src="/images/hero-bg.jpg" alt="" className="h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-background/[0.88]" />
+      <div className="absolute inset-0 bg-background/[0.80]" />
     </div>
     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
 
