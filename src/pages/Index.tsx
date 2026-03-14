@@ -15,14 +15,13 @@ const Index = () => (
   <div>
     <HeroSection />
     <BrandLogoBar />
-    <DiscoverCreatorsSection />
-    <CreatorCommunitySection />
-    <CreatorSpotlightSection />
-    <CategoriesSection />
-    <SearchFilterSection />
-    <OpportunitiesSection />
     <HowItWorksSection />
+    <CreatorCommunitySection />
+    <DiscoverCreatorsSection />
+    <CreatorSpotlightSection />
     <CollaborationsSection />
+    <CategoriesSection />
+    <OpportunitiesSection />
     <TrendingCreatorsSection />
     <CTASection />
   </div>
