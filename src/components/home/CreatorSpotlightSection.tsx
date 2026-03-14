@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Star, MapPin, ExternalLink } from "lucide-react";
+import { Star, MapPin, ExternalLink, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { creators } from "@/lib/data";
@@ -44,6 +44,17 @@ const CreatorSpotlightSection = () => (
             <p className="mt-1 flex items-center justify-center gap-1 text-xs text-muted-foreground">
               <MapPin size={10} /> {c.location}
             </p>
+            {c.instagram && (
+              <a
+                href={`https://instagram.com/${c.instagram}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Instagram size={12} />
+                @{c.instagram}
+              </a>
+            )}
             <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
               {c.bio}
             </p>
