@@ -43,17 +43,25 @@ const DiscoverCreatorsSection = () => {
 
       <div
         ref={scrollRef}
-        className="mt-12 flex gap-5 overflow-x-auto px-[max(1rem,calc((100vw-1400px)/2+2rem))] pb-4 scrollbar-hide"
-        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="mt-12 overflow-hidden relative"
+        onMouseEnter={() => scrollRef.current?.style.setProperty('--play-state', 'paused')}
+        onMouseLeave={() => scrollRef.current?.style.setProperty('--play-state', 'running')}
       >
-        {creators.map((creator, i) => (
-          <CreatorVideoCard
-            key={creator.id}
-            creator={creator}
-            index={i}
-            uploadedVideoUrl={videoMap.get(creator.id)}
-          />
-        ))}
+        <div
+          className="flex gap-5 w-max animate-marquee"
+          style={{
+            animationPlayState: 'var(--play-state, running)',
+          }}
+        >
+          {[...creators, ...creators].map((creator, i) => (
+            <CreatorVideoCard
+              key={`${creator.id}-${i}`}
+              creator={creator}
+              index={i % creators.length}
+              uploadedVideoUrl={videoMap.get(creator.id)}
+            />
+          ))}
+        </div>
       </div>
 
       <DropZoneUpload />
