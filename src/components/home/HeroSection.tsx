@@ -13,10 +13,12 @@ const fadeUp = {
 
 const HeroSection = () =>
 <section className="relative py-20 md:py-28 overflow-hidden">
-    {/* Soft abstract gradient — no image needed for Scandi feel */}
-    <div className="absolute inset-0 bg-gradient-to-b from-sand via-background to-background" />
-    <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-primary/[0.04] blur-3xl -translate-y-1/2 translate-x-1/4" />
-    <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-primary/[0.03] blur-3xl translate-y-1/3 -translate-x-1/4" />
+    {/* Subtle hero background photo */}
+    <div className="absolute inset-0">
+      <img src="/images/hero-bg.jpg" alt="" className="h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-background/[0.88]" />
+    </div>
+    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
 
     <div className="container relative z-10 flex flex-col items-center text-center">
       <motion.div
