@@ -15,8 +15,8 @@ const HeroSection = () =>
 <section className="relative py-20 md:py-28 overflow-hidden">
     {/* Subtle hero background photo */}
     <div className="absolute inset-0">
-      <img src="/images/hero-bg.jpg" alt="" className="h-full w-full object-cover blur-[2px] brightness-110 saturate-[1.05] sepia-[0.08]" />
-      <div className="absolute inset-0 bg-background/[0.75]" />
+      <img src="/images/hero-bg.jpg" alt="" className="h-full w-full object-cover blur-[2px] brightness-125 saturate-[1.05] sepia-[0.08]" />
+      <div className="absolute inset-0 bg-background/[0.62]" />
     </div>
     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
 
