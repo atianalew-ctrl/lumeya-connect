@@ -15,9 +15,9 @@ const Index = () => (
   <div>
     <HeroSection />
     <BrandLogoBar />
+    <DiscoverCreatorsSection />
     <HowItWorksSection />
     <CreatorCommunitySection />
-    <DiscoverCreatorsSection />
     <CreatorSpotlightSection />
     <CollaborationsSection />
     <CategoriesSection />
