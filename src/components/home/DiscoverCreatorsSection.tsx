@@ -41,17 +41,14 @@ const DiscoverCreatorsSection = () => {
         </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="mt-12 overflow-hidden relative"
-        onMouseEnter={() => scrollRef.current?.style.setProperty('--play-state', 'paused')}
-        onMouseLeave={() => scrollRef.current?.style.setProperty('--play-state', 'running')}
-      >
-        <div
-          className="flex gap-5 w-max animate-marquee"
-          style={{
-            animationPlayState: 'var(--play-state, running)',
-          }}
+      <div className="mt-12 overflow-hidden relative">
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-r from-background to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 z-10 bg-gradient-to-l from-background to-transparent" />
+
+        <motion.div
+          className="flex gap-5 w-max"
+          animate={{ x: ["0%", "-50%"] }}
+          transition={{ duration: 40, ease: "linear", repeat: Infinity }}
         >
           {[...creators, ...creators].map((creator, i) => (
             <CreatorVideoCard
@@ -61,7 +58,7 @@ const DiscoverCreatorsSection = () => {
               uploadedVideoUrl={videoMap.get(creator.id)}
             />
           ))}
-        </div>
+        </motion.div>
       </div>
 
       <DropZoneUpload />
