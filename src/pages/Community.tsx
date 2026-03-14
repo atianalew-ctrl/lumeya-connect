@@ -60,7 +60,7 @@ const communityPosts: Post[] = [
   },
   {
     id: 3,
-    author: { name: "Celina Beck", role: "UGC Creator", avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png", location: "Canggu, Bali" },
+    author: { name: "Nella Ryglova", role: "UGC Creator", avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png", location: "Canggu, Bali" },
     content: "Sharing my latest brand identity project for an eco-conscious skincare line based in Ubud. The brief was 'Balinese heritage meets modern minimalism.' Loved exploring traditional patterns reimagined through a Scandinavian design lens.",
     tags: ["Brand Design", "Sustainability", "Portfolio"],
     likes: 89,
