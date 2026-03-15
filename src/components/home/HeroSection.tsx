@@ -1,110 +1,162 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 14 },
-  visible: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { delay: i * 0.15, duration: 0.6, ease: "easeOut" as const }
-  })
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1400&q=90",
+  "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1400&q=90",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&q=90",
+];
+
+const STATS = [
+  { value: "2,400+", label: "Vetted Creators" },
+  { value: "94%", label: "Brand Satisfaction" },
+  { value: "48hrs", label: "Avg. Content Turnaround" },
+  { value: "€0", label: "To Get Started" },
+];
+
+const HeroSection = () => {
+  const [activeImg, setActiveImg] = useState(0);
+
+  return (
+    <section className="relative min-h-[92vh] flex flex-col overflow-hidden bg-[#0c0c0b]">
+      {/* Background image — full bleed */}
+      <div className="absolute inset-0">
+        {HERO_IMAGES.map((src, i) => (
+          <motion.div
+            key={src}
+            className="absolute inset-0"
+            animate={{ opacity: activeImg === i ? 1 : 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+          >
+            <img
+              src={src}
+              alt=""
+              className="w-full h-full object-cover"
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          </motion.div>
+        ))}
+        {/* Gradient overlay — dark at bottom and left */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col justify-end h-full flex-1 container pb-16 pt-32 md:pt-40">
+        <div className="max-w-2xl">
+          {/* Eyebrow */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="inline-flex items-center gap-2.5 mb-8"
+          >
+            <span className="h-px w-8 bg-white/40" />
+            <span className="text-[11px] tracking-[0.35em] uppercase text-white/60">
+              Creator Marketplace
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="text-5xl md:text-7xl font-display font-normal leading-[1.05] text-white mb-6"
+          >
+            Where brands
+            <br />
+            <em className="text-white/60">meet creators</em>
+            <br />
+            who convert.
+          </motion.h1>
+
+          {/* Subtext */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="text-sm text-white/50 leading-relaxed max-w-sm mb-10"
+          >
+            Find, brief, and collaborate with world-class UGC creators in one place. No agencies. No middlemen.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="flex flex-wrap gap-3 mb-16"
+          >
+            <Link
+              to="/post-opportunity"
+              className="inline-flex items-center gap-2 bg-white text-black px-7 py-3.5 text-xs font-medium tracking-widest uppercase hover:bg-white/90 transition-all"
+            >
+              Post a Campaign <ArrowRight size={13} />
+            </Link>
+            <Link
+              to="/creators"
+              className="inline-flex items-center gap-2 border border-white/25 text-white/80 px-7 py-3.5 text-xs font-medium tracking-widest uppercase hover:border-white/50 hover:text-white transition-all"
+            >
+              Browse Creators
+            </Link>
+            <Link
+              to="/feed"
+              className="inline-flex items-center gap-2 text-white/50 px-4 py-3.5 text-xs font-medium tracking-wider hover:text-white transition-all"
+            >
+              <Play size={11} className="mr-0.5" /> Watch The Feed
+            </Link>
+          </motion.div>
+
+          {/* Stats row */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="flex flex-wrap gap-8 border-t border-white/10 pt-8"
+          >
+            {STATS.map((s) => (
+              <div key={s.label}>
+                <p className="text-2xl font-light text-white">{s.value}</p>
+                <p className="text-[10px] text-white/40 tracking-wider mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Image switcher dots */}
+        <div className="absolute bottom-8 right-6 md:right-10 flex flex-col gap-2">
+          {HERO_IMAGES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveImg(i)}
+              className={`w-1 rounded-full transition-all ${activeImg === i ? "h-8 bg-white" : "h-3 bg-white/30 hover:bg-white/50"}`}
+            />
+          ))}
+        </div>
+
+        {/* Scroll hint */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2">
+          <span className="text-[9px] tracking-[0.3em] uppercase text-white/30">Scroll</span>
+          <div className="h-8 w-px bg-gradient-to-b from-white/30 to-transparent" />
+        </div>
+      </div>
+
+      {/* Brand trust strip — bottom */}
+      <div className="relative z-10 border-t border-white/10 bg-black/40 backdrop-blur-sm py-4">
+        <div className="container flex items-center gap-6 overflow-x-auto">
+          <span className="text-[9px] tracking-[0.3em] uppercase text-white/30 shrink-0">Trusted by</span>
+          {["GANNI", "NA-KD", "COS", "ARKET", "OATLY", "SKIMS", "GLOSSIER", "ZARA"].map(b => (
+            <span key={b} className="text-sm font-light tracking-[0.2em] text-white/25 shrink-0 hover:text-white/50 transition-colors cursor-default">
+              {b}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 };
-
-const HeroSection = () =>
-<section className="relative py-20 md:py-28 overflow-hidden">
-    {/* Video background — falls back to blurred image if video fails */}
-    <div className="absolute inset-0">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className="h-full w-full object-cover blur-[2px] brightness-90 saturate-[1.1]"
-        poster="/images/hero-bg.jpg"
-      >
-        {/* Video will only load if placed in /public/videos/hero.mp4 */}
-        <source src="/videos/hero.mp4" type="video/mp4" />
-        {/* Fallback to image if no video */}
-        <img src="/images/hero-bg.jpg" alt="" className="h-full w-full object-cover blur-[4px] brightness-110 saturate-[1.02]" />
-      </video>
-      <div className="absolute inset-0 bg-background/[0.62]" />
-    </div>
-    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/60 to-background" />
-
-    <div className="container relative z-10 flex flex-col items-center text-center">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={0}
-        className="inline-flex items-center gap-2.5 rounded-full border border-border/60 bg-card/60 backdrop-blur-sm px-5 py-2 text-xs tracking-scandi uppercase text-muted-foreground"
-      >
-        <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
-        Creator community & collaboration
-      </motion.div>
-
-      <motion.h1
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={1}
-        className="mt-10 max-w-2xl text-4xl font-normal leading-[1.15] md:text-[3.5rem] text-balance"
-      >
-        Discover creators{" "}
-        <span className="italic text-primary/80">Launch Collaborations.</span>
-      </motion.h1>
-
-      <motion.p
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={2}
-        className="mt-7 max-w-md text-base text-muted-foreground leading-relaxed"
-      >
-        An exclusive matchmaking community so you never waste time on bad UGC again.
-      </motion.p>
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={3}
-        className="mt-12 flex flex-wrap justify-center gap-3"
-      >
-        <Button size="lg" className="rounded-full px-7" asChild>
-          <Link to="/creators">
-            Find Creators <ArrowRight size={15} className="ml-2" />
-          </Link>
-        </Button>
-        <Button size="lg" variant="outline" className="rounded-full px-7" asChild>
-          <Link to="/opportunities">
-            Post an Opportunity
-          </Link>
-        </Button>
-      </motion.div>
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        custom={4}
-        className="mt-10 flex items-center gap-8 text-sm text-muted-foreground"
-      >
-        <span className="flex items-center gap-1.5">
-          <span className="font-medium text-foreground">500+</span> Creators
-        </span>
-        <span className="h-3 w-px bg-border" />
-        <span className="flex items-center gap-1.5">
-          <span className="font-medium text-foreground">120+</span> Brands
-        </span>
-        <span className="h-3 w-px bg-border" />
-        <span className="flex items-center gap-1.5">
-          <span className="font-medium text-foreground">1,200+</span> Collaborations
-        </span>
-      </motion.div>
-    </div>
-  </section>;
 
 export default HeroSection;
