@@ -10,95 +10,17 @@ import {
   Lightbulb,
   Users,
   Sparkles,
-  ArrowRight,
   MapPin,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { creators } from "@/lib/data";
-
-interface Post {
-  id: number;
-  author: {
-    name: string;
-    role: string;
-    avatar: string;
-    location: string;
-  };
-  content: string;
-  tags: string[];
-  likes: number;
-  comments: number;
-  timeAgo: string;
-  type: "discussion" | "tip" | "showcase" | "collab";
-  liked?: boolean;
-  saved?: boolean;
-}
-
-const communityPosts: Post[] = [
-  {
-    id: 1,
-    author: { name: "Amelia Kozak", role: "Content Creator", avatar: "/lovable-uploads/23b97164-8b1e-40d0-a9c4-fc5686f28068.jpg", location: "Bali, ID" },
-    content: "Just wrapped a 3-month collaboration with a sustainable fashion brand here in Bali. The key to making cross-cultural content work? Let the location speak for itself. Minimal edits, natural lighting, authentic moments. Would love to hear how others approach location-driven storytelling.",
-    tags: ["Storytelling", "Sustainability", "Bali"],
-    likes: 42,
-    comments: 12,
-    timeAgo: "2h ago",
-    type: "discussion",
-  },
-  {
-    id: 2,
-    author: { name: "Ronja Aaslund", role: "UGC Creator", avatar: "/lovable-uploads/45d7dcc1-eb95-4a25-b50d-87bc5730e1c5.jpg", location: "Stockholm, SE" },
-    content: "Tip for fellow UGC creators: when working with international brands, always establish a shared mood board before production. It bridges language gaps and aligns creative vision faster than any brief. Tools I use: Milanote + Loom for async walkthroughs.",
-    tags: ["UGC Tips", "Remote Work", "Workflow"],
-    likes: 67,
-    comments: 23,
-    timeAgo: "5h ago",
-    type: "tip",
-  },
-  {
-    id: 3,
-    author: { name: "Nella Ryglova", role: "UGC Creator", avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png", location: "Canggu, Bali" },
-    content: "Sharing my latest brand identity project for an eco-conscious skincare line based in Ubud. The brief was 'Balinese heritage meets modern minimalism.' Loved exploring traditional patterns reimagined through a Scandinavian design lens.",
-    tags: ["Brand Design", "Sustainability", "Portfolio"],
-    likes: 89,
-    comments: 31,
-    timeAgo: "8h ago",
-    type: "showcase",
-  },
-  {
-    id: 4,
-    author: { name: "Daniel Osei", role: "Motion Designer", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Daniel", location: "Berlin, DE" },
-    content: "Looking for a photographer in Southeast Asia for a joint pitch to a wellness brand. They need motion + stills for a campaign launching in Q2. Anyone interested in collaborating? Remote-friendly, budget split 50/50.",
-    tags: ["Collaboration", "Southeast Asia", "Wellness"],
-    likes: 34,
-    comments: 18,
-    timeAgo: "1d ago",
-    type: "collab",
-  },
-  {
-    id: 5,
-    author: { name: "Sakura Tanaka", role: "Influencer", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Sakura", location: "Tokyo, JP" },
-    content: "The creator economy in Asia Pacific is evolving fast. Brands here are shifting from follower counts to engagement quality. I've started including 'community impact' metrics in my media kit — saves, shares, DM conversations. It's changing the conversation with brands completely.",
-    tags: ["Industry Insights", "Asia Pacific", "Strategy"],
-    likes: 56,
-    comments: 27,
-    timeAgo: "1d ago",
-    type: "discussion",
-  },
-  {
-    id: 6,
-    author: { name: "Jordan Blake", role: "Photographer", avatar: "https://api.dicebear.com/9.x/avataaars/svg?seed=Jordan", location: "New York, NY" },
-    content: "Quick lighting tip for product photography in tropical climates: embrace the golden hour but watch for humidity haze. A simple polarizing filter + reflector combo gives you that clean Scandinavian look even in Bali's afternoon light.",
-    tags: ["Photography Tips", "Lighting", "Tropical"],
-    likes: 45,
-    comments: 9,
-    timeAgo: "2d ago",
-    type: "tip",
-  },
-];
+import { useCommunityPosts, type PostType } from "@/hooks/use-community-posts";
+import { useAuth } from "@/contexts/AuthContext";
+import { formatDistanceToNow } from "date-fns";
 
 const trendingTopics = [
   { label: "Sustainable Content", count: 142 },
@@ -116,24 +38,19 @@ const typeConfig = {
 };
 
 const Community = () => {
-  const [posts, setPosts] = useState(communityPosts);
+  const { user } = useAuth();
+  const { posts, loading, createPost, toggleLike, toggleSave } = useCommunityPosts();
   const [newPost, setNewPost] = useState("");
+  const [selectedType, setSelectedType] = useState<PostType>("discussion");
   const [activeTab, setActiveTab] = useState("all");
+  const [submitting, setSubmitting] = useState(false);
 
-  const toggleLike = (id: number) => {
-    setPosts((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 }
-          : p
-      )
-    );
-  };
-
-  const toggleSave = (id: number) => {
-    setPosts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, saved: !p.saved } : p))
-    );
+  const handlePost = async () => {
+    if (!newPost.trim()) return;
+    setSubmitting(true);
+    const ok = await createPost(newPost.trim(), selectedType, []);
+    if (ok) setNewPost("");
+    setSubmitting(false);
   };
 
   const filteredPosts =
@@ -143,9 +60,7 @@ const Community = () => {
     <div className="container py-16">
       {/* Header */}
       <div className="max-w-2xl">
-        <p className="text-sm uppercase tracking-widest text-muted-foreground">
-          Connect
-        </p>
+        <p className="text-sm uppercase tracking-widest text-muted-foreground">Connect</p>
         <h1 className="mt-2 text-4xl">Community</h1>
         <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
           Share knowledge, discover collaborators, and grow together.
@@ -158,25 +73,34 @@ const Community = () => {
         <div className="space-y-6">
           {/* Compose */}
           <div className="rounded-lg border border-border bg-card p-6">
+            {!user && (
+              <p className="text-xs text-muted-foreground mb-3">
+                <Link to="/creator-signup" className="text-primary hover:underline">Sign in</Link> to post in the community
+              </p>
+            )}
             <Textarea
               placeholder="Share an insight, ask a question, or find a collaborator..."
               className="min-h-[80px] resize-none border-0 bg-transparent p-0 text-sm placeholder:text-muted-foreground/60 focus-visible:ring-0"
               value={newPost}
               onChange={(e) => setNewPost(e.target.value)}
+              disabled={!user}
             />
-            <div className="mt-4 flex items-center justify-between">
-              <div className="flex gap-1.5">
+            <div className="mt-4 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex gap-1.5 flex-wrap">
                 {(["discussion", "tip", "showcase", "collab"] as const).map((type) => (
                   <span
                     key={type}
-                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${typeConfig[type].color} cursor-pointer opacity-60 hover:opacity-100 transition-opacity`}
+                    onClick={() => setSelectedType(type)}
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium cursor-pointer transition-opacity ${typeConfig[type].color} ${
+                      selectedType === type ? "opacity-100 ring-1 ring-current" : "opacity-50 hover:opacity-80"
+                    }`}
                   >
                     {typeConfig[type].label}
                   </span>
                 ))}
               </div>
-              <Button size="sm" disabled={!newPost.trim()}>
-                Post
+              <Button size="sm" disabled={!newPost.trim() || !user || submitting} onClick={handlePost}>
+                {submitting ? <Loader2 size={14} className="animate-spin" /> : "Post"}
               </Button>
             </div>
           </div>
@@ -202,7 +126,19 @@ const Community = () => {
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-4 space-y-4">
-              {filteredPosts.map((post, i) => (
+              {loading && (
+                <div className="flex items-center justify-center py-16 text-muted-foreground">
+                  <Loader2 size={20} className="animate-spin mr-2" /> Loading posts…
+                </div>
+              )}
+
+              {!loading && filteredPosts.length === 0 && (
+                <div className="py-16 text-center text-muted-foreground">
+                  <p className="text-sm">No posts yet. Be the first! 🚀</p>
+                </div>
+              )}
+
+              {!loading && filteredPosts.map((post, i) => (
                 <motion.article
                   key={post.id}
                   initial={{ opacity: 0, y: 12 }}
@@ -213,67 +149,57 @@ const Community = () => {
                   {/* Author */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={post.author.avatar}
-                        alt={post.author.name}
-                        className="h-9 w-9 rounded-full bg-accent object-cover"
-                      />
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage src={post.author_avatar || undefined} />
+                        <AvatarFallback>{post.author_name[0]}</AvatarFallback>
+                      </Avatar>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">
-                            {post.author.name}
-                          </span>
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${typeConfig[post.type].color}`}
-                          >
+                          <span className="text-sm font-medium">{post.author_name}</span>
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${typeConfig[post.type].color}`}>
                             {typeConfig[post.type].label}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <span>{post.author.role}</span>
+                          <span>{post.author_role}</span>
+                          {post.author_location && (
+                            <>
+                              <span>·</span>
+                              <span className="flex items-center gap-0.5">
+                                <MapPin size={9} />{post.author_location}
+                              </span>
+                            </>
+                          )}
                           <span>·</span>
-                          <span className="flex items-center gap-0.5">
-                            <MapPin size={9} />
-                            {post.author.location}
-                          </span>
-                          <span>·</span>
-                          <span>{post.timeAgo}</span>
+                          <span>{formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Content */}
-                  <p className="mt-4 text-sm leading-relaxed text-foreground/85">
-                    {post.content}
-                  </p>
+                  <p className="mt-4 text-sm leading-relaxed text-foreground/85">{post.content}</p>
 
                   {/* Tags */}
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] text-accent-foreground"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  {post.tags.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {post.tags.map((tag) => (
+                        <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] text-accent-foreground">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Actions */}
                   <div className="mt-4 flex items-center gap-4 border-t border-border pt-3">
                     <button
                       onClick={() => toggleLike(post.id)}
                       className={`flex items-center gap-1.5 text-xs transition-colors ${
-                        post.liked
-                          ? "text-rose-500"
-                          : "text-muted-foreground hover:text-foreground"
+                        post.liked ? "text-rose-500" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
-                      <Heart
-                        size={14}
-                        className={post.liked ? "fill-current" : ""}
-                      />
+                      <Heart size={14} className={post.liked ? "fill-current" : ""} />
                       {post.likes}
                     </button>
                     <button className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
@@ -287,25 +213,14 @@ const Community = () => {
                     <button
                       onClick={() => toggleSave(post.id)}
                       className={`ml-auto flex items-center gap-1.5 text-xs transition-colors ${
-                        post.saved
-                          ? "text-primary"
-                          : "text-muted-foreground hover:text-foreground"
+                        post.saved ? "text-primary" : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
-                      <Bookmark
-                        size={14}
-                        className={post.saved ? "fill-current" : ""}
-                      />
+                      <Bookmark size={14} className={post.saved ? "fill-current" : ""} />
                     </button>
                   </div>
                 </motion.article>
               ))}
-
-              {filteredPosts.length === 0 && (
-                <div className="py-16 text-center text-muted-foreground">
-                  <p className="text-sm">No posts in this category yet.</p>
-                </div>
-              )}
             </TabsContent>
           </Tabs>
         </div>
@@ -319,17 +234,12 @@ const Community = () => {
               Trending Topics
             </h3>
             <div className="mt-4 space-y-3">
-              {trendingTopics.map((topic, i) => (
-                <div
-                  key={topic.label}
-                  className="flex items-center justify-between text-sm"
-                >
+              {trendingTopics.map((topic) => (
+                <div key={topic.label} className="flex items-center justify-between text-sm">
                   <span className="text-foreground/80 hover:text-foreground cursor-pointer transition-colors">
                     {topic.label}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {topic.count} posts
-                  </span>
+                  <span className="text-[10px] text-muted-foreground">{topic.count} posts</span>
                 </div>
               ))}
             </div>
@@ -343,23 +253,11 @@ const Community = () => {
             </h3>
             <div className="mt-4 space-y-3">
               {creators.slice(0, 5).map((creator) => (
-                <Link
-                  key={creator.id}
-                  to={`/creators/${creator.id}`}
-                  className="flex items-center gap-2.5 group"
-                >
-                  <img
-                    src={creator.avatar}
-                    alt={creator.name}
-                    className="h-7 w-7 rounded-full bg-accent object-cover"
-                  />
+                <Link key={creator.id} to={`/creators/${creator.id}`} className="flex items-center gap-2.5 group">
+                  <img src={creator.avatar} alt={creator.name} className="h-7 w-7 rounded-full bg-accent object-cover" />
                   <div>
-                    <p className="text-xs font-medium group-hover:text-primary transition-colors">
-                      {creator.name}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {creator.role}
-                    </p>
+                    <p className="text-xs font-medium group-hover:text-primary transition-colors">{creator.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{creator.role}</p>
                   </div>
                 </Link>
               ))}
