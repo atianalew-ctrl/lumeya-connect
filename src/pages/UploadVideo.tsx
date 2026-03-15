@@ -70,7 +70,13 @@ const UploadVideo = () => {
         is_featured: isFeatured,
       });
 
-      if (dbError) throw dbError;
+      // If RLS blocks it, show helpful message
+      if (dbError) {
+        if (dbError.message?.includes("row-level security")) {
+          throw new Error("Please run the SQL fix in Supabase dashboard first — check your WhatsApp for instructions.");
+        }
+        throw dbError;
+      }
 
       setProgress(100);
       setDone(true);
