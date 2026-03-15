@@ -10,6 +10,9 @@ const navLinks = [
   { to: "/creators", label: "Creators" },
   { to: "/matchmaker", label: "✨ Matchmaker" },
   { to: "/activate", label: "⚡ Activate" },
+  { to: "/brief", label: "📋 Brief" },
+  { to: "/brand-os", label: "🚀 Brand OS" },
+  { to: "/black", label: "🖤 Black" },
   { to: "/opportunities", label: "Opportunities" },
   { to: "/community", label: "Community" },
 ];

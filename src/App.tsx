@@ -20,6 +20,9 @@ import UploadVideo from "./pages/UploadVideo";
 import Matchmaker from "./pages/Matchmaker";
 import DesignShowcase from "./pages/DesignShowcase";
 import ContentActivation from "./pages/ContentActivation";
+import LumeyaBlack from "./pages/LumeyaBlack";
+import BrandOS from "./pages/BrandOS";
+import BriefGenerator from "./pages/BriefGenerator";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -48,6 +51,9 @@ const App = () => (
             <Route path="/matchmaker" element={<Matchmaker />} />
             <Route path="/designs" element={<DesignShowcase />} />
             <Route path="/activate" element={<ContentActivation />} />
+            <Route path="/black" element={<LumeyaBlack />} />
+            <Route path="/brand-os" element={<BrandOS />} />
+            <Route path="/brief" element={<BriefGenerator />} />
             <Route path="/dashboard" element={<BrandDashboard />} />
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />
