@@ -104,16 +104,53 @@ const Creators = () => {
   }, [search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly]);
 
   return (
-    <div className="container py-16">
-      {/* Header */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Discover</p>
-          <h1 className="mt-2 text-4xl">Global Creators</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Find talent across borders — filter by region, language, and specialty.
-          </p>
+    <div className="container py-12">
+      {/* Hub Header */}
+      <div className="mb-10">
+        <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground mb-3">Creator Hub</p>
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-display font-normal">
+              Find your perfect
+              <em className="text-primary/60"> creator.</em>
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground max-w-md">
+              2,400+ vetted creators across 40+ countries. Filter by niche, location, engagement and more.
+            </p>
+          </div>
+          <div className="flex gap-6 shrink-0">
+            {[["14", "Countries"], ["2.4K+", "Creators"], ["94%", "Satisfaction"]].map(([v, l]) => (
+              <div key={l} className="text-center">
+                <p className="text-2xl font-light">{v}</p>
+                <p className="text-[10px] text-muted-foreground tracking-wider">{l}</p>
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
+
+      {/* Quick niche pills */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {["All", "Fashion", "Beauty", "Lifestyle", "Food", "Fitness", "Luxury", "TikTok", "Travel"].map((niche) => (
+          <button
+            key={niche}
+            onClick={() => {
+              if (niche === "All") { setSearch(""); }
+              else setSearch(niche);
+            }}
+            className={`rounded-full border px-4 py-1.5 text-xs transition-colors ${
+              (niche === "All" && !search) || search === niche
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+            }`}
+          >
+            {niche}
+          </button>
+        ))}
+      </div>
+
+      {/* Search + filters row */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center gap-2">
           <div className="relative w-full max-w-sm">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
