@@ -19,6 +19,7 @@ import Community from "./pages/Community";
 import UploadVideo from "./pages/UploadVideo";
 import Matchmaker from "./pages/Matchmaker";
 import DesignShowcase from "./pages/DesignShowcase";
+import ContentActivation from "./pages/ContentActivation";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/community" element={<Community />} />
             <Route path="/matchmaker" element={<Matchmaker />} />
             <Route path="/designs" element={<DesignShowcase />} />
+            <Route path="/activate" element={<ContentActivation />} />
             <Route path="/dashboard" element={<BrandDashboard />} />
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />
