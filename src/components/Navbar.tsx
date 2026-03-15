@@ -8,6 +8,7 @@ import logo from "@/assets/logo.png";
 // Simplified nav — grouped by audience
 const BRAND_LINKS = [
   { to: "/for-brands", label: "For Brands" },
+  { to: "/make-ads", label: "⚡ Make Ads in Minutes" },
   { to: "/matchmaker", label: "AI Matchmaker" },
   { to: "/brief", label: "Brief Generator" },
   { to: "/brand-os", label: "Brand OS" },
