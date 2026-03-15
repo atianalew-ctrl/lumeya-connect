@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
+  { to: "/feed", label: "✦ Feed" },
   { to: "/creators", label: "Creators" },
   { to: "/matchmaker", label: "Matchmaker" },
   { to: "/opportunities", label: "Opportunities" },
