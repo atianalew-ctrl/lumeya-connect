@@ -33,7 +33,7 @@ const ForBrandsPage = () => (
     {/* HERO */}
     <section className="relative bg-[#080808] text-white min-h-[90vh] flex flex-col justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&q=85" alt="" className="w-full h-full object-cover opacity-20" />
+        <img src="https://images.unsplash.com/photo-1550614000-4895a10e1bfd?w=1600&q=85" alt="" className="w-full h-full object-cover opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
       </div>
 
