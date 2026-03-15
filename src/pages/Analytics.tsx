@@ -35,9 +35,9 @@ const CHANNELS = [
 ];
 
 const CREATORS_PERF = [
-  { name: "Ronja Aaslund", platform: "Instagram + TikTok", reach: "52,100", roi: "4.2x", avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80" },
-  { name: "Nella Ryglova", platform: "TikTok", reach: "28,400", roi: "3.8x", avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80" },
-  { name: "Sussie Agger", platform: "Instagram", reach: "18,900", roi: "3.1x", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80" },
+  { name: "Ronja Aaslund", platform: "Instagram + TikTok", reach: "52,100", roi: "4.2x", avatar: "/lovable-uploads/488193ca-12b4-40ef-905e-1c618634eef9.jpg" },
+  { name: "Nella Ryglova", platform: "TikTok", reach: "28,400", roi: "3.8x", avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png" },
+  { name: "Sussie Agger", platform: "Instagram", reach: "18,900", roi: "3.1x", avatar: "/lovable-uploads/ff812edb-72d9-419a-809e-81d311763fdb.jpg" },
 ];
 
 const Analytics = () => {

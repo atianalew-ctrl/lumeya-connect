@@ -8,7 +8,7 @@ import { creators } from "@/lib/data";
 const CONTENT = [
   {
     id: 1, creator: "Ronja Aaslund", handle: "@ronjaaaslund",
-    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80",
+    avatar: "/lovable-uploads/488193ca-12b4-40ef-905e-1c618634eef9.jpg",
     image: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80",
     type: "reel", category: "Fashion", brand: "GlowCo",
     caption: "Morning ritual ✦ when your skincare routine becomes your favourite part of the day",
@@ -16,7 +16,7 @@ const CONTENT = [
   },
   {
     id: 2, creator: "Nikoline Amelia", handle: "@nikoline.amelia",
-    avatar: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=400&q=80",
+    avatar: "/lovable-uploads/cd5a920c-8cf1-4735-9844-a67d2c7e4d28.png",
     image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&q=80",
     type: "photo", category: "Lifestyle", brand: "Arket",
     caption: "Copenhagen summer. Nothing else needed.",
@@ -24,7 +24,7 @@ const CONTENT = [
   },
   {
     id: 3, creator: "Sussie Agger", handle: "@sussieagger",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80",
+    avatar: "/lovable-uploads/ff812edb-72d9-419a-809e-81d311763fdb.jpg",
     image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=600&q=80",
     type: "photo", category: "Fashion", brand: "NA-KD",
     caption: "The pieces that stay. Season after season.",
@@ -32,7 +32,7 @@ const CONTENT = [
   },
   {
     id: 4, creator: "Amalie Asheim", handle: "@amalieasheim",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80",
+    avatar: "/lovable-uploads/b0a2c103-a2be-4f3e-8785-4b072d9f90cf.png",
     image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&q=80",
     type: "reel", category: "Travel", brand: "Wanderlust",
     caption: "Bali mornings hit different when the work is this good 🌿",
@@ -40,7 +40,7 @@ const CONTENT = [
   },
   {
     id: 5, creator: "Nella Ryglova", handle: "@nellaryglova",
-    avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80",
+    avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png",
     image: "https://images.unsplash.com/photo-1526738549149-8e07eca6c147?w=600&q=80",
     type: "photo", category: "Beauty", brand: "LuxeBeauty",
     caption: "Clean skin, cleaner conscience. This is the routine.",
@@ -48,7 +48,7 @@ const CONTENT = [
   },
   {
     id: 6, creator: "Celina Beck", handle: "@celinabeck",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+    avatar: "/lovable-uploads/0eabe39f-7869-4598-9148-b1264c4af989.jpg",
     image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80",
     type: "photo", category: "Fashion", brand: "COS",
     caption: "Minimal wardrobe. Maximum presence.",
@@ -56,7 +56,7 @@ const CONTENT = [
   },
   {
     id: 7, creator: "Ronja Aaslund", handle: "@ronjaaaslund",
-    avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80",
+    avatar: "/lovable-uploads/488193ca-12b4-40ef-905e-1c618634eef9.jpg",
     image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80",
     type: "reel", category: "Beauty", brand: "FreshFace",
     caption: "No filter. Just good skin and good light.",
@@ -64,7 +64,7 @@ const CONTENT = [
   },
   {
     id: 8, creator: "Amalie Asheim", handle: "@amalieasheim",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80",
+    avatar: "/lovable-uploads/b0a2c103-a2be-4f3e-8785-4b072d9f90cf.png",
     image: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80",
     type: "photo", category: "Lifestyle", brand: "Oatly",
     caption: "The brand that matches the lifestyle. Always.",
@@ -72,7 +72,7 @@ const CONTENT = [
   },
   {
     id: 9, creator: "Nella Ryglova", handle: "@nellaryglova",
-    avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80",
+    avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png",
     image: "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80",
     type: "photo", category: "Fashion", brand: "Ganni",
     caption: "She wore it first. You saw it here.",
@@ -80,7 +80,7 @@ const CONTENT = [
   },
   {
     id: 10, creator: "Sussie Agger", handle: "@sussieagger",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80",
+    avatar: "/lovable-uploads/ff812edb-72d9-419a-809e-81d311763fdb.jpg",
     image: "https://images.unsplash.com/photo-1550614000-4895a10e1bfd?w=600&q=80",
     type: "reel", category: "Lifestyle", brand: "1 People",
     caption: "Sustainable never looked so good. Or felt this way.",
@@ -88,7 +88,7 @@ const CONTENT = [
   },
   {
     id: 11, creator: "Celina Beck", handle: "@celinabeck",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&q=80",
+    avatar: "/lovable-uploads/0eabe39f-7869-4598-9148-b1264c4af989.jpg",
     image: "https://images.unsplash.com/photo-1566206091558-7f218b696731?w=600&q=80",
     type: "photo", category: "Beauty", brand: "GlowCo",
     caption: "Morning light and the serum that started it all.",
@@ -96,7 +96,7 @@ const CONTENT = [
   },
   {
     id: 12, creator: "Nikoline Amelia", handle: "@nikoline.amelia",
-    avatar: "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=400&q=80",
+    avatar: "/lovable-uploads/cd5a920c-8cf1-4735-9844-a67d2c7e4d28.png",
     image: "https://images.unsplash.com/photo-1602488283247-29bf1f5b148a?w=600&q=80",
     type: "reel", category: "Travel", brand: "Wanderlust",
     caption: "Paris in March. You already know.",
