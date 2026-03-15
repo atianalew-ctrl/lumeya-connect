@@ -11,6 +11,29 @@ import { toast } from "sonner";
 
 const categories = ["UGC", "Photography", "Videography", "Social Media", "Design", "Writing"];
 
+const UGC_TYPES = [
+  { id: "product-review", label: "Product Review", desc: "Creator reviews your product honestly on camera" },
+  { id: "unboxing", label: "Unboxing", desc: "Raw, authentic first-impression unboxing" },
+  { id: "testimonial", label: "Testimonial", desc: "Personal story about results or experience" },
+  { id: "lifestyle", label: "Lifestyle Content", desc: "Product naturally integrated into daily life" },
+  { id: "tutorial", label: "Tutorial / How-to", desc: "Step-by-step how to use your product" },
+  { id: "problem-solution", label: "Problem → Solution", desc: "Pain point in first 3 seconds, product as the answer" },
+  { id: "broll", label: "Voiceover / B-roll", desc: "Clean product footage with narration, no face needed" },
+  { id: "tiktok-trend", label: "TikTok Trend", desc: "Product integrated into a trending audio or format" },
+  { id: "vlog", label: "Vlog / Day-in-the-life", desc: "Creator features product in their daily routine" },
+  { id: "comparison", label: "Before & After", desc: "Transformation or comparison showing results" },
+];
+
+const PLATFORMS = [
+  { id: "ugc-only", label: "UGC Only", desc: "Raw files delivered to us — creator does not post", icon: "📦" },
+  { id: "tiktok", label: "TikTok", desc: "Creator posts on their TikTok account", icon: "🎵" },
+  { id: "instagram-reels", label: "Instagram Reels", desc: "Creator posts as a Reel on their Instagram", icon: "📸" },
+  { id: "instagram-story", label: "Instagram Story", desc: "Creator posts as a Story with link", icon: "⭕" },
+  { id: "instagram-feed", label: "Instagram Feed Post", desc: "Static or carousel post on their feed", icon: "🖼" },
+  { id: "youtube-short", label: "YouTube Shorts", desc: "Creator posts on their YouTube channel", icon: "▶️" },
+  { id: "both", label: "UGC + Creator Posts", desc: "We get raw files AND creator posts on their channels", icon: "✦" },
+];
+
 type ScriptIdea = { hook: string; concept: string; style: string };
 
 const PostOpportunity = () => {
@@ -30,6 +53,11 @@ const PostOpportunity = () => {
   const [deadline, setDeadline] = useState("");
   const [location, setLocation] = useState("");
   const [timeline, setTimeline] = useState("");
+  const [selectedUGCTypes, setSelectedUGCTypes] = useState<string[]>([]);
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
+
+  const toggleUGCType = (id: string) => setSelectedUGCTypes(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  const togglePlatform = (id: string) => setSelectedPlatforms(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
 
   const callAI = async (action: string, input: Record<string, string>) => {
     const { data, error } = await supabase.functions.invoke("ai-brief", {
@@ -263,6 +291,70 @@ const PostOpportunity = () => {
                 <RefineButton field="deliverables" />
               </div>
               <Textarea id="deliverables" required rows={4} placeholder={"5 short-form videos\nVertical format for TikTok\nRaw footage included"} value={deliverables} onChange={e => setDeliverables(e.target.value)} />
+            </div>
+          </div>
+
+          {/* UGC Type */}
+          <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+            <div>
+              <h2 className="text-base font-semibold">Content Type</h2>
+              <p className="text-xs text-muted-foreground mt-1">What kind of UGC do you need? Select all that apply.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {UGC_TYPES.map(t => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => toggleUGCType(t.id)}
+                  className={`text-left rounded-xl border p-3 transition-all ${
+                    selectedUGCTypes.includes(t.id)
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium">{t.label}</span>
+                    {selectedUGCTypes.includes(t.id) && (
+                      <span className="h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                        <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">{t.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Posting platform */}
+          <div className="rounded-lg border border-border bg-card p-6 space-y-4">
+            <div>
+              <h2 className="text-base font-semibold">Where Should Creators Post?</h2>
+              <p className="text-xs text-muted-foreground mt-1">Choose if you want raw UGC files only, or creators to also publish on their own channels.</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {PLATFORMS.map(p => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => togglePlatform(p.id)}
+                  className={`text-left rounded-xl border p-3 transition-all ${
+                    selectedPlatforms.includes(p.id)
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/30"
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium flex items-center gap-1.5">{p.icon} {p.label}</span>
+                    {selectedPlatforms.includes(p.id) && (
+                      <span className="h-4 w-4 rounded-full bg-primary flex items-center justify-center">
+                        <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 3L3 5L7 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">{p.desc}</p>
+                </button>
+              ))}
             </div>
           </div>
 
