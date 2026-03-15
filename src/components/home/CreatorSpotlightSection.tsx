@@ -7,7 +7,7 @@ import { creators } from "@/lib/data";
 const spotlightCreators = [creators[0], creators[2], creators[4]];
 
 const CreatorSpotlightSection = () => (
-  <section className="border-t border-border py-24">
+  <section className="border-t border-border py-24 bg-accent/30">
     <div className="container">
       <motion.div
         initial={{ opacity: 0 }}

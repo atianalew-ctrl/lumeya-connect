@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 import AIMatchmaker from "@/components/matchmaker/AIMatchmaker";
 
 const MatchmakerSection = () => (
-  <section className="border-t border-border py-20">
+  <section className="border-t border-border py-20 bg-primary/[0.03]">
     <div className="container max-w-2xl">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
