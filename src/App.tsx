@@ -28,6 +28,7 @@ import ContractSigning from "./pages/ContractSigning";
 import Analytics from "./pages/Analytics";
 import ContentBoard from "./pages/ContentBoard";
 import Notifications from "./pages/Notifications";
+import ForBrandsPage from "./pages/ForBrands";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/feed" element={<ContentBoard />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/for-brands" element={<ForBrandsPage />} />
             <Route path="/dashboard" element={<BrandDashboard />} />
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />
