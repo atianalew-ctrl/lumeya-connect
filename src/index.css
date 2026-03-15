@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&family=DM+Serif+Display&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,35 +6,37 @@
 
 @layer base {
   :root {
-    --background: 40 10% 97%;
-    --foreground: 220 12% 18%;
+    /* Elevated warm ivory — more refined than before */
+    --background: 36 18% 96%;
+    --foreground: 220 15% 14%;
 
-    --card: 40 10% 99%;
-    --card-foreground: 220 12% 18%;
+    --card: 36 14% 98%;
+    --card-foreground: 220 15% 14%;
 
-    --popover: 40 10% 99%;
-    --popover-foreground: 220 12% 18%;
+    --popover: 36 14% 98%;
+    --popover-foreground: 220 15% 14%;
 
-    --primary: 210 18% 58%;
+    /* Richer primary — deeper slate blue, more exclusive */
+    --primary: 215 25% 42%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 8% 93%;
+    --secondary: 35 10% 91%;
     --secondary-foreground: 220 10% 28%;
 
-    --muted: 35 6% 94%;
-    --muted-foreground: 220 8% 52%;
+    --muted: 35 8% 93%;
+    --muted-foreground: 220 10% 48%;
 
-    --accent: 35 10% 91%;
-    --accent-foreground: 210 15% 32%;
+    --accent: 35 12% 89%;
+    --accent-foreground: 215 20% 30%;
 
     --destructive: 0 50% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 35 6% 90%;
-    --input: 35 6% 90%;
-    --ring: 210 18% 58%;
+    --border: 35 8% 88%;
+    --input: 35 8% 88%;
+    --ring: 215 25% 42%;
 
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 40 10% 97%;
     --sidebar-foreground: 220 8% 28%;
@@ -84,12 +86,26 @@
   body {
     @apply bg-background text-foreground font-body antialiased;
     letter-spacing: 0.01em;
+    font-feature-settings: "liga" 1, "kern" 1;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
+    font-feature-settings: "liga" 1;
   }
+
+  /* Refined scrollbar */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--muted-foreground)); }
+
+  /* Selection colour */
+  ::selection { background: hsl(var(--primary) / 0.15); }
+
+  /* Smooth link transitions */
+  a { transition: color 0.15s ease, opacity 0.15s ease; }
 
   /* Scandinavian spacing rhythm */
   section {

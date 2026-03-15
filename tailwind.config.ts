@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ["DM Serif Display", "Georgia", "serif"],
-        body: ["DM Sans", "system-ui", "sans-serif"],
+        display: ["Playfair Display", "DM Serif Display", "Georgia", "serif"],
+        body: ["Inter", "DM Sans", "system-ui", "sans-serif"],
       },
       letterSpacing: {
         "scandi": "0.08em",
