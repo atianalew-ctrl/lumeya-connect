@@ -64,13 +64,13 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-5xl md:text-7xl font-display font-normal leading-[1.05] text-white mb-6"
+            className="text-5xl md:text-7xl font-display font-bold leading-[1.0] text-white mb-6"
           >
-            Where brands
+            Make ads
             <br />
-            <em className="text-white/60">meet creators</em>
+            <span className="text-white/90">in minutes.</span>
             <br />
-            who convert.
+            <em className="text-white/30 font-normal text-3xl md:text-5xl">The biggest hub for exclusive creators.</em>
           </motion.h1>
 
           {/* Subtext */}
@@ -80,7 +80,7 @@ const HeroSection = () => {
             transition={{ delay: 0.35 }}
             className="text-sm text-white/50 leading-relaxed max-w-sm mb-10"
           >
-            Find, brief, and collaborate with world-class UGC creators in one place. No agencies. No middlemen.
+            Pick a vetted creator. Get a scroll-stopping ad. 48 hours. No agency. No BS.
           </motion.p>
 
           {/* CTAs */}
@@ -91,10 +91,10 @@ const HeroSection = () => {
             className="flex flex-wrap gap-3 mb-16"
           >
             <Link
-              to="/post-opportunity"
-              className="inline-flex items-center gap-2 bg-white text-black px-7 py-3.5 text-xs font-medium tracking-widest uppercase hover:bg-white/90 transition-all"
+              to="/make-ads"
+              className="inline-flex items-center gap-2 bg-white text-black px-7 py-3.5 text-xs font-semibold tracking-widest uppercase hover:bg-white/90 transition-all hover:scale-105"
             >
-              Post a Campaign <ArrowRight size={13} />
+              ⚡ Make My Ad <ArrowRight size={13} />
             </Link>
             <Link
               to="/creators"
