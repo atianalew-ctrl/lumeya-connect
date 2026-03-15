@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Bell } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -68,6 +68,12 @@ const Navbar = () => {
 
         {/* Right side */}
         <div className="hidden items-center gap-2 md:flex shrink-0">
+          {/* Notification bell */}
+          <Link to="/notifications" className="relative h-9 w-9 flex items-center justify-center rounded-full hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
+            <Bell size={16} />
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-primary border border-background" />
+          </Link>
+
           {/* Black pill — always visible */}
           <Link
             to="/black"
