@@ -8,6 +8,7 @@ import logo from "@/assets/logo.png";
 const navLinks = [
   { to: "/", label: "Home" },
   { to: "/creators", label: "Creators" },
+  { to: "/matchmaker", label: "✨ Matchmaker" },
   { to: "/opportunities", label: "Opportunities" },
   { to: "/community", label: "Community" },
 ];

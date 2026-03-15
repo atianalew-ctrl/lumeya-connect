@@ -17,6 +17,7 @@ import BrandDashboard from "./pages/BrandDashboard";
 import CampaignWorkspace from "./pages/CampaignWorkspace";
 import Community from "./pages/Community";
 import UploadVideo from "./pages/UploadVideo";
+import Matchmaker from "./pages/Matchmaker";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/post-opportunity" element={<PostOpportunity />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/community" element={<Community />} />
+            <Route path="/matchmaker" element={<Matchmaker />} />
             <Route path="/dashboard" element={<BrandDashboard />} />
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />

@@ -1,6 +1,7 @@
 import HeroSection from "@/components/home/HeroSection";
 import BrandLogoBar from "@/components/home/BrandLogoBar";
 import CollabTicker from "@/components/home/CollabTicker";
+import MatchmakerSection from "@/components/home/MatchmakerSection";
 import DiscoverCreatorsSection from "@/components/home/DiscoverCreatorsSection";
 import CategoriesSection from "@/components/home/CategoriesSection";
 import SearchFilterSection from "@/components/home/SearchFilterSection";
@@ -17,6 +18,7 @@ const Index = () => (
     <HeroSection />
     <CollabTicker />
     <BrandLogoBar />
+    <MatchmakerSection />
     <DiscoverCreatorsSection />
     <HowItWorksSection />
     <CreatorCommunitySection />
