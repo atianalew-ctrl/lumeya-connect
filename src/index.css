@@ -101,4 +101,36 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Swipeable card utility */
+  .swipe-card {
+    touch-action: pan-y;
+    user-select: none;
+  }
+
+  /* Smooth scrolling ticker pause on hover */
+  .ticker-wrap:hover .ticker-inner {
+    animation-play-state: paused;
+  }
+}
+
+/* Enhanced dark mode — warm charcoal with sand accents */
+.dark body {
+  background: hsl(220, 12%, 7%);
+}
+
+.dark .bg-card {
+  background: hsl(220, 12%, 10%);
+}
+
+/* Subtle animated gradient for primary buttons in dark mode */
+.dark .btn-primary-gradient {
+  background: linear-gradient(135deg, hsl(210, 25%, 45%), hsl(200, 30%, 38%));
+}
+
+/* Creator card hover glow */
+.creator-card-hover:hover {
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3), 0 8px 32px hsl(var(--primary) / 0.08);
+  transform: translateY(-2px);
+  transition: all 0.25s ease;
 }

@@ -1,5 +1,6 @@
 import HeroSection from "@/components/home/HeroSection";
 import BrandLogoBar from "@/components/home/BrandLogoBar";
+import CollabTicker from "@/components/home/CollabTicker";
 import DiscoverCreatorsSection from "@/components/home/DiscoverCreatorsSection";
 import CategoriesSection from "@/components/home/CategoriesSection";
 import SearchFilterSection from "@/components/home/SearchFilterSection";
@@ -14,6 +15,7 @@ import CTASection from "@/components/home/CTASection";
 const Index = () => (
   <div>
     <HeroSection />
+    <CollabTicker />
     <BrandLogoBar />
     <DiscoverCreatorsSection />
     <HowItWorksSection />

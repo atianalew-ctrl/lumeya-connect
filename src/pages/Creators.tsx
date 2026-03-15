@@ -1,7 +1,8 @@
-import { motion } from "framer-motion";
-import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check } from "lucide-react";
-import { useState, useMemo } from "react";
+import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check, Heart, XCircle } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { creators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
@@ -52,6 +53,10 @@ const Creators = () => {
   const [remoteOnly, setRemoteOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(true);
   const [locationOpen, setLocationOpen] = useState(false);
+  const [swipeMode, setSwipeMode] = useState(false);
+  const [swipeIndex, setSwipeIndex] = useState(0);
+  const [saved, setSaved] = useState<number[]>([]);
+  const isMobile = useIsMobile();
 
   const toggleFilter = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
@@ -327,20 +332,90 @@ const Creators = () => {
         </div>
       )}
 
-      {/* Results count */}
-      <p className="mt-6 text-xs text-muted-foreground">
-        {filtered.length} creator{filtered.length !== 1 ? "s" : ""} found
-      </p>
+      {/* Results count + swipe toggle */}
+      <div className="mt-6 flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          {filtered.length} creator{filtered.length !== 1 ? "s" : ""} found
+        </p>
+        {isMobile && (
+          <button
+            onClick={() => { setSwipeMode(!swipeMode); setSwipeIndex(0); }}
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${
+              swipeMode ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
+            }`}
+          >
+            {swipeMode ? "Grid view" : "✨ Swipe mode"}
+          </button>
+        )}
+      </div>
 
-      {/* Grid */}
-      <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {/* Swipe mode — mobile only */}
+      {swipeMode && isMobile && filtered.length > 0 && (
+        <div className="mt-6 flex flex-col items-center gap-4">
+          <p className="text-xs text-muted-foreground">{swipeIndex + 1} / {filtered.length}</p>
+          <div className="relative w-full max-w-xs h-[480px]">
+            {filtered.slice(swipeIndex, swipeIndex + 2).reverse().map((creator, i) => (
+              <motion.div
+                key={creator.id}
+                className={`absolute inset-0 rounded-2xl border border-border bg-card p-6 shadow-lg swipe-card ${i === 1 ? "z-10" : "z-0 scale-95 opacity-60"}`}
+                drag={i === 1 ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragEnd={(_, info) => {
+                  if (Math.abs(info.offset.x) > 80) {
+                    if (info.offset.x > 0) setSaved(s => [...s, creator.id]);
+                    setSwipeIndex(idx => Math.min(idx + 1, filtered.length - 1));
+                  }
+                }}
+                whileDrag={{ rotate: (0.05 * 1) }}
+              >
+                <img src={creator.avatar} alt={creator.name} className="h-16 w-16 rounded-full object-cover mx-auto" />
+                <h3 className="mt-3 text-center text-lg font-semibold">{creator.name}</h3>
+                <p className="text-center text-xs text-muted-foreground">{creator.role}</p>
+                <p className="text-center text-xs text-muted-foreground mt-1 flex items-center justify-center gap-1"><MapPin size={10} />{creator.location}</p>
+                <p className="mt-4 text-sm text-muted-foreground leading-relaxed line-clamp-3">{creator.bio}</p>
+                <div className="mt-3 flex flex-wrap justify-center gap-1.5">
+                  {creator.tags.slice(0, 3).map(tag => (
+                    <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[11px]">{tag}</span>
+                  ))}
+                </div>
+                <div className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground">
+                  <Star size={11} className="text-primary" /> {creator.rating} · {creator.portfolio} works
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          <div className="flex items-center gap-6">
+            <button onClick={() => setSwipeIndex(i => Math.min(i + 1, filtered.length - 1))} className="flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card shadow-md text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors">
+              <XCircle size={22} />
+            </button>
+            <Button size="sm" asChild variant="outline">
+              <Link to={`/creators/${filtered[swipeIndex]?.id}`}>View Profile</Link>
+            </Button>
+            <button onClick={() => { setSaved(s => [...s, filtered[swipeIndex]?.id]); setSwipeIndex(i => Math.min(i + 1, filtered.length - 1)); }} className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/40 bg-primary/10 shadow-md text-primary hover:bg-primary/20 transition-colors">
+              <Heart size={22} />
+            </button>
+          </div>
+          {saved.length > 0 && (
+            <p className="text-xs text-muted-foreground">{saved.length} creator{saved.length > 1 ? "s" : ""} saved ❤️</p>
+          )}
+          {swipeIndex >= filtered.length - 1 && (
+            <div className="text-center text-sm text-muted-foreground py-4">
+              <p>You've seen all creators! 🎉</p>
+              <button onClick={() => setSwipeIndex(0)} className="mt-2 text-primary hover:underline text-xs">Start over</button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Grid — hidden in swipe mode */}
+      {!swipeMode && <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((creator, i) => (
           <motion.div
             key={creator.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
+            className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30 creator-card-hover"
           >
             <div className="flex items-center gap-3">
               <img src={creator.avatar} alt={creator.name} className="h-10 w-10 rounded-full bg-accent object-cover" />
@@ -383,9 +458,9 @@ const Creators = () => {
             </div>
           </motion.div>
         ))}
-      </div>
+      </div>}
 
-      {filtered.length === 0 && (
+      {filtered.length === 0 && !swipeMode && (
         <div className="mt-20 text-center text-muted-foreground">
           <Globe size={32} className="mx-auto mb-3 text-muted-foreground/50" />
           <p>No creators found matching your filters.</p>
