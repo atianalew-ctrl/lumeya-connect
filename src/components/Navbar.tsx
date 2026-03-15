@@ -13,6 +13,9 @@ const navLinks = [
   { to: "/activate", label: "Activate" },
   { to: "/brief", label: "Brief" },
   { to: "/brand-os", label: "Brand OS" },
+  { to: "/analytics", label: "Analytics" },
+  { to: "/contract", label: "Contracts" },
+  { to: "/pricing", label: "Pricing" },
 ];
 
 const authNavLinks = [

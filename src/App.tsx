@@ -23,6 +23,9 @@ import ContentActivation from "./pages/ContentActivation";
 import LumeyaBlack from "./pages/LumeyaBlack";
 import BrandOS from "./pages/BrandOS";
 import BriefGenerator from "./pages/BriefGenerator";
+import Pricing from "./pages/Pricing";
+import ContractSigning from "./pages/ContractSigning";
+import Analytics from "./pages/Analytics";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -54,6 +57,9 @@ const App = () => (
             <Route path="/black" element={<LumeyaBlack />} />
             <Route path="/brand-os" element={<BrandOS />} />
             <Route path="/brief" element={<BriefGenerator />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/contract" element={<ContractSigning />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/dashboard" element={<BrandDashboard />} />
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />
