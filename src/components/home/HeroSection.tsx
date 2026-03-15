@@ -20,6 +20,7 @@ const HeroSection = () =>
         muted
         loop
         playsInline
+        preload="auto"
         className="h-full w-full object-cover blur-[2px] brightness-90 saturate-[1.1]"
         poster="/images/hero-bg.jpg"
       >

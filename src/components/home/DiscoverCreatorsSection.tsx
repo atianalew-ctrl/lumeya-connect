@@ -75,36 +75,35 @@ const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeo
 
   const videoSrc = uploadedVideoUrl || creator.videoUrl;
 
-  // Lazy load: only load video src when card enters viewport
+  // Preload videos aggressively — show immediately when in view
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setIsVisible(true); observer.disconnect(); } },
-      { rootMargin: "200px" }
+      { rootMargin: "600px" } // preload much earlier
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
+  // Autoplay as soon as video is visible
+  useEffect(() => {
+    if (isVisible && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, [isVisible]);
+
   const handleMouseEnter = () => {
     setIsHovering(true);
     if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play().catch(() => {}); // play() returns a promise; ignore autoplay errors
-      previewTimeout.current = setTimeout(() => {
-        if (videoRef.current) { videoRef.current.pause(); }
-      }, 5000);
+      videoRef.current.play().catch(() => {});
     }
   };
 
   const handleMouseLeave = () => {
     setIsHovering(false);
-    clearTimeout(previewTimeout.current);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
+    // keep playing — looks better
   };
 
   return (
@@ -127,7 +126,7 @@ const CreatorVideoCard = ({ creator, index, uploadedVideoUrl }: { creator: typeo
             muted
             loop
             playsInline
-            preload="metadata"
+            preload="auto"
             className="absolute inset-0 h-full w-full object-cover"
           />
         )}
