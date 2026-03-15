@@ -22,12 +22,12 @@ const ICON_MAP: Record<NotifType, { icon: React.ElementType; color: string; bg: 
 };
 
 const INITIAL: Notif[] = [
-  { id: 1, type: "application", title: "New creator application", body: "Ronja Aaslund applied to your Summer Serum campaign", time: "2 min ago", read: false, avatar: "/lovable-uploads/488193ca-12b4-40ef-905e-1c618634eef9.jpg", action: "Review application" },
+  { id: 1, type: "application", title: "New creator application", body: "Ronja Aaslund applied to your Summer Serum campaign", time: "2 min ago", read: false, avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80", action: "Review application" },
   { id: 2, type: "message", title: "New message from NA-KD", body: "Can you send your media kit? We'd love to move forward.", time: "12 min ago", read: false, avatar: "https://ui-avatars.com/api/?name=NAKD&background=e8e0f5&color=6a4a8a&bold=true", action: "Reply" },
   { id: 3, type: "contract", title: "Contract signed ✦", body: "GlowCo has signed the collaboration agreement. Payment is now in escrow.", time: "1 hour ago", read: false, action: "View contract" },
   { id: 4, type: "payment", title: "Payment released 🎉", body: "€350 has been transferred to your account for the Wanderlust campaign.", time: "3 hours ago", read: true },
   { id: 5, type: "match", title: "New creator match", body: "We found 3 creators that are a perfect match for your brief — 95%+ compatibility score.", time: "5 hours ago", read: true, action: "See matches" },
-  { id: 6, type: "review", title: "New review received", body: "Sussie Agger left you a 5-star review: 'Incredible to work with, very clear brief.'", time: "Yesterday", read: true, avatar: "/lovable-uploads/ff812edb-72d9-419a-809e-81d311763fdb.jpg" },
+  { id: 6, type: "review", title: "New review received", body: "Sussie Agger left you a 5-star review: 'Incredible to work with, very clear brief.'", time: "Yesterday", read: true, avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80" },
   { id: 7, type: "application", title: "2 new applications", body: "Nella Ryglova and Amalie Asheim applied to your TikTok campaign.", time: "Yesterday", read: true, action: "Review" },
   { id: 8, type: "system", title: "Welcome to Lumeya ✦", body: "Your brand profile is live. Start posting an opportunity or browse creators to get started.", time: "2 days ago", read: true },
 ];

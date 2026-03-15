@@ -21,10 +21,10 @@ const FEATURES = [
 ];
 
 const CREATORS = [
-  { name: "Ronja Aaslund", niche: "Fashion & Beauty", followers: "42.8K", engagement: "5.2%", avatar: "/lovable-uploads/488193ca-12b4-40ef-905e-1c618634eef9.jpg" },
-  { name: "Sussie Agger", niche: "Lifestyle & TikTok", followers: "89.2K", engagement: "6.8%", avatar: "/lovable-uploads/ff812edb-72d9-419a-809e-81d311763fdb.jpg" },
-  { name: "Amalie Asheim", niche: "Travel & Luxury", followers: "124K", engagement: "3.9%", avatar: "/lovable-uploads/b0a2c103-a2be-4f3e-8785-4b072d9f90cf.png" },
-  { name: "Nella Ryglova", niche: "Food & Fashion", followers: "31.6K", engagement: "7.1%", avatar: "/lovable-uploads/59419297-8971-48c3-a2c5-2b636c4b1db6.png" },
+  { name: "Ronja Aaslund", niche: "Fashion & Beauty", followers: "42.8K", engagement: "5.2%", avatar: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&q=80" },
+  { name: "Sussie Agger", niche: "Lifestyle & TikTok", followers: "89.2K", engagement: "6.8%", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&q=80" },
+  { name: "Amalie Asheim", niche: "Travel & Luxury", followers: "124K", engagement: "3.9%", avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80" },
+  { name: "Nella Ryglova", niche: "Food & Fashion", followers: "31.6K", engagement: "7.1%", avatar: "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&q=80" },
 ];
 
 const ForBrandsPage = () => (
