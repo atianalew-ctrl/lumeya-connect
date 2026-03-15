@@ -29,6 +29,7 @@ import Analytics from "./pages/Analytics";
 import ContentBoard from "./pages/ContentBoard";
 import Notifications from "./pages/Notifications";
 import ForBrandsPage from "./pages/ForBrands";
+import Welcome from "./pages/Welcome";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/feed" element={<ContentBoard />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/for-brands" element={<ForBrandsPage />} />
+            <Route path="/welcome" element={<Welcome />} />
             <Route path="/dashboard" element={<BrandDashboard />} />
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />
