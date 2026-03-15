@@ -408,54 +408,82 @@ const Creators = () => {
       )}
 
       {/* Grid — hidden in swipe mode */}
-      {!swipeMode && <div className="mt-4 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {!swipeMode && <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((creator, i) => (
           <motion.div
             key={creator.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
-            className="group cursor-pointer rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30 creator-card-hover"
           >
-            <div className="flex items-center gap-3">
-              <img src={creator.avatar} alt={creator.name} className="h-10 w-10 rounded-full bg-accent object-cover" />
-              <div>
-                <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">{creator.name}</h3>
-                <p className="text-xs text-muted-foreground">{creator.role}</p>
-              </div>
-            </div>
-            <div className="mt-3 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><MapPin size={10} />{creator.location}</span>
-              <span className="flex items-center gap-1"><Star size={10} className="text-primary" />{creator.rating}</span>
-            </div>
+            <Link to={`/creators/${creator.id}`} className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg">
+              {/* Big hero photo */}
+              <div className="relative aspect-[3/4] overflow-hidden bg-accent">
+                <img
+                  src={creator.avatar}
+                  alt={creator.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
-            {/* Languages */}
-            <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-              <Languages size={10} />
-              <span>{creator.languages.join(", ")}</span>
-            </div>
-
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground line-clamp-2">{creator.bio}</p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {creator.tags.map((tag) => (
-                <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[11px] text-accent-foreground">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <div className="mt-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-muted-foreground">{creator.portfolio} works</span>
+                {/* Remote badge */}
                 {creator.availableForRemote && (
-                  <span className="flex items-center gap-0.5 text-[10px] text-primary">
-                    <Wifi size={9} /> Remote
-                  </span>
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
+                      <Wifi size={8} /> Remote
+                    </span>
+                  </div>
                 )}
+
+                {/* Rating badge */}
+                <div className="absolute top-3 right-3">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
+                    <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
+                  </span>
+                </div>
+
+                {/* Name + location overlay */}
+                <div className="absolute bottom-3 left-3 right-3">
+                  <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    <MapPin size={9} className="text-white/50" />
+                    <span className="text-[10px] text-white/50">{creator.location}</span>
+                  </div>
+                </div>
               </div>
-              <Button size="sm" variant="outline" className="text-xs h-7" asChild>
-                <Link to={`/creators/${creator.id}`}>View</Link>
-              </Button>
-            </div>
+
+              {/* Stats row */}
+              <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-medium">{creator.followersK || "—"}</p>
+                  <p className="text-[9px] text-muted-foreground">Followers</p>
+                </div>
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-medium text-emerald-500">{creator.engagementRate || "—"}</p>
+                  <p className="text-[9px] text-muted-foreground">Engagement</p>
+                </div>
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-medium">{creator.portfolio}</p>
+                  <p className="text-[9px] text-muted-foreground">Works</p>
+                </div>
+              </div>
+
+              {/* Tags + niche */}
+              <div className="p-3">
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {creator.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] text-muted-foreground">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">{creator.rates}</span>
+                  <span className="text-[10px] font-medium text-primary group-hover:underline">View profile →</span>
+                </div>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </div>}
