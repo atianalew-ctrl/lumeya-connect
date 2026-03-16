@@ -31,11 +31,20 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
 const toBase64 = (file: File): Promise<string> =>
   new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(file); });
 
-const call = async (action: string, data?: object, id?: string) => {
+// Call admin edge function
+const api = async (action: string, data?: object, id?: string) => {
   const { data: result, error } = await supabase.functions.invoke("admin-creators", { body: { action, data, id } });
   if (error) throw error;
-  if (!result?.ok) throw new Error(result?.error || "Unknown error");
+  if (!result?.ok) throw new Error(result?.error || "Error");
   return result;
+};
+
+// Upload a file via edge function → returns public URL
+const uploadFile = async (file: File, bucket: string): Promise<string> => {
+  const base64 = await toBase64(file);
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${file.name.split(".").pop()}`;
+  const result = await api("upload", { file: base64, bucket, filename });
+  return result.data.url;
 };
 
 const CreatorForm = ({ initial, onSave, onCancel }: {
@@ -57,8 +66,11 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
 
   const handleAvatar = async (file: File) => {
     setUploadingAvatar(true);
-    try { set("avatar_url", await toBase64(file)); toast.success("Photo ready!"); }
-    catch { toast.error("Failed to read image."); }
+    try {
+      const url = await uploadFile(file, "creator-avatars");
+      set("avatar_url", url);
+      toast.success("Profile photo uploaded! ✓");
+    } catch { toast.error("Upload failed."); }
     finally { setUploadingAvatar(false); }
   };
 
@@ -66,17 +78,21 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
     setUploadingPortfolio(true);
     try {
       const current = form.portfolio_images || [];
-      const newOnes = await Promise.all(Array.from(files).slice(0, 6 - current.length).map(toBase64));
-      set("portfolio_images", [...current, ...newOnes]);
-      toast.success(`${newOnes.length} photo${newOnes.length > 1 ? "s" : ""} added!`);
-    } catch { toast.error("Failed to read images."); }
+      const toUpload = Array.from(files).slice(0, 6 - current.length);
+      const urls = await Promise.all(toUpload.map(f => uploadFile(f, "creator-portfolio")));
+      set("portfolio_images", [...current, ...urls]);
+      toast.success(`${urls.length} photo${urls.length > 1 ? "s" : ""} uploaded! ✓`);
+    } catch { toast.error("Upload failed."); }
     finally { setUploadingPortfolio(false); }
   };
 
   const handleVideo = async (file: File) => {
     setUploadingVideo(true);
-    try { set("video_url", await toBase64(file)); toast.success("Video ready!"); }
-    catch { toast.error("Failed."); }
+    try {
+      const url = await uploadFile(file, "creator-videos");
+      set("video_url", url);
+      toast.success("Video uploaded! ✓");
+    } catch { toast.error("Video upload failed."); }
     finally { setUploadingVideo(false); }
   };
 
@@ -89,19 +105,32 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+
       {/* Profile photo + name */}
       <div className="flex items-start gap-4">
-        <div className="relative w-24 h-24 rounded-xl border-2 border-dashed border-border flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary/40 transition-colors bg-muted/30 flex-shrink-0" onClick={() => avatarRef.current?.click()}>
-          {form.avatar_url ? <img src={form.avatar_url} alt="" className="w-full h-full object-cover" />
-            : uploadingAvatar ? <Loader2 size={20} className="animate-spin text-muted-foreground" />
-            : <div className="text-center p-2"><ImageIcon size={18} className="mx-auto text-muted-foreground mb-1" /><p className="text-[10px] text-muted-foreground">Profile photo</p></div>}
-          {form.avatar_url && <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center"><Upload size={16} className="text-white" /></div>}
+        <div
+          className="relative w-28 h-28 rounded-xl border-2 border-dashed border-border flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary/40 transition-colors bg-muted/30 flex-shrink-0"
+          onClick={() => avatarRef.current?.click()}
+        >
+          {form.avatar_url
+            ? <img src={form.avatar_url} alt="" className="w-full h-full object-cover" />
+            : uploadingAvatar
+              ? <Loader2 size={22} className="animate-spin text-muted-foreground" />
+              : <div className="text-center p-2"><ImageIcon size={20} className="mx-auto text-muted-foreground mb-1" /><p className="text-[10px] text-muted-foreground">Profile photo</p></div>
+          }
+          {form.avatar_url && !uploadingAvatar && (
+            <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+              <Upload size={16} className="text-white" />
+              <p className="text-[10px] text-white">Change</p>
+            </div>
+          )}
         </div>
         <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleAvatar(e.target.files[0])} />
+
         <div className="flex-1 space-y-3">
           <div>
             <label className="text-xs text-muted-foreground block mb-1.5">Full name *</label>
-            <Input required placeholder="e.g. Nelly" value={form.display_name} onChange={e => set("display_name", e.target.value)} />
+            <Input required placeholder="e.g. Nelly Hansen" value={form.display_name} onChange={e => set("display_name", e.target.value)} />
           </div>
           <div>
             <label className="text-xs text-muted-foreground block mb-1.5">Role / tagline</label>
@@ -113,63 +142,86 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
       {/* Portfolio photos */}
       <div>
         <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-muted-foreground uppercase tracking-widest">Portfolio Photos (up to 6)</label>
+          <label className="text-xs text-muted-foreground uppercase tracking-widest">
+            Portfolio Photos ({form.portfolio_images?.length || 0}/6)
+          </label>
           {(form.portfolio_images?.length || 0) < 6 && (
-            <button type="button" onClick={() => portfolioRef.current?.click()} className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors">
-              {uploadingPortfolio ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />} Add photos
+            <button type="button" onClick={() => portfolioRef.current?.click()}
+              className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors">
+              {uploadingPortfolio ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+              {uploadingPortfolio ? "Uploading..." : "Add photos"}
             </button>
           )}
         </div>
-        <input ref={portfolioRef} type="file" accept="image/*" multiple className="hidden" onChange={e => e.target.files && e.target.files.length > 0 && handlePortfolio(e.target.files)} />
+        <input ref={portfolioRef} type="file" accept="image/*" multiple className="hidden"
+          onChange={e => e.target.files && e.target.files.length > 0 && handlePortfolio(e.target.files)} />
         <div className="grid grid-cols-3 gap-2">
           {(form.portfolio_images || []).map((img, idx) => (
-            <div key={idx} className="relative aspect-square rounded-lg overflow-hidden group">
+            <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group">
               <img src={img} alt="" className="w-full h-full object-cover" />
-              <button type="button" onClick={() => set("portfolio_images", (form.portfolio_images || []).filter((_, i) => i !== idx))}
-                className="absolute top-1 right-1 h-5 w-5 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <button type="button"
+                onClick={() => set("portfolio_images", (form.portfolio_images || []).filter((_, i) => i !== idx))}
+                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                 <X size={10} className="text-white" />
               </button>
             </div>
           ))}
           {(form.portfolio_images?.length || 0) < 6 && (
-            <div onClick={() => portfolioRef.current?.click()} className="aspect-square rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
-              {uploadingPortfolio ? <Loader2 size={18} className="animate-spin text-muted-foreground" /> : <Plus size={18} className="text-muted-foreground" />}
+            <div onClick={() => portfolioRef.current?.click()}
+              className="aspect-square rounded-xl border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
+              {uploadingPortfolio
+                ? <Loader2 size={20} className="animate-spin text-muted-foreground" />
+                : <Plus size={20} className="text-muted-foreground" />}
             </div>
           )}
         </div>
       </div>
 
-      {/* Video */}
+      {/* Intro video */}
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Intro Video</label>
         {form.video_url ? (
           <div className="relative rounded-xl overflow-hidden bg-black aspect-video">
             <video src={form.video_url} className="w-full h-full object-cover" controls muted />
-            <button type="button" onClick={() => set("video_url", null)} className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/60 flex items-center justify-center hover:bg-black/80 transition-colors"><X size={13} className="text-white" /></button>
+            <button type="button" onClick={() => set("video_url", null)}
+              className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/70 flex items-center justify-center hover:bg-black/90 transition-colors">
+              <X size={13} className="text-white" />
+            </button>
           </div>
         ) : (
-          <div onClick={() => videoRef.current?.click()} className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
-            {uploadingVideo ? <><Loader2 size={20} className="animate-spin text-muted-foreground mb-2" /><p className="text-xs text-muted-foreground">Processing...</p></>
-              : <><Video size={20} className="text-muted-foreground mb-2" /><p className="text-xs text-muted-foreground">Tap to upload intro video</p><p className="text-[10px] text-muted-foreground/60 mt-1">MP4, MOV</p></>}
+          <div onClick={() => videoRef.current?.click()}
+            className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
+            {uploadingVideo
+              ? <><Loader2 size={22} className="animate-spin text-muted-foreground mb-2" /><p className="text-xs text-muted-foreground">Uploading video...</p></>
+              : <><Video size={22} className="text-muted-foreground mb-2" /><p className="text-xs text-muted-foreground">Tap to upload intro video</p><p className="text-[10px] text-muted-foreground/60 mt-1">MP4, MOV</p></>}
           </div>
         )}
         <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideo(e.target.files[0])} />
       </div>
 
-      {/* Info fields */}
+      {/* Info */}
       <div className="grid grid-cols-2 gap-4">
-        <div><label className="text-xs text-muted-foreground block mb-1.5">Location</label><Input placeholder="Copenhagen, Denmark" value={form.location} onChange={e => set("location", e.target.value)} /></div>
-        <div><label className="text-xs text-muted-foreground block mb-1.5">Instagram handle</label><Input placeholder="@handle" value={form.instagram} onChange={e => set("instagram", e.target.value)} /></div>
+        <div><label className="text-xs text-muted-foreground block mb-1.5">Location</label>
+          <Input placeholder="Copenhagen, Denmark" value={form.location} onChange={e => set("location", e.target.value)} /></div>
+        <div><label className="text-xs text-muted-foreground block mb-1.5">Instagram</label>
+          <Input placeholder="@handle" value={form.instagram} onChange={e => set("instagram", e.target.value)} /></div>
       </div>
+
       <div><label className="text-xs text-muted-foreground block mb-1.5">Bio</label>
-        <textarea rows={3} placeholder="Tell brands about this creator..." value={form.bio} onChange={e => set("bio", e.target.value)}
+        <textarea rows={3} placeholder="Tell brands about this creator..." value={form.bio}
+          onChange={e => set("bio", e.target.value)}
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring" /></div>
+
       <div className="grid grid-cols-2 gap-4">
-        <div><label className="text-xs text-muted-foreground block mb-1.5">Rate / pricing</label><Input placeholder="€200–€500 per video" value={form.rates} onChange={e => set("rates", e.target.value)} /></div>
-        <div><label className="text-xs text-muted-foreground block mb-1.5">Tags (comma separated)</label><Input placeholder="Beauty, Lifestyle, UGC" value={tagInput} onChange={e => setTagInput(e.target.value)} /></div>
+        <div><label className="text-xs text-muted-foreground block mb-1.5">Rate / pricing</label>
+          <Input placeholder="€200–€500 per video" value={form.rates} onChange={e => set("rates", e.target.value)} /></div>
+        <div><label className="text-xs text-muted-foreground block mb-1.5">Tags (comma separated)</label>
+          <Input placeholder="Beauty, Lifestyle, UGC" value={tagInput} onChange={e => setTagInput(e.target.value)} /></div>
       </div>
+
       <div><label className="text-xs text-muted-foreground block mb-1.5">Rating (0–5)</label>
-        <Input type="number" step="0.1" min="0" max="5" placeholder="4.9" value={form.rating || ""} onChange={e => set("rating", Number(e.target.value))} className="w-32" /></div>
+        <Input type="number" step="0.1" min="0" max="5" placeholder="4.9" value={form.rating || ""}
+          onChange={e => set("rating", Number(e.target.value))} className="w-32" /></div>
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={saving} className="flex-1">
@@ -183,13 +235,16 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
 
 const CreatorCard = ({ creator, onEdit, onDelete }: { creator: Creator; onEdit: () => void; onDelete: () => void }) => (
   <div className="flex items-center gap-4 p-4 border border-border rounded-xl bg-card hover:border-primary/20 transition-all">
-    {creator.avatar_url ? <img src={creator.avatar_url} alt={creator.display_name} className="w-14 h-14 rounded-lg object-cover flex-shrink-0" />
-      : <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center flex-shrink-0"><Users size={20} className="text-muted-foreground" /></div>}
+    {creator.avatar_url
+      ? <img src={creator.avatar_url} alt={creator.display_name} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
+      : <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center flex-shrink-0"><Users size={22} className="text-muted-foreground" /></div>}
     <div className="flex-1 min-w-0">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <p className="font-medium text-sm">{creator.display_name}</p>
-        {(creator.portfolio_images?.length || 0) > 0 && <span className="text-[10px] text-muted-foreground border border-border rounded px-1">{creator.portfolio_images?.length} photos</span>}
-        {creator.video_url && <span className="text-[10px] text-primary border border-primary/30 rounded px-1">video</span>}
+        {(creator.portfolio_images?.length || 0) > 0 &&
+          <span className="text-[10px] text-muted-foreground border border-border rounded px-1.5 py-0.5">{creator.portfolio_images?.length} photos</span>}
+        {creator.video_url &&
+          <span className="text-[10px] text-primary border border-primary/30 rounded px-1.5 py-0.5">video ✓</span>}
       </div>
       <p className="text-xs text-muted-foreground mt-0.5">{creator.tagline} · {creator.location}</p>
       <div className="flex items-center gap-3 mt-1">
@@ -214,31 +269,44 @@ const Admin = () => {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const result = await call("list");
-      if (result.data) setCreators(result.data);
+      const r = await api("list");
+      setCreators(r.data || []);
     } catch (e) {
-      console.error(e);
-      toast.error("Could not load creators — deploy the Edge Function first.");
+      toast.error("Could not load — " + String(e));
     }
     setLoading(false);
   };
 
   useEffect(() => { fetchAll(); }, []);
 
+  const buildPayload = (data: Omit<Creator, "id" | "created_at">) => ({
+    display_name: data.display_name,
+    tagline: data.tagline,
+    location: data.location,
+    bio: data.bio,
+    instagram: data.instagram,
+    rates: data.rates,
+    tags: data.tags,
+    avatar_url: data.avatar_url,
+    portfolio_images: data.portfolio_images || [],
+    video_url: data.video_url || null,
+    rating: data.rating,
+  });
+
   const handleAdd = async (data: Omit<Creator, "id" | "created_at">) => {
-    try { await call("insert", data); toast.success("Creator added! 🎉"); setShowForm(false); fetchAll(); }
-    catch (e: unknown) { toast.error("Failed: " + (e instanceof Error ? e.message : String(e))); }
+    try { await api("insert", buildPayload(data)); toast.success("Creator added! 🎉"); setShowForm(false); fetchAll(); }
+    catch (e) { toast.error("Failed: " + String(e)); }
   };
 
   const handleEdit = async (data: Omit<Creator, "id" | "created_at">) => {
     if (!editingId) return;
-    try { await call("update", data, editingId); toast.success("Updated!"); setEditingId(null); setEditInitial(null); fetchAll(); }
-    catch (e: unknown) { toast.error("Failed: " + (e instanceof Error ? e.message : String(e))); }
+    try { await api("update", buildPayload(data), editingId); toast.success("Updated!"); setEditingId(null); setEditInitial(null); fetchAll(); }
+    catch (e) { toast.error("Failed: " + String(e)); }
   };
 
   const handleDelete = async (id: string) => {
-    try { await call("delete", undefined, id); toast.success("Removed"); fetchAll(); }
-    catch { toast.error("Failed to delete"); }
+    try { await api("delete", undefined, id); toast.success("Removed"); fetchAll(); }
+    catch { toast.error("Failed"); }
   };
 
   const startEdit = (c: Creator) => {
@@ -253,7 +321,7 @@ const Admin = () => {
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Lumeya Admin</p>
           <h1 className="text-3xl font-display">Creator Profiles</h1>
-          <p className="text-sm text-muted-foreground mt-1">Add real creators with photos & videos — live instantly</p>
+          <p className="text-sm text-muted-foreground mt-1">Add real creators — photos & videos upload to cloud</p>
         </div>
         <Button onClick={() => { setShowForm(true); setEditingId(null); setEditInitial(null); }} disabled={showForm}>
           <Plus size={14} className="mr-2" />Add Creator
