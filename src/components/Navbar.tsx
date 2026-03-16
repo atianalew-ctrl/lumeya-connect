@@ -3,35 +3,38 @@ import { Menu, X, LogOut, Bell, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLang } from "@/contexts/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 import logo from "@/assets/logo.png";
 
-// Simplified nav — grouped by audience
-const BRAND_LINKS = [
-  { to: "/for-brands", label: "For Brands" },
-  { to: "/make-ads", label: "⚡ Make Ads in Minutes" },
-  { to: "/matchmaker", label: "AI Matchmaker" },
-  { to: "/brief", label: "Brief Generator" },
-  { to: "/brand-os", label: "Brand OS" },
-  { to: "/pricing", label: "Pricing" },
+// Nav link keys — labels resolved from translations at render time
+const BRAND_LINK_KEYS = [
+  { to: "/for-brands", key: "nav_for_brands" as const },
+  { to: "/make-ads", key: "nav_make_ads" as const },
+  { to: "/matchmaker", key: "nav_matchmaker" as const },
+  { to: "/brief", key: "nav_brief" as const },
+  { to: "/brand-os", key: "nav_brand_os" as const },
+  { to: "/pricing", key: "nav_pricing" as const },
 ];
 
-const CREATOR_LINKS = [
-  { to: "/creators", label: "Browse Creators" },
-  { to: "/feed", label: "The Feed" },
-  { to: "/opportunities", label: "Opportunities" },
-  { to: "/community", label: "Community" },
+const CREATOR_LINK_KEYS = [
+  { to: "/creators", key: "nav_browse_creators" as const },
+  { to: "/feed", key: "nav_feed" as const },
+  { to: "/opportunities", key: "nav_opportunities" as const },
+  { to: "/community", key: "nav_community" as const },
 ];
 
-const MORE_LINKS = [
-  { to: "/activate", label: "Content Activation" },
-  { to: "/analytics", label: "Analytics" },
-  { to: "/contract", label: "Contracts" },
+const MORE_LINK_KEYS = [
+  { to: "/activate", key: "nav_content_activation" as const },
+  { to: "/analytics", key: "nav_analytics" as const },
+  { to: "/contract", key: "nav_contracts" as const },
 ];
 
 const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, role, signOut } = useAuth();
+  const { t } = useLang();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [brandsOpen, setBrandsOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
@@ -52,15 +55,15 @@ const Navbar = () => {
         <div className="hidden md:flex items-center gap-1">
           {/* For Brands dropdown */}
           <div className="relative" onMouseEnter={() => setBrandsOpen(true)} onMouseLeave={() => setBrandsOpen(false)}>
-            <button className={`flex items-center gap-1 px-3 py-2 text-[12px] rounded-lg transition-colors ${BRAND_LINKS.some(l => isActive(l.to)) ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
-              For Brands <ChevronDown size={11} className={`transition-transform ${brandsOpen ? "rotate-180" : ""}`} />
+            <button className={`flex items-center gap-1 px-3 py-2 text-[12px] rounded-lg transition-colors ${BRAND_LINK_KEYS.some(l => isActive(l.to)) ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
+              {t("nav_for_brands")} <ChevronDown size={11} className={`transition-transform ${brandsOpen ? "rotate-180" : ""}`} />
             </button>
             {brandsOpen && (
-              <div className="absolute top-full left-0 pt-1 w-48">
+              <div className="absolute top-full left-0 pt-1 w-52">
                 <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden py-1">
-                  {BRAND_LINKS.map(({ to, label }) => (
+                  {BRAND_LINK_KEYS.map(({ to, key }) => (
                     <Link key={to} to={to} className={`block px-4 py-2.5 text-xs transition-colors ${isActive(to) ? "text-foreground bg-accent font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>
-                      {label}
+                      {t(key)}
                     </Link>
                   ))}
                 </div>
@@ -69,23 +72,23 @@ const Navbar = () => {
           </div>
 
           {/* Creator links */}
-          {CREATOR_LINKS.map(({ to, label }) => (
+          {CREATOR_LINK_KEYS.map(({ to, key }) => (
             <Link key={to} to={to} className={`px-3 py-2 text-[12px] rounded-lg transition-colors whitespace-nowrap ${isActive(to) ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
-              {label}
+              {t(key)}
             </Link>
           ))}
 
           {/* More dropdown */}
           <div className="relative" onMouseEnter={() => setMoreOpen(true)} onMouseLeave={() => setMoreOpen(false)}>
-            <button className={`flex items-center gap-1 px-3 py-2 text-[12px] rounded-lg transition-colors ${MORE_LINKS.some(l => isActive(l.to)) ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
-              More <ChevronDown size={11} className={`transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+            <button className={`flex items-center gap-1 px-3 py-2 text-[12px] rounded-lg transition-colors ${MORE_LINK_KEYS.some(l => isActive(l.to)) ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`}>
+              {t("nav_more")} <ChevronDown size={11} className={`transition-transform ${moreOpen ? "rotate-180" : ""}`} />
             </button>
             {moreOpen && (
               <div className="absolute top-full left-0 pt-1 w-44">
                 <div className="bg-card border border-border rounded-xl shadow-lg overflow-hidden py-1">
-                  {MORE_LINKS.map(({ to, label }) => (
+                  {MORE_LINK_KEYS.map(({ to, key }) => (
                     <Link key={to} to={to} className={`block px-4 py-2.5 text-xs transition-colors ${isActive(to) ? "text-foreground bg-accent font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>
-                      {label}
+                      {t(key)}
                     </Link>
                   ))}
                 </div>
@@ -96,6 +99,9 @@ const Navbar = () => {
 
         {/* Right side */}
         <div className="hidden md:flex items-center gap-2 shrink-0">
+          {/* Language switcher */}
+          <LanguageSwitcher />
+
           {/* Notification bell */}
           <Link to="/notifications" className="relative h-9 w-9 flex items-center justify-center rounded-full hover:bg-accent transition-colors text-muted-foreground hover:text-foreground">
             <Bell size={16} />
@@ -105,23 +111,23 @@ const Navbar = () => {
           {/* Black pill */}
           <Link to="/black" className="inline-flex items-center gap-1.5 rounded-full bg-foreground text-background px-4 py-1.5 text-[11px] font-medium tracking-widest uppercase hover:bg-foreground/90 transition-colors">
             <span className="w-1 h-1 rounded-full bg-background/50" />
-            Black
+            {t("nav_black")}
           </Link>
 
           {user ? (
             <>
               <span className="text-xs text-muted-foreground capitalize">{role}</span>
               <Button variant="ghost" size="sm" className="text-[12px] rounded-full px-4 gap-1.5" onClick={handleSignOut}>
-                <LogOut size={12} /> Out
+                <LogOut size={12} /> {t("nav_sign_out")}
               </Button>
             </>
           ) : (
             <>
               <Button variant="ghost" size="sm" className="text-[12px] rounded-full px-4" asChild>
-                <Link to="/creator-signup">Join as Creator</Link>
+                <Link to="/creator-signup">{t("nav_join_creator")}</Link>
               </Button>
               <Button size="sm" className="text-[12px] rounded-full px-5" asChild>
-                <Link to="/for-brands">For Brands</Link>
+                <Link to="/for-brands">{t("nav_for_brands_btn")}</Link>
               </Button>
             </>
           )}
@@ -137,25 +143,28 @@ const Navbar = () => {
       {mobileOpen && (
         <div className="border-t border-border/40 bg-background/98 backdrop-blur px-4 pb-6 md:hidden">
           <div className="py-3 space-y-0.5">
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground px-3 pt-2 pb-1">For Brands</p>
-            {BRAND_LINKS.map(l => (
+            <div className="flex items-center justify-between px-3 pt-2 pb-1">
+              <p className="text-[9px] uppercase tracking-widest text-muted-foreground">{t("nav_for_brands")}</p>
+              <LanguageSwitcher />
+            </div>
+            {BRAND_LINK_KEYS.map(l => (
               <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)}
                 className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive(l.to) ? "text-foreground font-medium bg-accent" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>
-                {l.label}
+                {t(l.key)}
               </Link>
             ))}
             <p className="text-[9px] uppercase tracking-widest text-muted-foreground px-3 pt-4 pb-1">Creators</p>
-            {CREATOR_LINKS.map(l => (
+            {CREATOR_LINK_KEYS.map(l => (
               <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)}
                 className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive(l.to) ? "text-foreground font-medium bg-accent" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>
-                {l.label}
+                {t(l.key)}
               </Link>
             ))}
-            <p className="text-[9px] uppercase tracking-widest text-muted-foreground px-3 pt-4 pb-1">More</p>
-            {MORE_LINKS.map(l => (
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground px-3 pt-4 pb-1">{t("nav_more")}</p>
+            {MORE_LINK_KEYS.map(l => (
               <Link key={l.to} to={l.to} onClick={() => setMobileOpen(false)}
                 className={`flex items-center px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive(l.to) ? "text-foreground font-medium bg-accent" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}>
-                {l.label}
+                {t(l.key)}
               </Link>
             ))}
             <Link to="/black" onClick={() => setMobileOpen(false)}
@@ -166,15 +175,15 @@ const Navbar = () => {
           <div className="mt-3 flex flex-col gap-2">
             {user ? (
               <Button variant="ghost" size="sm" className="rounded-full gap-1.5" onClick={handleSignOut}>
-                <LogOut size={13} /> Sign out
+                <LogOut size={13} /> {t("nav_sign_out")}
               </Button>
             ) : (
               <>
                 <Button variant="outline" size="sm" className="rounded-full" asChild>
-                  <Link to="/creator-signup" onClick={() => setMobileOpen(false)}>Join as Creator</Link>
+                  <Link to="/creator-signup" onClick={() => setMobileOpen(false)}>{t("nav_join_creator")}</Link>
                 </Button>
                 <Button size="sm" className="rounded-full" asChild>
-                  <Link to="/for-brands" onClick={() => setMobileOpen(false)}>For Brands →</Link>
+                  <Link to="/for-brands" onClick={() => setMobileOpen(false)}>{t("nav_for_brands_btn")} →</Link>
                 </Button>
               </>
             )}
