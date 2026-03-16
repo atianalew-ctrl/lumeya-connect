@@ -1,14 +1,15 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check, Heart, XCircle } from "lucide-react";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { creators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
+import { creators as staticCreators, type Region, UGC_CONTENT_TYPES, type UGCContentType } from "@/lib/data";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { supabase } from "@/integrations/supabase/client";
 
 const allCountries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
@@ -57,6 +58,39 @@ const Creators = () => {
   const [swipeIndex, setSwipeIndex] = useState(0);
   const [saved, setSaved] = useState<number[]>([]);
   const isMobile = useIsMobile();
+
+  // Load real creators from DB, fall back to static
+  const [dbCreators, setDbCreators] = useState<typeof staticCreators | null>(null);
+  useEffect(() => {
+    supabase.functions.invoke("admin-creators", { body: { action: "list" } }).then(({ data }) => {
+      if (data?.ok && data.data?.length > 0) {
+        // Map DB creators to the same shape as static creators
+        const mapped = data.data.map((c: { id: string; display_name: string; tagline?: string; location?: string; bio?: string; instagram?: string; rates?: string; tags?: string[]; avatar_url?: string; portfolio_images?: string[]; video_url?: string; rating?: number }, i: number) => ({
+          id: i + 1000,
+          name: c.display_name,
+          role: c.tagline || "UGC Creator",
+          location: c.location || "",
+          bio: c.bio || "",
+          avatar: c.avatar_url || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80`,
+          tags: c.tags || [],
+          rates: c.rates || "",
+          rating: c.rating || 5.0,
+          followers: "0",
+          engagementRate: 0,
+          completedCampaigns: 0,
+          responseTime: "Same day",
+          available_for_remote: true,
+          region: "Europe" as Region,
+          instagram: c.instagram || "",
+          portfolioImages: c.portfolio_images || [],
+          videoUrl: c.video_url || null,
+        }));
+        setDbCreators(mapped);
+      }
+    }).catch(() => null);
+  }, []);
+
+  const creators = dbCreators ?? staticCreators;
 
   const toggleFilter = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
