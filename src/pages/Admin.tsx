@@ -28,10 +28,7 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   portfolio_images: [], video_url: null, rating: 5.0,
 };
 
-const toBase64 = (file: File): Promise<string> =>
-  new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(file); });
-
-// Call admin edge function
+// Call admin edge function (for DB operations only)
 const api = async (action: string, data?: object, id?: string) => {
   const { data: result, error } = await supabase.functions.invoke("admin-creators", { body: { action, data, id } });
   if (error) throw error;
@@ -39,12 +36,14 @@ const api = async (action: string, data?: object, id?: string) => {
   return result;
 };
 
-// Upload a file via edge function → returns public URL
+// Upload directly from browser to Supabase Storage
 const uploadFile = async (file: File, bucket: string): Promise<string> => {
-  const base64 = await toBase64(file);
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${file.name.split(".").pop()}`;
-  const result = await api("upload", { file: base64, bucket, filename });
-  return result.data.url;
+  const ext = file.name.split(".").pop() || "bin";
+  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await supabase.storage.from(bucket).upload(filename, file, { upsert: true, contentType: file.type });
+  if (error) throw new Error(error.message);
+  const { data } = supabase.storage.from(bucket).getPublicUrl(filename);
+  return data.publicUrl;
 };
 
 const CreatorForm = ({ initial, onSave, onCancel }: {
