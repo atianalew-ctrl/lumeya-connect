@@ -154,10 +154,24 @@ const PostOpportunity = () => {
         platforms: selectedPlatforms.length > 0 ? selectedPlatforms : null,
       });
       if (error) throw error;
+
+      // Notify creators about new opportunity (best-effort)
+      supabase.functions.invoke("send-email", {
+        body: {
+          type: "new_opportunity",
+          data: {
+            brandName: brand,
+            opportunityTitle: title,
+            budget,
+            deadline,
+            creatorEmails: ["hello@lumeya.dev"], // centralised — expand to real creator emails later
+          },
+        },
+      }).catch(console.error);
+
       setSubmitted(true);
     } catch (err) {
       console.error(err);
-      // Fall back to local success if Supabase not configured yet
       setSubmitted(true);
     } finally {
       setLoading(null);

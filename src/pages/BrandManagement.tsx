@@ -2,12 +2,13 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Instagram, Video, Image, BarChart2, Calendar, Sparkles,
-  Filter, ChevronDown, Star, Check, X, ArrowRight, Lock
+  Filter, ChevronDown, Star, Check, X, ArrowRight, Lock, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { creators } from "@/lib/data";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 // ─── Static brand listings ──────────────────────────────────────────────────
 
@@ -116,15 +117,52 @@ const ApplyModal = ({
 }) => {
   const [name, setName] = useState("");
   const [instagram, setInstagram] = useState("");
+  const [email, setEmail] = useState("");
   const [pitch, setPitch] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   if (!listing) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    toast.success("Application sent! The brand will review it shortly.");
+    setSending(true);
+    try {
+      // Send notification email to brand + confirmation to creator
+      await supabase.functions.invoke("send-email", {
+        body: {
+          type: "creator_application",
+          data: {
+            creatorName: name,
+            creatorInstagram: instagram,
+            pitch,
+            brandName: listing.brand,
+            brandEmail: "hello@lumeya.dev", // centralised inbox — forward to brand
+            budget: listing.budget,
+            platforms: listing.platforms,
+          },
+        },
+      });
+
+      if (email) {
+        await supabase.functions.invoke("send-email", {
+          body: {
+            type: "creator_confirmation",
+            data: {
+              creatorName: name,
+              creatorEmail: email,
+              brandName: listing.brand,
+            },
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Email error (non-blocking):", err);
+    } finally {
+      setSending(false);
+      setSubmitted(true);
+      toast.success("Application sent! The brand will review it shortly.");
+    }
   };
 
   return (
@@ -165,6 +203,10 @@ const ApplyModal = ({
                 <Input required placeholder="@yourhandle" value={instagram} onChange={(e) => setInstagram(e.target.value)} />
               </div>
               <div>
+                <label className="text-xs text-muted-foreground block mb-1.5">Your email <span className="text-muted-foreground/50">(for confirmation)</span></label>
+                <Input type="email" placeholder="you@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+              </div>
+              <div>
                 <label className="text-xs text-muted-foreground block mb-1.5">
                   Why are you the right manager for {listing.brand}?
                 </label>
@@ -177,7 +219,9 @@ const ApplyModal = ({
                   className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                 />
               </div>
-              <Button type="submit" className="w-full">Send Application</Button>
+              <Button type="submit" className="w-full" disabled={sending}>
+                {sending ? <><Loader2 size={14} className="animate-spin mr-2" />Sending...</> : "Send Application"}
+              </Button>
               <p className="text-xs text-muted-foreground text-center">
                 Lumeya Black exclusive — only verified creators can apply
               </p>
