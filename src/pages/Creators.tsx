@@ -59,43 +59,47 @@ const Creators = () => {
   const [saved, setSaved] = useState<number[]>([]);
   const isMobile = useIsMobile();
 
-  // Load real creators from DB, fall back to static
-  const [dbCreators, setDbCreators] = useState<typeof staticCreators | null>(null);
+  // Load real creators from DB — show alongside static until enough real ones exist
+  const [dbCreators, setDbCreators] = useState<typeof staticCreators>([]);
   useEffect(() => {
     supabase.functions.invoke("admin-creators", { body: { action: "list" } }).then(({ data }) => {
-      if (data?.ok && data.data?.length > 0) {
-        // Map DB creators to the same shape as static creators
-        const mapped = data.data.map((c: { id: string; display_name: string; tagline?: string; location?: string; bio?: string; instagram?: string; rates?: string; tags?: string[]; avatar_url?: string; portfolio_images?: string[]; video_url?: string; rating?: number }, i: number) => ({
-          id: i + 1000,
-          name: c.display_name,
-          role: c.tagline || "UGC Creator",
-          location: c.location || "",
-          country: c.location || "",
-          bio: c.bio || "",
-          avatar: c.avatar_url || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80`,
-          tags: c.tags || [],
-          rates: c.rates || "",
-          rating: c.rating || 5.0,
-          followers: "0",
-          engagementRate: 0,
-          completedCampaigns: 0,
-          responseTime: "Same day",
-          availableForRemote: true,
-          available_for_remote: true,
-          region: "Europe" as Region,
-          languages: ["English"],
-          contentTypes: [] as UGCContentType[],
-          ugcContentTypes: [],
-          instagram: c.instagram || "",
-          portfolioImages: c.portfolio_images || [],
-          videoUrl: c.video_url || null,
-        }));
-        setDbCreators(mapped);
-      }
+      if (!data?.ok || !data.data) return;
+      // Only show real creators that have a display_name
+      const real = data.data.filter((c: { display_name?: string }) => c.display_name && c.display_name.trim() !== "");
+      if (real.length === 0) return;
+      const mapped = real.map((c: { id: string; display_name: string; tagline?: string; location?: string; bio?: string; instagram?: string; rates?: string; tags?: string[]; avatar_url?: string; portfolio_images?: string[]; video_url?: string; rating?: number }, i: number) => ({
+        id: i + 1000,
+        name: c.display_name,
+        role: c.tagline || "UGC Creator",
+        location: c.location || "",
+        country: c.location || "",
+        bio: c.bio || "",
+        avatar: c.avatar_url || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80`,
+        tags: c.tags || [],
+        rates: c.rates || "",
+        rating: c.rating || 5.0,
+        followers: "10K",
+        engagementRate: 5.0,
+        completedCampaigns: 0,
+        responseTime: "Same day",
+        availableForRemote: true,
+        available_for_remote: true,
+        region: "Europe" as Region,
+        languages: ["English", "Danish"],
+        contentTypes: [] as UGCContentType[],
+        ugcContentTypes: [],
+        instagram: c.instagram || "",
+        portfolioImages: c.portfolio_images || [],
+        videoUrl: c.video_url || null,
+      }));
+      setDbCreators(mapped);
     }).catch(() => null);
   }, []);
 
-  const creators = dbCreators ?? staticCreators;
+  // Show real creators first, then fill with static demos if fewer than 4 real ones
+  const creators = dbCreators.length >= 1
+    ? [...dbCreators, ...staticCreators.slice(0, Math.max(0, 4 - dbCreators.length))]
+    : staticCreators;
 
   const toggleFilter = (arr: string[], item: string, setter: (v: string[]) => void) => {
     setter(arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item]);
@@ -140,7 +144,7 @@ const Creators = () => {
 
       return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote;
     });
-  }, [search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly]);
+  }, [creators, search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly]);
 
   return (
     <div className="container py-12">
