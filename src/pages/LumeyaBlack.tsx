@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Check, Lock, Star, Globe, Zap } from "lucide-react";
+import { ArrowRight, Check, Lock, Star, Globe, Zap, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ const PERKS = [
   { icon: Zap, title: "AI Matchmaker Priority", desc: "Skip the queue. AI finds your perfect creator in seconds, not hours." },
   { icon: Globe, title: "Creator Travel Campaigns", desc: "We send creators to Bali, Copenhagen, Tokyo to film your brand on location." },
   { icon: Lock, title: "Exclusive Briefs", desc: "Your campaigns are never shared with other brands. Full exclusivity on content rights." },
+  { icon: Users, title: "Creator-Run Brand Management", desc: "Hand your entire Instagram to an elite creator. They post, engage, grow — full account management included." },
 ];
 
 const FEATURED_CREATORS = creators.slice(0, 4);
@@ -71,6 +73,35 @@ const LumeyaBlack = () => {
               Apply for Access <ArrowRight size={15} />
             </a>
             <p className="text-xs text-white/20 mt-4">Currently accepting 12 brands per quarter</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Brand Management CTA */}
+      <section className="py-16 px-6 bg-white/[0.02]">
+        <div className="container max-w-3xl">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="border border-white/10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+          >
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Users size={14} className="text-white/40" />
+                <span className="text-xs tracking-[0.2em] uppercase text-white/30">New — Black Exclusive</span>
+              </div>
+              <h2 className="text-2xl font-extralight mb-2">Creator-Run Brand Management</h2>
+              <p className="text-white/40 text-sm leading-relaxed max-w-sm">
+                Let an elite creator own your Instagram completely. Daily posts, Reels, Stories, engagement, strategy — all handled.
+              </p>
+            </div>
+            <Link
+              to="/brand-management"
+              className="flex-shrink-0 inline-flex items-center gap-2 bg-white text-black px-6 py-3 text-sm font-medium tracking-wide hover:bg-white/90 transition-colors"
+            >
+              Browse Opportunities <ArrowRight size={14} />
+            </Link>
           </motion.div>
         </div>
       </section>
