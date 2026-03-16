@@ -1,21 +1,79 @@
 import { motion } from "framer-motion";
-import { Search, Clock, DollarSign } from "lucide-react";
-import { useState } from "react";
+import { Search, Clock, DollarSign, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { opportunities } from "@/lib/data";
+import { opportunities as staticOpportunities } from "@/lib/data";
 import ApplyModal from "@/components/ApplyModal";
+import { supabase } from "@/integrations/supabase/client";
 
 const categories = ["All", "UGC", "Photography", "Social Media", "Videography", "Design", "Writing"];
+
+type Opportunity = {
+  id: string | number;
+  title: string;
+  brand: string;
+  category: string;
+  budget: string;
+  deadline: string;
+  location?: string | null;
+  desc: string;
+  tags: string[];
+  overview?: string | null;
+  deliverables?: string | string[] | null;
+  timeline?: string | null;
+};
 
 const Opportunities = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [applyOpp, setApplyOpp] = useState<typeof opportunities[0] | null>(null);
+  const [applyOpp, setApplyOpp] = useState<Opportunity | null>(null);
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOpportunities = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("opportunities")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (error || !data || data.length === 0) {
+          // Fall back to static data
+          setOpportunities(staticOpportunities.map((o) => ({ ...o, id: String(o.id) })));
+        } else {
+          setOpportunities(
+            data.map((o) => ({
+              id: o.id,
+              title: o.title,
+              brand: o.brand,
+              category: o.category,
+              budget: o.budget,
+              deadline: o.deadline,
+              location: o.location,
+              desc: o.description,
+              tags: o.tags ?? [],
+              overview: o.overview,
+              deliverables: o.deliverables,
+              timeline: o.timeline,
+            }))
+          );
+        }
+      } catch {
+        setOpportunities(staticOpportunities.map((o) => ({ ...o, id: String(o.id) })));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOpportunities();
+  }, []);
 
   const filtered = opportunities.filter((opp) => {
-    const matchesSearch = opp.title.toLowerCase().includes(search.toLowerCase()) ||
+    const matchesSearch =
+      opp.title.toLowerCase().includes(search.toLowerCase()) ||
       opp.brand.toLowerCase().includes(search.toLowerCase()) ||
       opp.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
     const matchesCategory = activeCategory === "All" || opp.category === activeCategory;
@@ -52,51 +110,74 @@ const Opportunities = () => {
         </div>
         <div className="relative w-full max-w-sm">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search opportunities..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input
+            placeholder="Search opportunities..."
+            className="pl-9"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="mt-8 flex flex-col gap-3">
-        {filtered.map((opp, i) => (
-          <motion.div
-            key={opp.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
-            className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
-          >
-            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-              <Link to={`/opportunities/${opp.id}`} className="flex-1">
-                <h3 className="font-body text-base font-semibold group-hover:text-primary transition-colors">{opp.title}</h3>
-                <p className="mt-1 text-xs text-muted-foreground">by {opp.brand}</p>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{opp.desc}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {opp.tags.map((tag) => (
-                    <span key={tag} className="text-xs text-muted-foreground">{tag}</span>
-                  ))}
+      {loading ? (
+        <div className="mt-20 flex justify-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      ) : (
+        <div className="mt-8 flex flex-col gap-3">
+          {filtered.map((opp, i) => (
+            <motion.div
+              key={opp.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+              className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
+            >
+              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <Link to={`/opportunities/${opp.id}`} className="flex-1">
+                  <h3 className="font-body text-base font-semibold group-hover:text-primary transition-colors">
+                    {opp.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">by {opp.brand}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{opp.desc}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {opp.tags.map((tag) => (
+                      <span key={tag} className="text-xs text-muted-foreground">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </Link>
+                <div className="flex flex-col items-end gap-2 md:min-w-[140px]">
+                  <span className="flex items-center gap-1 text-sm font-medium">
+                    <DollarSign size={13} className="text-primary" />
+                    {opp.budget}
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock size={11} />
+                    {opp.deadline}
+                  </span>
+                  <Button size="sm" className="mt-2 text-xs h-8" onClick={() => setApplyOpp(opp)}>
+                    Apply
+                  </Button>
                 </div>
-              </Link>
-              <div className="flex flex-col items-end gap-2 md:min-w-[140px]">
-                <span className="flex items-center gap-1 text-sm font-medium">
-                  <DollarSign size={13} className="text-primary" />{opp.budget}
-                </span>
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock size={11} />{opp.deadline}
-                </span>
-                <Button size="sm" className="mt-2 text-xs h-8" onClick={() => setApplyOpp(opp)}>Apply</Button>
               </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+            </motion.div>
+          ))}
 
-      {filtered.length === 0 && (
-        <div className="mt-20 text-center text-muted-foreground">
-          <p>No opportunities found. Try adjusting your filters.</p>
+          {filtered.length === 0 && (
+            <div className="mt-20 text-center text-muted-foreground">
+              <p>No opportunities found. Try adjusting your filters.</p>
+            </div>
+          )}
         </div>
       )}
 
-      <ApplyModal open={!!applyOpp} onOpenChange={(o) => !o && setApplyOpp(null)} opportunity={applyOpp} />
+      <ApplyModal
+        open={!!applyOpp}
+        onOpenChange={(o) => !o && setApplyOpp(null)}
+        opportunity={applyOpp}
+      />
     </div>
   );
 };

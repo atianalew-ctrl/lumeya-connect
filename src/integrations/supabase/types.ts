@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      opportunities: {
+        Row: {
+          id: string
+          title: string
+          brand: string
+          category: string
+          description: string
+          overview: string | null
+          deliverables: string | null
+          timeline: string | null
+          budget: string
+          deadline: string
+          location: string | null
+          tags: string[] | null
+          ugc_types: string[] | null
+          platforms: string[] | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          brand: string
+          category: string
+          description: string
+          overview?: string | null
+          deliverables?: string | null
+          timeline?: string | null
+          budget: string
+          deadline: string
+          location?: string | null
+          tags?: string[] | null
+          ugc_types?: string[] | null
+          platforms?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          brand?: string
+          category?: string
+          description?: string
+          overview?: string | null
+          deliverables?: string | null
+          timeline?: string | null
+          budget?: string
+          deadline?: string
+          location?: string | null
+          tags?: string[] | null
+          ugc_types?: string[] | null
+          platforms?: string[] | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       creator_videos: {
         Row: {
           created_at: string

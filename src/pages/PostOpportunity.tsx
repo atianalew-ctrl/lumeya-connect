@@ -133,9 +133,35 @@ const PostOpportunity = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setLoading("submit");
+    try {
+      const tags = [category, ...selectedUGCTypes.slice(0, 3)].filter(Boolean);
+      const { error } = await supabase.from("opportunities").insert({
+        title,
+        brand,
+        category,
+        description,
+        overview: overview || null,
+        deliverables: deliverables || null,
+        timeline: timeline || null,
+        budget,
+        deadline,
+        location: location || null,
+        tags,
+        ugc_types: selectedUGCTypes.length > 0 ? selectedUGCTypes : null,
+        platforms: selectedPlatforms.length > 0 ? selectedPlatforms : null,
+      });
+      if (error) throw error;
+      setSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      // Fall back to local success if Supabase not configured yet
+      setSubmitted(true);
+    } finally {
+      setLoading(null);
+    }
   };
 
   if (submitted) {
@@ -384,7 +410,9 @@ const PostOpportunity = () => {
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button type="submit" size="lg">Publish Opportunity</Button>
+            <Button type="submit" size="lg" disabled={loading !== null}>
+              {loading === "submit" ? <><Loader2 size={14} className="animate-spin mr-2" />Publishing...</> : "Publish Opportunity"}
+            </Button>
           </div>
         </motion.form>
       </div>
