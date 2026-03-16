@@ -33,6 +33,7 @@ import Welcome from "./pages/Welcome";
 import MakeAds from "./pages/MakeAds";
 import MediaManager from "./pages/MediaManager";
 import BrandManagement from "./pages/BrandManagement";
+import Admin from "./pages/Admin";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -77,6 +78,7 @@ const App = () => (
             <Route path="/campaigns/:id" element={<CampaignWorkspace />} />
             <Route path="/upload-video" element={<UploadVideo />} />
             <Route path="/brand-management" element={<BrandManagement />} />
+            <Route path="/admin" element={<Admin />} />
             <Route path="/creator-signup" element={<CreatorSignup />} />
             <Route path="/brand-login" element={<BrandLogin />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
