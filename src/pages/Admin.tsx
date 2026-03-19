@@ -210,23 +210,21 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
             Videos ({(form.video_urls?.length || 0) + (form.video_url ? 1 : 0)}/9)
           </label>
           {((form.video_urls?.length || 0) + (form.video_url ? 1 : 0)) < 9 && (
-            <button type="button" onClick={() => videosRef.current?.click()}
-              className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors">
+            <label className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors cursor-pointer">
+              <input type="file" accept="video/*" multiple className="hidden"
+                onChange={e => e.target.files && e.target.files.length > 0 && handleVideos(e.target.files)} />
               {uploadingVideo ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
               {uploadingVideo ? "Uploading..." : "Add videos"}
-            </button>
+            </label>
           )}
         </div>
-        <input ref={videosRef} type="file" accept="video/*" multiple className="hidden"
-          onChange={e => e.target.files && e.target.files.length > 0 && handleVideos(e.target.files)} />
-        <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideo(e.target.files[0])} />
         <div className="grid grid-cols-3 gap-2">
           {/* Legacy single video_url */}
           {form.video_url && (
             <div className="relative aspect-[9/16] rounded-xl overflow-hidden bg-black group">
               <video src={form.video_url} className="w-full h-full object-cover" muted playsInline />
               <button type="button" onClick={() => set("video_url", null)}
-                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center">
                 <X size={10} className="text-white" />
               </button>
             </div>
@@ -240,19 +238,20 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
               </div>
               <button type="button"
                 onClick={() => set("video_urls", (form.video_urls || []).filter((_, i) => i !== idx))}
-                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center">
                 <X size={10} className="text-white" />
               </button>
             </div>
           ))}
-          {/* Add more slot */}
+          {/* Add more slot — label wraps input directly for mobile compatibility */}
           {((form.video_urls?.length || 0) + (form.video_url ? 1 : 0)) < 9 && (
-            <div onClick={() => videosRef.current?.click()}
-              className="aspect-[9/16] rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
+            <label className="aspect-[9/16] rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
+              <input type="file" accept="video/*" multiple className="hidden"
+                onChange={e => e.target.files && e.target.files.length > 0 && handleVideos(e.target.files)} />
               {uploadingVideo
                 ? <Loader2 size={20} className="animate-spin text-muted-foreground" />
                 : <><Video size={18} className="text-muted-foreground mb-1" /><p className="text-[10px] text-muted-foreground">Add video</p></>}
-            </div>
+            </label>
           )}
         </div>
       </div>
