@@ -6,11 +6,22 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const REGIONS = ["Scandinavia", "Europe", "North America", "Latin America", "Asia Pacific", "Southeast Asia", "Middle East", "Africa", "Global"];
+const LANGUAGES = ["English", "Danish", "Swedish", "Norwegian", "French", "German", "Spanish", "Italian", "Dutch", "Portuguese", "Japanese", "Korean", "Arabic", "Chinese"];
+const UGC_TYPES = ["Product Review", "Product Demo", "Testimonial", "Unboxing", "Lifestyle Content", "Problem → Solution Ad", "Voiceover / B-roll", "Vlog / Day-in-the-life", "TikTok Trend / Social Trend"];
+
 type Creator = {
   id: string;
   display_name: string;
   tagline: string;
   location: string;
+  country?: string;
+  region?: string;
+  languages?: string[];
+  content_types?: string[];
+  available_for_remote?: boolean;
+  followers?: number;
+  engagement_rate?: number;
   bio: string;
   instagram: string;
   rates: string;
@@ -25,6 +36,8 @@ type Creator = {
 
 const EMPTY: Omit<Creator, "id" | "created_at"> = {
   display_name: "", tagline: "UGC Creator", location: "", bio: "",
+  country: "", region: "Europe", languages: ["English"], content_types: [],
+  available_for_remote: true, followers: 0, engagement_rate: 5.0,
   instagram: "", rates: "", tags: [], avatar_url: null,
   portfolio_images: [], video_url: null, video_urls: [], rating: 5.0,
 };
@@ -246,10 +259,78 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
 
       {/* Info */}
       <div className="grid grid-cols-2 gap-4">
-        <div><label className="text-xs text-muted-foreground block mb-1.5">Location</label>
+        <div><label className="text-xs text-muted-foreground block mb-1.5">Location (city)</label>
           <Input placeholder="Copenhagen, Denmark" value={form.location} onChange={e => set("location", e.target.value)} /></div>
         <div><label className="text-xs text-muted-foreground block mb-1.5">Instagram</label>
           <Input placeholder="@handle" value={form.instagram} onChange={e => set("instagram", e.target.value)} /></div>
+      </div>
+
+      {/* Filter fields */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">Country</label>
+          <Input placeholder="Denmark" value={form.country || ""} onChange={e => set("country", e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">Region</label>
+          <select value={form.region || "Europe"} onChange={e => set("region", e.target.value)}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Languages */}
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Languages</label>
+        <div className="flex flex-wrap gap-2">
+          {LANGUAGES.map(lang => {
+            const selected = (form.languages || []).includes(lang);
+            return (
+              <button key={lang} type="button"
+                onClick={() => set("languages", selected ? (form.languages || []).filter(l => l !== lang) : [...(form.languages || []), lang])}
+                className={`px-3 py-1 rounded-full text-xs border transition-colors ${selected ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}>
+                {lang}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* UGC Content Types */}
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">UGC Content Types</label>
+        <div className="flex flex-wrap gap-2">
+          {UGC_TYPES.map(type => {
+            const selected = (form.content_types || []).includes(type);
+            return (
+              <button key={type} type="button"
+                onClick={() => set("content_types", selected ? (form.content_types || []).filter(t => t !== type) : [...(form.content_types || []), type])}
+                className={`px-3 py-1 rounded-full text-xs border transition-colors ${selected ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}>
+                {type}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Remote + stats */}
+      <div className="grid grid-cols-3 gap-4 items-end">
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">Followers</label>
+          <Input type="number" placeholder="10000" value={form.followers || ""} onChange={e => set("followers", Number(e.target.value))} />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">Engagement %</label>
+          <Input type="number" step="0.1" placeholder="5.0" value={form.engagement_rate || ""} onChange={e => set("engagement_rate", Number(e.target.value))} />
+        </div>
+        <div className="flex items-center gap-2 pb-2">
+          <button type="button" onClick={() => set("available_for_remote", !form.available_for_remote)}
+            className={`relative w-10 h-5 rounded-full transition-colors ${form.available_for_remote ? "bg-primary" : "bg-muted-foreground/30"}`}>
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.available_for_remote ? "translate-x-5" : "translate-x-0.5"}`} />
+          </button>
+          <label className="text-xs text-muted-foreground">Available remote</label>
+        </div>
       </div>
 
       <div><label className="text-xs text-muted-foreground block mb-1.5">Bio</label>
@@ -336,6 +417,13 @@ const Admin = () => {
     portfolio_images: data.portfolio_images || [],
     video_url: data.video_url || null,
     video_urls: data.video_urls || [],
+    country: data.country || null,
+    region: data.region || "Europe",
+    languages: data.languages || [],
+    content_types: data.content_types || [],
+    available_for_remote: data.available_for_remote ?? true,
+    followers: data.followers || 0,
+    engagement_rate: data.engagement_rate || 5.0,
     rating: data.rating,
   });
 
@@ -357,7 +445,7 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
     setShowForm(false);
   };
 
