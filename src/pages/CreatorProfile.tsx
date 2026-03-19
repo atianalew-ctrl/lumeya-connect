@@ -291,13 +291,19 @@ const CreatorProfile = () => {
               </div>
             )}
 
-            {/* Videos tab */}
+            {/* Videos tab — TikTok-style portrait grid */}
             {activeTab === "videos" && (
-              <div className="space-y-4">
-                <VideoPlayer src={creator.videoUrl} label="Featured Video" />
-                {uploadedVideos?.map(v => (
-                  <VideoPlayer key={v.id} src={v.video_url} label={v.title || "Creator Video"} />
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  ...(creator.videoUrl ? [{ src: creator.videoUrl, label: "Featured" }] : []),
+                  ...(uploadedVideos?.map(v => ({ src: v.video_url, label: v.title || "Video" })) || []),
+                ].map((v, i) => (
+                  <VideoTile key={i} src={v.src} label={v.label} />
                 ))}
+                {/* Empty state */}
+                {!creator.videoUrl && (!uploadedVideos || uploadedVideos.length === 0) && (
+                  <div className="col-span-3 py-12 text-center text-sm text-muted-foreground">No videos yet</div>
+                )}
               </div>
             )}
 
@@ -424,6 +430,36 @@ const VideoPlayer = ({ src, label }: { src: string; label?: string }) => {
             </div>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+// TikTok-style portrait grid tile — hover to play
+const VideoTile = ({ src, label }: { src: string; label?: string }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const handleMouseEnter = () => { videoRef.current?.play(); setPlaying(true); };
+  const handleMouseLeave = () => { videoRef.current?.pause(); videoRef.current && (videoRef.current.currentTime = 0); setPlaying(false); };
+  const handleClick = () => {
+    if (!videoRef.current) return;
+    if (playing) { videoRef.current.pause(); setPlaying(false); } else { videoRef.current.play(); setPlaying(true); }
+  };
+  return (
+    <div className="relative aspect-[9/16] rounded-xl overflow-hidden bg-accent cursor-pointer group"
+      onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleClick}>
+      <video ref={videoRef} src={src} muted loop playsInline preload="metadata"
+        className="absolute inset-0 h-full w-full object-cover" />
+      {/* Overlay with play icon when paused */}
+      <div className={`absolute inset-0 flex items-end justify-start p-2 bg-gradient-to-t from-black/50 to-transparent transition-opacity ${playing ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}>
+        {!playing && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+              <Play size={16} className="text-white ml-0.5" />
+            </div>
+          </div>
+        )}
+        {label && <span className="text-[10px] text-white/80 font-medium relative z-10">{label}</span>}
       </div>
     </div>
   );
