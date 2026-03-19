@@ -68,7 +68,7 @@ const Creators = () => {
       const real = data.data.filter((c: { display_name?: string }) => c.display_name && c.display_name.trim() !== "");
       if (real.length === 0) return;
       const mapped = real.map((c: { id: string; display_name: string; tagline?: string; location?: string; bio?: string; instagram?: string; rates?: string; tags?: string[]; avatar_url?: string; portfolio_images?: string[]; video_url?: string; rating?: number }, i: number) => ({
-        id: i + 1000,
+        id: c.id as any,
         name: c.display_name,
         role: c.tagline || "UGC Creator",
         location: c.location || "",
