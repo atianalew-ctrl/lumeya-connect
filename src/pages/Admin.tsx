@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, Edit2, Save, Upload, Loader2, Users, Star, Instagram, ImageIcon, Video, X } from "lucide-react";
+import { Plus, Trash2, Edit2, Save, Upload, Loader2, Users, Star, Instagram, ImageIcon, Video, X, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,6 +18,7 @@ type Creator = {
   avatar_url: string | null;
   portfolio_images?: string[];
   video_url?: string | null;
+  video_urls?: string[];
   rating: number;
   created_at?: string;
 };
@@ -25,7 +26,7 @@ type Creator = {
 const EMPTY: Omit<Creator, "id" | "created_at"> = {
   display_name: "", tagline: "UGC Creator", location: "", bio: "",
   instagram: "", rates: "", tags: [], avatar_url: null,
-  portfolio_images: [], video_url: null, rating: 5.0,
+  portfolio_images: [], video_url: null, video_urls: [], rating: 5.0,
 };
 
 // Call admin edge function (for DB operations only)
@@ -60,6 +61,7 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
   const avatarRef = useRef<HTMLInputElement>(null);
   const portfolioRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
+  const videosRef = useRef<HTMLInputElement>(null);
 
   const set = (k: keyof typeof form, v: unknown) => setForm(f => ({ ...f, [k]: v }));
 
@@ -91,6 +93,18 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
       const url = await uploadFile(file, "creator-videos");
       set("video_url", url);
       toast.success("Video uploaded! ✓");
+    } catch { toast.error("Video upload failed."); }
+    finally { setUploadingVideo(false); }
+  };
+
+  const handleVideos = async (files: FileList) => {
+    setUploadingVideo(true);
+    try {
+      const current = form.video_urls || [];
+      const toUpload = Array.from(files).slice(0, 9 - current.length);
+      const urls = await Promise.all(toUpload.map(f => uploadFile(f, "creator-videos")));
+      set("video_urls", [...current, ...urls]);
+      toast.success(`${urls.length} video${urls.length > 1 ? "s" : ""} uploaded! ✓`);
     } catch { toast.error("Video upload failed."); }
     finally { setUploadingVideo(false); }
   };
@@ -176,26 +190,58 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
         </div>
       </div>
 
-      {/* Intro video */}
+      {/* Videos — TikTok-style multi upload */}
       <div>
-        <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Intro Video</label>
-        {form.video_url ? (
-          <div className="relative rounded-xl overflow-hidden bg-black aspect-video">
-            <video src={form.video_url} className="w-full h-full object-cover" controls muted />
-            <button type="button" onClick={() => set("video_url", null)}
-              className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/70 flex items-center justify-center hover:bg-black/90 transition-colors">
-              <X size={13} className="text-white" />
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs text-muted-foreground uppercase tracking-widest">
+            Videos ({(form.video_urls?.length || 0) + (form.video_url ? 1 : 0)}/9)
+          </label>
+          {((form.video_urls?.length || 0) + (form.video_url ? 1 : 0)) < 9 && (
+            <button type="button" onClick={() => videosRef.current?.click()}
+              className="flex items-center gap-1 text-xs text-primary hover:text-primary/80 transition-colors">
+              {uploadingVideo ? <Loader2 size={12} className="animate-spin" /> : <Plus size={12} />}
+              {uploadingVideo ? "Uploading..." : "Add videos"}
             </button>
-          </div>
-        ) : (
-          <div onClick={() => videoRef.current?.click()}
-            className="border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
-            {uploadingVideo
-              ? <><Loader2 size={22} className="animate-spin text-muted-foreground mb-2" /><p className="text-xs text-muted-foreground">Uploading video...</p></>
-              : <><Video size={22} className="text-muted-foreground mb-2" /><p className="text-xs text-muted-foreground">Tap to upload intro video</p><p className="text-[10px] text-muted-foreground/60 mt-1">MP4, MOV</p></>}
-          </div>
-        )}
+          )}
+        </div>
+        <input ref={videosRef} type="file" accept="video/*" multiple className="hidden"
+          onChange={e => e.target.files && e.target.files.length > 0 && handleVideos(e.target.files)} />
         <input ref={videoRef} type="file" accept="video/*" className="hidden" onChange={e => e.target.files?.[0] && handleVideo(e.target.files[0])} />
+        <div className="grid grid-cols-3 gap-2">
+          {/* Legacy single video_url */}
+          {form.video_url && (
+            <div className="relative aspect-[9/16] rounded-xl overflow-hidden bg-black group">
+              <video src={form.video_url} className="w-full h-full object-cover" muted playsInline />
+              <button type="button" onClick={() => set("video_url", null)}
+                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <X size={10} className="text-white" />
+              </button>
+            </div>
+          )}
+          {/* Multiple videos */}
+          {(form.video_urls || []).map((vid, idx) => (
+            <div key={idx} className="relative aspect-[9/16] rounded-xl overflow-hidden bg-black group">
+              <video src={vid} className="w-full h-full object-cover" muted playsInline />
+              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                <Play size={18} className="text-white/80" />
+              </div>
+              <button type="button"
+                onClick={() => set("video_urls", (form.video_urls || []).filter((_, i) => i !== idx))}
+                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <X size={10} className="text-white" />
+              </button>
+            </div>
+          ))}
+          {/* Add more slot */}
+          {((form.video_urls?.length || 0) + (form.video_url ? 1 : 0)) < 9 && (
+            <div onClick={() => videosRef.current?.click()}
+              className="aspect-[9/16] rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-primary/40 transition-colors bg-muted/20">
+              {uploadingVideo
+                ? <Loader2 size={20} className="animate-spin text-muted-foreground" />
+                : <><Video size={18} className="text-muted-foreground mb-1" /><p className="text-[10px] text-muted-foreground">Add video</p></>}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Info */}
@@ -289,6 +335,7 @@ const Admin = () => {
     avatar_url: data.avatar_url,
     portfolio_images: data.portfolio_images || [],
     video_url: data.video_url || null,
+    video_urls: data.video_urls || [],
     rating: data.rating,
   });
 
@@ -310,7 +357,7 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], rating: c.rating });
     setShowForm(false);
   };
 

@@ -94,6 +94,7 @@ const CreatorProfile = () => {
       instagram: c.instagram || "",
       portfolioImages: c.portfolio_images || [],
       videoUrl: c.video_url || "",
+      videoUrls: c.video_urls || [],
       brands: [],
       portfolio: (c.portfolio_images || []).length,
     };
@@ -296,6 +297,7 @@ const CreatorProfile = () => {
               <div className="grid grid-cols-3 gap-2">
                 {[
                   ...(creator.videoUrl ? [{ src: creator.videoUrl, label: "Featured" }] : []),
+                  ...((creator as any).videoUrls?.map((src: string) => ({ src, label: "Video" })) || []),
                   ...(uploadedVideos?.map(v => ({ src: v.video_url, label: v.title || "Video" })) || []),
                 ].map((v, i) => (
                   <VideoTile key={i} src={v.src} label={v.label} />
