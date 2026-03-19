@@ -56,107 +56,7 @@ const CreatorProfile = () => {
     );
   }
 
-  // Build a unified creator object from DB data
-  if (!staticCreator && dbCreator) {
-    const c = dbCreator;
-    const portfolioImages = c.portfolio_images || [];
-    return (
-      <div className="min-h-screen">
-        <div className="h-40 bg-gradient-to-br from-primary/20 to-primary/5 relative overflow-hidden">
-          <div className="absolute inset-0 bg-foreground/10" />
-          <div className="container h-full flex items-end pb-0 relative z-10">
-            <Link to="/creators" className="absolute top-5 left-4 md:left-6 inline-flex items-center gap-1.5 text-xs text-foreground/70 hover:text-foreground transition-colors bg-background/30 backdrop-blur rounded-full px-3 py-1.5">
-              <ArrowLeft size={12} /> Back
-            </Link>
-          </div>
-        </div>
-        <div className="container relative">
-          <div className="flex items-end justify-between -mt-10 mb-6 flex-wrap gap-4">
-            <div className="flex items-end gap-4">
-              <div className="relative">
-                {c.avatar_url
-                  ? <img src={c.avatar_url} alt={c.display_name} className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg" />
-                  : <div className="h-20 w-20 rounded-full border-4 border-background shadow-lg bg-primary/10 flex items-center justify-center text-2xl font-display text-primary">{c.display_name?.[0]}</div>
-                }
-              </div>
-              <div className="pb-1">
-                <h1 className="text-2xl font-display">{c.display_name}</h1>
-                <p className="text-sm text-muted-foreground">{c.tagline}{c.location ? ` · ${c.location}` : ""}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 pb-1">
-              {c.instagram && (
-                <a href={`https://instagram.com/${c.instagram}`} target="_blank" rel="noopener noreferrer"
-                  className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
-                  <Instagram size={14} />
-                </a>
-              )}
-              <Button size="sm" className="rounded-full" asChild>
-                <Link to="/messages"><MessageCircle size={12} className="mr-1.5" /> Message</Link>
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-8 pb-16">
-            <aside className="w-full lg:w-64 shrink-0 space-y-5">
-              <div className="rounded-xl border border-border bg-card p-5">
-                <div className="flex items-center gap-2 mb-1">
-                  <Star size={14} className="text-primary" />
-                  <span className="font-medium text-sm">{c.rating} / 5.0</span>
-                </div>
-              </div>
-              {c.rates && (
-                <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Rate</p>
-                  <p className="text-sm font-medium">{c.rates}</p>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <Shield size={11} className="text-emerald-500" />
-                    <p className="text-[10px] text-muted-foreground">Lumeya payment protection</p>
-                  </div>
-                </div>
-              )}
-              {c.tags?.length > 0 && (
-                <div className="rounded-xl border border-border bg-card p-5">
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Tags</p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {c.tags.map((t: string) => <span key={t} className="rounded-full bg-accent px-2.5 py-0.5 text-[11px]">{t}</span>)}
-                  </div>
-                </div>
-              )}
-            </aside>
-
-            <div className="flex-1 min-w-0 space-y-6">
-              {c.bio && (
-                <div className="rounded-xl border border-border bg-card p-6">
-                  <p className="text-sm leading-relaxed text-foreground/80">{c.bio}</p>
-                </div>
-              )}
-              {portfolioImages.length > 0 && (
-                <div>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Portfolio</p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {portfolioImages.map((img: string, i: number) => (
-                      <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
-                        <img src={img} alt="" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {c.video_url && (
-                <div>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Video</p>
-                  <VideoPlayer src={c.video_url} label="Creator Video" />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!staticCreator) {
+  if (!staticCreator && !dbCreator) {
     return (
       <div className="container py-24 text-center">
         <p className="text-muted-foreground">Creator not found.</p>
@@ -167,7 +67,37 @@ const CreatorProfile = () => {
     );
   }
 
-  const creator = staticCreator;
+  // Map DB creator into the same shape as static creator so we use one layout
+  const creator = staticCreator ?? (() => {
+    const c = dbCreator;
+    return {
+      id: c.id,
+      name: c.display_name,
+      role: c.tagline || "UGC Creator",
+      location: c.location || "",
+      bio: c.bio || "",
+      avatar: c.avatar_url || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80`,
+      tags: c.tags || [],
+      skills: [],
+      rates: c.rates || "",
+      rating: c.rating || 5.0,
+      followers: 10000,
+      engagementRate: 5.0,
+      completedCampaigns: 0,
+      responseTime: "Same day",
+      availableForRemote: true,
+      color: "from-primary/30 to-primary/10",
+      region: "Europe",
+      languages: ["English"],
+      contentTypes: [],
+      ugcContentTypes: [],
+      instagram: c.instagram || "",
+      portfolioImages: c.portfolio_images || [],
+      videoUrl: c.video_url || "",
+      brands: [],
+      portfolio: (c.portfolio_images || []).length,
+    };
+  })();
 
   const portfolioImages = creator.portfolioImages || [];
   const lbTotal = portfolioImages.length;
