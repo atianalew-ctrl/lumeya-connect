@@ -10,15 +10,17 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { creators } from "@/lib/data";
 import { useCreatorVideos } from "@/hooks/use-creator-videos";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const fmtFollowers = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
 
+// Check if string looks like a UUID (DB creator)
+const isUUID = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+
 const CreatorProfile = () => {
   const { id } = useParams();
-  const creator = creators.find((c) => c.id === Number(id));
-  const { data: uploadedVideos } = useCreatorVideos(Number(id));
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [saved, setSaved] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -26,8 +28,135 @@ const CreatorProfile = () => {
   const [revisionNote, setRevisionNote] = useState("");
   const [revisionSent, setRevisionSent] = useState(false);
   const [activeTab, setActiveTab] = useState<"portfolio" | "videos" | "reviews">("portfolio");
+  const [dbCreator, setDbCreator] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  if (!creator) {
+  // Try static first, then DB
+  const staticCreator = creators.find((c) => c.id === Number(id));
+
+  useEffect(() => {
+    if (!staticCreator && id && isUUID(id)) {
+      setLoading(true);
+      supabase.functions.invoke("admin-creators", { body: { action: "list" } })
+        .then(({ data }) => {
+          const found = data?.data?.find((c: any) => c.id === id);
+          if (found) setDbCreator(found);
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [id, staticCreator]);
+
+  const { data: uploadedVideos } = useCreatorVideos(staticCreator ? Number(id) : undefined);
+
+  if (loading) {
+    return (
+      <div className="container py-24 text-center">
+        <p className="text-muted-foreground">Loading creator…</p>
+      </div>
+    );
+  }
+
+  // Build a unified creator object from DB data
+  if (!staticCreator && dbCreator) {
+    const c = dbCreator;
+    const portfolioImages = c.portfolio_images || [];
+    return (
+      <div className="min-h-screen">
+        <div className="h-40 bg-gradient-to-br from-primary/20 to-primary/5 relative overflow-hidden">
+          <div className="absolute inset-0 bg-foreground/10" />
+          <div className="container h-full flex items-end pb-0 relative z-10">
+            <Link to="/creators" className="absolute top-5 left-4 md:left-6 inline-flex items-center gap-1.5 text-xs text-foreground/70 hover:text-foreground transition-colors bg-background/30 backdrop-blur rounded-full px-3 py-1.5">
+              <ArrowLeft size={12} /> Back
+            </Link>
+          </div>
+        </div>
+        <div className="container relative">
+          <div className="flex items-end justify-between -mt-10 mb-6 flex-wrap gap-4">
+            <div className="flex items-end gap-4">
+              <div className="relative">
+                {c.avatar_url
+                  ? <img src={c.avatar_url} alt={c.display_name} className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg" />
+                  : <div className="h-20 w-20 rounded-full border-4 border-background shadow-lg bg-primary/10 flex items-center justify-center text-2xl font-display text-primary">{c.display_name?.[0]}</div>
+                }
+              </div>
+              <div className="pb-1">
+                <h1 className="text-2xl font-display">{c.display_name}</h1>
+                <p className="text-sm text-muted-foreground">{c.tagline}{c.location ? ` · ${c.location}` : ""}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 pb-1">
+              {c.instagram && (
+                <a href={`https://instagram.com/${c.instagram}`} target="_blank" rel="noopener noreferrer"
+                  className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
+                  <Instagram size={14} />
+                </a>
+              )}
+              <Button size="sm" className="rounded-full" asChild>
+                <Link to="/messages"><MessageCircle size={12} className="mr-1.5" /> Message</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-8 pb-16">
+            <aside className="w-full lg:w-64 shrink-0 space-y-5">
+              <div className="rounded-xl border border-border bg-card p-5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Star size={14} className="text-primary" />
+                  <span className="font-medium text-sm">{c.rating} / 5.0</span>
+                </div>
+              </div>
+              {c.rates && (
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Rate</p>
+                  <p className="text-sm font-medium">{c.rates}</p>
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <Shield size={11} className="text-emerald-500" />
+                    <p className="text-[10px] text-muted-foreground">Lumeya payment protection</p>
+                  </div>
+                </div>
+              )}
+              {c.tags?.length > 0 && (
+                <div className="rounded-xl border border-border bg-card p-5">
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Tags</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {c.tags.map((t: string) => <span key={t} className="rounded-full bg-accent px-2.5 py-0.5 text-[11px]">{t}</span>)}
+                  </div>
+                </div>
+              )}
+            </aside>
+
+            <div className="flex-1 min-w-0 space-y-6">
+              {c.bio && (
+                <div className="rounded-xl border border-border bg-card p-6">
+                  <p className="text-sm leading-relaxed text-foreground/80">{c.bio}</p>
+                </div>
+              )}
+              {portfolioImages.length > 0 && (
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Portfolio</p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {portfolioImages.map((img: string, i: number) => (
+                      <div key={i} className="relative aspect-square rounded-xl overflow-hidden">
+                        <img src={img} alt="" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {c.video_url && (
+                <div>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Video</p>
+                  <VideoPlayer src={c.video_url} label="Creator Video" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!staticCreator) {
     return (
       <div className="container py-24 text-center">
         <p className="text-muted-foreground">Creator not found.</p>
@@ -37,6 +166,8 @@ const CreatorProfile = () => {
       </div>
     );
   }
+
+  const creator = staticCreator;
 
   const portfolioImages = creator.portfolioImages || [];
   const lbTotal = portfolioImages.length;
