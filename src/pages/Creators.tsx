@@ -307,13 +307,15 @@ const Creators = () => {
 
   const filtered = useMemo(() => {
     return creators.filter((c) => {
+      const lowerSearch = (search || "").toLowerCase();
       const matchesSearch =
         !search ||
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        c.role.toLowerCase().includes(search.toLowerCase()) ||
-        c.tags.some((t) => t.toLowerCase().includes(search.toLowerCase())) ||
-        c.location.toLowerCase().includes(search.toLowerCase()) ||
-        c.country.toLowerCase().includes(search.toLowerCase());
+        (c.name || "").toLowerCase().includes(lowerSearch) ||
+        (c.role || "").toLowerCase().includes(lowerSearch) ||
+        c.tags.some((t) => (t || "").toLowerCase().includes(lowerSearch)) ||
+        (c.location || "").toLowerCase().includes(lowerSearch) ||
+        (c.country || "").toLowerCase().includes(lowerSearch) ||
+        (c.bio || "").toLowerCase().includes(lowerSearch);
 
       const matchesRegion = selectedRegions.length === 0 || selectedRegions.includes(c.region);
 
@@ -331,9 +333,12 @@ const Creators = () => {
 
       const matchesRemote = !remoteOnly || c.availableForRemote;
 
-      return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote;
+      const matchesSavedTab =
+        activeTab === "all" || savedIds.includes(String(c.id));
+
+      return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote && matchesSavedTab;
     });
-  }, [creators, search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly]);
+  }, [creators, search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly, activeTab, savedIds]);
 
   return (
     <div className="container py-12">
@@ -601,8 +606,28 @@ const Creators = () => {
         </div>
       )}
 
+      {/* Filter tabs: All | ❤️ Saved */}
+      <div className="mt-6 flex items-center gap-1 border-b border-border">
+        {[
+          { key: "all", label: "All" },
+          { key: "saved", label: `❤️ Saved${savedIds.length > 0 ? ` (${savedIds.length})` : ""}` },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key as "all" | "saved")}
+            className={`px-4 py-2.5 text-xs font-medium border-b-2 transition-colors ${
+              activeTab === tab.key
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
       {/* Results count + swipe toggle */}
-      <div className="mt-6 flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
           {filtered.length} creator{filtered.length !== 1 ? "s" : ""} found
         </p>
@@ -631,7 +656,7 @@ const Creators = () => {
                 dragConstraints={{ left: 0, right: 0 }}
                 onDragEnd={(_, info) => {
                   if (Math.abs(info.offset.x) > 80) {
-                    if (info.offset.x > 0) setSaved(s => [...s, creator.id]);
+                    if (info.offset.x > 0) setSwipeSaved(s => [...s, creator.id]);
                     setSwipeIndex(idx => Math.min(idx + 1, filtered.length - 1));
                   }
                 }}
@@ -660,12 +685,12 @@ const Creators = () => {
             <Button size="sm" asChild variant="outline">
               <Link to={`/creators/${filtered[swipeIndex]?.id}`}>View Profile</Link>
             </Button>
-            <button onClick={() => { setSaved(s => [...s, filtered[swipeIndex]?.id]); setSwipeIndex(i => Math.min(i + 1, filtered.length - 1)); }} className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/40 bg-primary/10 shadow-md text-primary hover:bg-primary/20 transition-colors">
+            <button onClick={() => { setSwipeSaved(s => [...s, filtered[swipeIndex]?.id]); setSwipeIndex(i => Math.min(i + 1, filtered.length - 1)); }} className="flex h-14 w-14 items-center justify-center rounded-full border border-primary/40 bg-primary/10 shadow-md text-primary hover:bg-primary/20 transition-colors">
               <Heart size={22} />
             </button>
           </div>
-          {saved.length > 0 && (
-            <p className="text-xs text-muted-foreground">{saved.length} creator{saved.length > 1 ? "s" : ""} saved ❤️</p>
+          {swipeSaved.length > 0 && (
+            <p className="text-xs text-muted-foreground">{swipeSaved.length} creator{swipeSaved.length > 1 ? "s" : ""} saved ❤️</p>
           )}
           {swipeIndex >= filtered.length - 1 && (
             <div className="text-center text-sm text-muted-foreground py-4">
@@ -678,14 +703,66 @@ const Creators = () => {
 
       {/* Grid — hidden in swipe mode */}
       {!swipeMode && <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {filtered.map((creator, i) => (
+        {filtered.map((creator, i) => {
+          const creatorIdStr = String(creator.id);
+          const isHeartSaved = savedIds.includes(creatorIdStr);
+          const isPending = pendingHeartId === creatorIdStr;
+          return (
           <motion.div
             key={creator.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
           >
-            <div className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg">
+            <div className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg relative">
+              {/* Heart button — absolute top-right of the card */}
+              <div className="absolute top-2 right-2 z-40">
+                {isPending ? (
+                  <div className="bg-card border border-border rounded-xl shadow-lg p-2 w-48">
+                    <p className="text-[10px] text-muted-foreground mb-1.5">Enter your email to save</p>
+                    <input
+                      type="email"
+                      value={emailPromptValue}
+                      onChange={(e) => setEmailPromptValue(e.target.value)}
+                      placeholder="you@brand.com"
+                      className="w-full rounded-md border border-input bg-background px-2 py-1 text-xs mb-1.5 focus:outline-none focus:ring-1 focus:ring-ring"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") confirmEmailAndSave(creatorIdStr);
+                        if (e.key === "Escape") setPendingHeartId(null);
+                      }}
+                    />
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => setPendingHeartId(null)}
+                        className="flex-1 rounded-md border border-border text-[10px] py-1 text-muted-foreground hover:bg-accent transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => confirmEmailAndSave(creatorIdStr)}
+                        disabled={!emailPromptValue.trim()}
+                        className="flex-1 rounded-md bg-primary text-primary-foreground text-[10px] py-1 disabled:opacity-40 transition-colors"
+                      >
+                        Save ❤️
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleHeartClick(creatorIdStr); }}
+                    className={`h-8 w-8 rounded-full flex items-center justify-center shadow-md transition-all ${
+                      isHeartSaved
+                        ? "bg-rose-500 text-white border border-rose-500"
+                        : "bg-card/90 backdrop-blur border border-border text-muted-foreground hover:text-rose-500 hover:border-rose-300"
+                    }`}
+                    title={isHeartSaved ? "Remove from saved" : "Save creator"}
+                  >
+                    <Heart size={13} className={isHeartSaved ? "fill-white" : ""} />
+                  </button>
+                )}
+              </div>
+
               <CreatorCardGallery creator={creator} />
 
               {/* Stats row */}
@@ -745,13 +822,14 @@ const Creators = () => {
               </div>
             </div>
           </motion.div>
-        ))}
+          );
+        })}
       </div>}
 
       {filtered.length === 0 && !swipeMode && (
-        <div className="mt-20 text-center text-muted-foreground">
+        <div className="mt-20 text-center">
           <Globe size={32} className="mx-auto mb-3 text-muted-foreground/50" />
-          <p>No creators found matching your filters.</p>
+          <p className="text-muted-foreground">No creators found</p>
           <Button variant="outline" size="sm" className="mt-3" onClick={clearAll}>
             Clear all filters
           </Button>
