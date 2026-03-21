@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 const REGIONS = ["Scandinavia", "Europe", "North America", "Latin America", "Asia Pacific", "Southeast Asia", "Middle East", "Africa", "Global"];
 const LANGUAGES = ["English", "Danish", "Swedish", "Norwegian", "French", "German", "Spanish", "Italian", "Dutch", "Portuguese", "Japanese", "Korean", "Arabic", "Chinese"];
-const UGC_TYPES = ["Product Review", "Product Demo", "Testimonial", "Unboxing", "Lifestyle Content", "Problem → Solution Ad", "Voiceover / B-roll", "Vlog / Day-in-the-life", "TikTok Trend / Social Trend", "Social Media Management"];
+const UGC_TYPES = ["Product Review", "Product Demo", "Testimonial", "Unboxing", "Lifestyle Content", "Problem → Solution Ad", "Voiceover / B-roll", "Vlog / Day-in-the-life", "TikTok Trend / Social Trend", "Social Media Management", "Personal Profile Post"];
 
 const GRADIENTS = [
   { label: "Violet Pink", value: "from-violet-200 to-pink-100" },
