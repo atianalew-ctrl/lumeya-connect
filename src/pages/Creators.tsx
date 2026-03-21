@@ -11,8 +11,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 
-const fmtNum = (n: any) => { const f = Number(n); if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; if (f >= 1000) return `${Math.round(f/1000)}K`; return f > 0 ? String(f) : "—"; };
-
 const allCountries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
@@ -92,7 +90,6 @@ const Creators = () => {
         contentTypes: (c.content_types || []) as UGCContentType[],
         ugcContentTypes: c.content_types || [],
         instagram: c.instagram || "",
-        tiktok: c.tiktok || "",
         portfolioImages: c.portfolio_images || [],
         videoUrl: c.video_url || null,
       }));
@@ -128,7 +125,7 @@ const Creators = () => {
         c.role.toLowerCase().includes(search.toLowerCase()) ||
         c.tags.some((t) => t.toLowerCase().includes(search.toLowerCase())) ||
         c.location.toLowerCase().includes(search.toLowerCase()) ||
-        (c.country || "").toLowerCase().includes(search.toLowerCase());
+        c.country.toLowerCase().includes(search.toLowerCase());
 
       const matchesRegion = selectedRegions.length === 0 || selectedRegions.includes(c.region);
 
@@ -500,42 +497,39 @@ const Creators = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
           >
-            <Link to={`/creators/${creator.id}`} className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-xl">
-              {/* Hero photo */}
+            <Link to={`/creators/${creator.id}`} className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg">
+              {/* Big hero photo */}
               <div className="relative aspect-[3/4] overflow-hidden bg-accent">
-                <img src={creator.avatar} alt={creator.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                <img
+                  src={creator.avatar}
+                  alt={creator.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
 
-                {/* Top badges */}
-                <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                  {creator.availableForRemote
-                    ? <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/80 backdrop-blur-sm px-2.5 py-1 text-[9px] text-white font-medium"><Wifi size={8} /> Remote</span>
-                    : <span />}
-                  <span className="inline-flex items-center gap-1 rounded-full bg-black/50 backdrop-blur-sm border border-white/10 px-2.5 py-1 text-[9px] text-white">
+                {/* Remote badge */}
+                {creator.availableForRemote && (
+                  <div className="absolute top-3 left-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
+                      <Wifi size={8} /> Remote
+                    </span>
+                  </div>
+                )}
+
+                {/* Rating badge */}
+                <div className="absolute top-3 right-3">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
                     <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
                   </span>
                 </div>
 
-                {/* Bottom overlay — name + social handles */}
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <h3 className="text-white font-semibold text-sm leading-tight">{creator.name}</h3>
-                  <div className="flex items-center gap-1 mt-0.5 mb-2">
+                {/* Name + location overlay */}
+                <div className="absolute bottom-3 left-3 right-3">
+                  <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
+                  <div className="flex items-center gap-1 mt-0.5">
                     <MapPin size={9} className="text-white/50" />
-                    <span className="text-[10px] text-white/60">{creator.location}</span>
-                  </div>
-                  {/* Social handles */}
-                  <div className="flex items-center gap-2">
-                    {creator.instagram ? (
-                      <span className="inline-flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] text-white/80">
-                        <Instagram size={9} /> @{String(creator.instagram).replace("@","")}
-                      </span>
-                    ) : null}
-                    {(creator as any).tiktok ? (
-                      <span className="inline-flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] text-white/80">
-                        ♪ @{String((creator as any).tiktok).replace("@","")}
-                      </span>
-                    ) : null}
+                    <span className="text-[10px] text-white/50">{creator.location}</span>
                   </div>
                 </div>
               </div>
@@ -543,7 +537,13 @@ const Creators = () => {
               {/* Stats row */}
               <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
                 <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold">{fmtNum(creator.followers)}</p>
+                  <p className="text-xs font-semibold">
+                    {(creator.followers as any) >= 1000000
+                      ? `${((creator.followers as any) / 1000000).toFixed(1)}M`
+                      : (creator.followers as any) >= 1000
+                      ? `${((creator.followers as any) / 1000).toFixed(1)}K`
+                      : (creator.followers as any) > 0 ? String(creator.followers) : "—"}
+                  </p>
                   <p className="text-[9px] text-muted-foreground">Followers</p>
                 </div>
                 <div className="px-3 py-2.5 text-center">
@@ -551,21 +551,23 @@ const Creators = () => {
                   <p className="text-[9px] text-muted-foreground">Engagement</p>
                 </div>
                 <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold">{creator.tags?.length || "—"}</p>
-                  <p className="text-[9px] text-muted-foreground">Niches</p>
+                  <p className="text-xs font-semibold">{creator.completedCampaigns || creator.portfolio || "—"}</p>
+                  <p className="text-[9px] text-muted-foreground">Campaigns</p>
                 </div>
               </div>
 
-              {/* Tags + rate */}
+              {/* Tags + niche */}
               <div className="p-3">
-                <div className="flex flex-wrap gap-1.5 mb-2.5">
-                  {creator.tags.slice(0, 3).map(tag => (
-                    <span key={tag} className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[10px] text-primary">{tag}</span>
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {creator.tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] text-muted-foreground">
+                      {tag}
+                    </span>
                   ))}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-muted-foreground font-medium">{creator.rates || "Rate on request"}</span>
-                  <span className="text-[10px] font-semibold text-primary group-hover:underline">View →</span>
+                  <span className="text-[10px] text-muted-foreground">{creator.instagram ? `@${String(creator.instagram).replace("@","")}` : creator.rates}</span>
+                  <span className="text-[10px] font-medium text-primary group-hover:underline">View profile →</span>
                 </div>
               </div>
             </Link>
