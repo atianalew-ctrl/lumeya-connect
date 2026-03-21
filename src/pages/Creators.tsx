@@ -13,75 +13,107 @@ import { supabase } from "@/integrations/supabase/client";
 
 const fmtNum = (n: any) => { const f = Number(n); if (!f || f < 100) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
 
-// Swipeable photo gallery — CSS scroll snap for reliable mobile swiping
+// Swipeable gallery using touch handlers — shows one image at a time
 const CreatorCardGallery = ({ creator }: { creator: any }) => {
   const photos = [creator.avatar, ...(creator.portfolioImages || [])].filter(Boolean).slice(0, 6);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isDragging = useRef(false);
+  const navigating = useRef(false);
 
-  const onScroll = () => {
-    if (!scrollRef.current) return;
-    const i = Math.round(scrollRef.current.scrollLeft / scrollRef.current.offsetWidth);
-    setIdx(i);
+  const goTo = (n: number) => setIdx(Math.max(0, Math.min(photos.length - 1, n)));
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isDragging.current = false;
+    navigating.current = false;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
+    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
+    if (dx > 8 && dx > dy) {
+      isDragging.current = true;
+      e.stopPropagation();
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    if (Math.abs(dx) > 40 && Math.abs(dx) > dy) {
+      navigating.current = true;
+      goTo(dx < 0 ? idx + 1 : idx - 1);
+    }
+  };
+
+  const handleClick = (e: React.MouseEvent) => {
+    if (navigating.current || isDragging.current) {
+      e.preventDefault();
+      navigating.current = false;
+      isDragging.current = false;
+    }
   };
 
   return (
-    <div className="relative aspect-[3/4] overflow-hidden bg-accent">
-        {/* Scrollable strip — pointer-events-auto so swipe works */}
-        <div ref={scrollRef} onScroll={onScroll}
-          className="flex h-full overflow-x-auto snap-x snap-mandatory"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" } as any}>
-          {photos.map((src, i) => (
-            <div key={i} className="relative shrink-0 w-full h-full snap-start">
-              <img src={src} alt={creator.name} className="w-full h-full object-cover" draggable={false} />
-            </div>
+    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}>
+
+      {/* Images — instant switch, no scroll */}
+      {photos.map((src, i) => (
+        <img key={i} src={src} alt={creator.name}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${i === idx ? "opacity-100" : "opacity-0"}`}
+          draggable={false} />
+      ))}
+
+      {/* Tap to go to profile */}
+      <Link to={`/creators/${creator.id}`} className="absolute inset-0 z-10" onClick={handleClick} />
+
+      {/* Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none z-20" />
+
+      {/* Dot indicators */}
+      {photos.length > 1 && (
+        <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-30 pointer-events-none">
+          {photos.map((_, i) => (
+            <span key={i} className={`h-0.5 rounded-full transition-all duration-200 ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/40"}`} />
           ))}
         </div>
+      )}
 
-        {/* Tap-to-navigate overlay — covers the area but lets scroll through */}
-        <Link to={`/creators/${creator.id}`} className="absolute inset-0 z-0" aria-label={creator.name} />
-
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
-
-        {/* Dot indicators */}
-        {photos.length > 1 && (
-          <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-none">
-            {photos.map((_, i) => (
-              <span key={i} className={`h-0.5 rounded-full transition-all duration-300 ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/40"}`} />
-            ))}
-          </div>
-        )}
-
-        {/* Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-          <div className="flex flex-col gap-1">
-            {(creator as any).is_verified && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">✓ Verified</span>
-            )}
-            {(creator as any).is_trending && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">🔥 Trending</span>
-            )}
-            {(creator as any).availability === "busy" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Busy</span>
-            )}
-            {(creator as any).availability === "limited" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Limited</span>
-            )}
-          </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
-            <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
-          </span>
+      {/* Badges */}
+      <div className="absolute top-7 left-3 right-3 flex items-center justify-between z-30 pointer-events-none">
+        <div className="flex flex-col gap-1">
+          {(creator as any).is_verified && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">✓ Verified</span>
+          )}
+          {(creator as any).is_trending && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">🔥 Trending</span>
+          )}
+          {(creator as any).availability === "busy" && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Busy</span>
+          )}
+          {(creator as any).availability === "limited" && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Limited</span>
+          )}
         </div>
+        <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
+          <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
+        </span>
+      </div>
 
-        {/* Name + location */}
-        <div className="absolute bottom-3 left-3 right-3 pointer-events-none">
-          <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
-          <div className="flex items-center gap-1 mt-0.5">
-            <MapPin size={9} className="text-white/50" />
-            <span className="text-[10px] text-white/50">{creator.location}{creator.country && creator.country !== creator.location ? `, ${creator.country}` : ""}</span>
-          </div>
+      {/* Name + location */}
+      <div className="absolute bottom-3 left-3 right-3 pointer-events-none z-30">
+        <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
+        <div className="flex items-center gap-1 mt-0.5">
+          <MapPin size={9} className="text-white/50" />
+          <span className="text-[10px] text-white/50">{creator.location}{creator.country && creator.country !== creator.location ? `, ${creator.country}` : ""}</span>
         </div>
+      </div>
     </div>
   );
 };
