@@ -349,6 +349,22 @@ const Creators = () => {
       <div className="mb-10">
         <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground mb-5">Creator Hub</p>
 
+        {/* Hub switcher: Real vs AI */}
+        <div className="flex rounded-2xl border border-border overflow-hidden mb-8 max-w-md">
+          <div className="flex-1 py-4 px-6 bg-foreground text-background">
+            <p className="text-sm font-semibold mb-0.5">Real Creators</p>
+            <p className="text-xs text-background/60">Humans. Real content.</p>
+          </div>
+          <div className="w-px bg-border" />
+          <a href="/ai-studio" className="flex-1 py-4 px-6 bg-background text-muted-foreground hover:text-foreground transition-colors group">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <p className="text-sm font-semibold text-foreground group-hover:text-foreground">AI Creators</p>
+              <span className="rounded-full bg-primary/10 text-primary text-[9px] px-1.5 py-0.5 font-medium">NEW</span>
+            </div>
+            <p className="text-xs">AI models + your product</p>
+          </a>
+        </div>
+
         {/* Big type switcher */}
         <div className="flex rounded-2xl border border-border overflow-hidden mb-8 max-w-lg">
           <button

@@ -37,6 +37,7 @@ import BrandManagement from "./pages/BrandManagement";
 import Admin from "./pages/Admin";
 import CreatorSignup from "./pages/CreatorSignup";
 import BrandLogin from "./pages/BrandLogin";
+import AIStudio from "./pages/AIStudio";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Waitlist from "./pages/Waitlist";
@@ -84,6 +85,7 @@ const App = () => (
             <Route path="/admin" element={<Admin />} />
             <Route path="/creator-signup" element={<CreatorSignup />} />
             <Route path="/brand-login" element={<BrandLogin />} />
+            <Route path="/ai-studio" element={<AIStudio />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/waitlist" element={<Waitlist />} />
