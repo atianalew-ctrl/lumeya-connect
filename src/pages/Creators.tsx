@@ -526,16 +526,16 @@ const Creators = () => {
                   </div>
                   {/* Social handles */}
                   <div className="flex items-center gap-2">
-                    {creator.instagram && (
+                    {creator.instagram ? (
                       <span className="inline-flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] text-white/80">
-                        <Instagram size={9} /> @{creator.instagram.replace("@","")}
+                        <Instagram size={9} /> @{String(creator.instagram).replace("@","")}
                       </span>
-                    )}
-                    {(creator as any).tiktok && (
+                    ) : null}
+                    {(creator as any).tiktok ? (
                       <span className="inline-flex items-center gap-1 bg-white/10 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] text-white/80">
-                        ♪ @{(creator as any).tiktok.replace("@","")}
+                        ♪ @{String((creator as any).tiktok).replace("@","")}
                       </span>
-                    )}
+                    ) : null}
                   </div>
                 </div>
               </div>
