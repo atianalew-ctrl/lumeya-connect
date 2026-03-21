@@ -334,9 +334,32 @@ const CreatorProfile = () => {
               </div>
             )}
 
+            {/* AI Content generation CTA */}
+            <div className="rounded-2xl border border-border bg-gradient-to-br from-accent/60 to-accent/20 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles size={14} className="text-primary" />
+                <p className="text-xs font-semibold">Generate AI content with {creator.display_name?.split(" ")[0]}</p>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
+                Upload your product → get studio-quality content featuring {creator.display_name?.split(" ")[0]}'s look. No shoot needed.
+              </p>
+              <div className="flex gap-2 text-[10px] text-muted-foreground mb-3">
+                <span className="rounded-full bg-background border border-border px-2 py-0.5">⚡ Instant</span>
+                <span className="rounded-full bg-background border border-border px-2 py-0.5">💰 From €50</span>
+                <span className="rounded-full bg-background border border-border px-2 py-0.5">🎨 Any style</span>
+              </div>
+              <Button
+                className="w-full rounded-full gap-1.5 bg-foreground text-background hover:opacity-80"
+                onClick={() => window.location.href = `/ai-studio?creator=${creator.id}&name=${encodeURIComponent(creator.display_name || "")}&avatar=${encodeURIComponent(creator.avatar_url || "")}`}
+              >
+                <Sparkles size={13} /> Generate AI content
+              </Button>
+            </div>
+
             {/* Request to Collab */}
             <div>
               <Button
+                variant="outline"
                 className="w-full rounded-full gap-1.5"
                 onClick={() => setCollabOpen(!collabOpen)}
               >

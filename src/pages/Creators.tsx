@@ -872,9 +872,14 @@ const Creators = () => {
                     className="flex-1 text-center rounded-full bg-foreground text-background text-[11px] font-medium py-2 hover:opacity-80 transition-opacity">
                     Hire
                   </Link>
+                  <Link to={`/ai-studio?creator=${creator.id}&name=${encodeURIComponent(String(creator.display_name || creator.name || ""))}&avatar=${encodeURIComponent(String(creator.avatar_url || ""))}`}
+                    className="flex-[0.6] text-center rounded-full border border-border text-[11px] text-muted-foreground py-2 hover:border-primary/40 hover:text-primary transition-colors flex items-center justify-center gap-1">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                    AI
+                  </Link>
                   <Link to={`/creators/${creator.id}`}
                     className="flex-1 text-center rounded-full border border-border text-[11px] text-muted-foreground py-2 hover:border-muted-foreground/60 hover:text-foreground transition-colors">
-                    View profile
+                    Profile
                   </Link>
                 </div>
               </div>

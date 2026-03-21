@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, Sparkles, ChevronRight, ChevronLeft, Check, X, Loader2, Image as ImageIcon } from "lucide-react";
+import { Upload, Sparkles, ChevronRight, ChevronLeft, Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const SUPABASE_URL = "https://xbgdynlutmosupfqafap.supabase.co";
@@ -80,10 +81,28 @@ function ImageUploadZone({ label, hint, files, onFiles }: {
 }
 
 export default function AIStudio() {
+  const [searchParams] = useSearchParams();
+  const preCreatorId = searchParams.get("creator");
+  const preCreatorName = searchParams.get("name");
+  const preCreatorAvatar = searchParams.get("avatar");
+
   const [creators, setCreators] = useState<AICreator[]>([]);
   const [loading, setLoading] = useState(true);
-  const [step, setStep] = useState(1);
-  const [selected, setSelected] = useState<AICreator | null>(null);
+  // If coming from a real creator profile, pre-fill a synthetic entry
+  const [selected, setSelected] = useState<AICreator | null>(
+    preCreatorId && preCreatorName ? {
+      id: preCreatorId,
+      name: preCreatorName,
+      tagline: "Real creator — AI generation using their likeness",
+      bio: "",
+      style: "lifestyle",
+      niche: [],
+      avatar_url: preCreatorAvatar || "",
+      sample_images: [],
+      ethnicity: "", age_range: "", hair: "", vibe: "", color_palette: "",
+    } : null
+  );
+  const [step, setStep] = useState(preCreatorId ? 2 : 1); // skip step 1 if coming from profile
   const [stylePreset, setStylePreset] = useState("lifestyle");
   const [productFiles, setProductFiles] = useState<UploadedFile[]>([]);
   const [modelRefFiles, setModelRefFiles] = useState<UploadedFile[]>([]);
