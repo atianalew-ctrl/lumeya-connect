@@ -483,8 +483,7 @@ const VideoTile = ({ src, caption, collab, avatar, name }: { src: string; captio
       <div className="absolute bottom-0 left-0 right-0 p-2">
         {collab && (
           <div className="flex items-center gap-1 mb-1">
-            <span className="text-[9px] text-white/70">Collaboration</span>
-            <span className="text-[9px] text-white font-semibold">× {collab}</span>
+            <span className="text-[10px] text-white font-semibold">× {collab}</span>
           </div>
         )}
         {caption && <p className="text-[10px] text-white leading-tight line-clamp-2">{caption}</p>}
