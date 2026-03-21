@@ -529,7 +529,7 @@ const Creators = () => {
                   <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
                   <div className="flex items-center gap-1 mt-0.5">
                     <MapPin size={9} className="text-white/50" />
-                    <span className="text-[10px] text-white/50">{creator.location}</span>
+                    <span className="text-[10px] text-white/50">{creator.location}{(creator as any).country && (creator as any).country !== creator.location ? `, ${(creator as any).country}` : ""}</span>
                   </div>
                 </div>
               </div>
