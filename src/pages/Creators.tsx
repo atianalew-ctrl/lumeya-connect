@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check, Heart, XCircle } from "lucide-react";
-import { useState, useMemo, useRef, useEffect, useRef as useRefAlias } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
@@ -155,6 +155,31 @@ const allCountries = [
 const regions: Region[] = ["Scandinavia", "Europe", "Bali / Southeast Asia", "Global"];
 const languages = ["English", "Japanese", "Indonesian", "Spanish", "Danish", "German", "French", "Polish", "Vietnamese"];
 
+// --- localStorage helpers for saved creators ---
+const LS_KEY_SAVED = "lumeya_saved_creators";
+const LS_KEY_EMAIL = "lumeya_brand_email";
+
+function getSavedData(): { email: string; saved: string[] } {
+  try {
+    const raw = localStorage.getItem(LS_KEY_SAVED);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { email: "", saved: [] };
+}
+
+function setSavedData(data: { email: string; saved: string[] }) {
+  try {
+    localStorage.setItem(LS_KEY_SAVED, JSON.stringify(data));
+  } catch {}
+}
+
+function getSavedEmail(): string {
+  try {
+    return localStorage.getItem(LS_KEY_EMAIL) || getSavedData().email || "";
+  } catch {}
+  return "";
+}
+
 const Creators = () => {
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get("search") || "";
@@ -172,8 +197,16 @@ const Creators = () => {
   const [locationOpen, setLocationOpen] = useState(false);
   const [swipeMode, setSwipeMode] = useState(false);
   const [swipeIndex, setSwipeIndex] = useState(0);
-  const [saved, setSaved] = useState<number[]>([]);
+  const [swipeSaved, setSwipeSaved] = useState<number[]>([]);
   const isMobile = useIsMobile();
+
+  // Saved/favourite state
+  const [savedIds, setSavedIds] = useState<string[]>(() => getSavedData().saved);
+  const [savedEmail, setSavedEmail] = useState<string>(() => getSavedEmail());
+  const [activeTab, setActiveTab] = useState<"all" | "saved">("all");
+  // For inline email prompt: tracks which creatorId is pending heart click
+  const [pendingHeartId, setPendingHeartId] = useState<string | null>(null);
+  const [emailPromptValue, setEmailPromptValue] = useState("");
 
   // Load real creators from DB — show alongside static until enough real ones exist
   const [dbCreators, setDbCreators] = useState<typeof staticCreators>([]);
@@ -235,6 +268,41 @@ const Creators = () => {
     setSelectedContentTypes([]);
     setRemoteOnly(false);
     setSearch("");
+    setActiveTab("all");
+  };
+
+  // Heart toggle logic
+  const handleHeartClick = (creatorId: string) => {
+    const email = getSavedEmail();
+    if (!email) {
+      // Show email prompt for this creator
+      setPendingHeartId(creatorId);
+      setEmailPromptValue("");
+      return;
+    }
+    toggleSave(creatorId, email);
+  };
+
+  const toggleSave = (creatorId: string, email: string) => {
+    const data = getSavedData();
+    const alreadySaved = data.saved.includes(creatorId);
+    const newSaved = alreadySaved
+      ? data.saved.filter((id) => id !== creatorId)
+      : [...data.saved, creatorId];
+    const newData = { email, saved: newSaved };
+    setSavedData(newData);
+    setSavedIds(newSaved);
+    setSavedEmail(email);
+    try { localStorage.setItem(LS_KEY_EMAIL, email); } catch {}
+  };
+
+  const confirmEmailAndSave = (creatorId: string) => {
+    const email = emailPromptValue.trim();
+    if (!email) return;
+    try { localStorage.setItem(LS_KEY_EMAIL, email); } catch {}
+    toggleSave(creatorId, email);
+    setPendingHeartId(null);
+    setEmailPromptValue("");
   };
 
   const filtered = useMemo(() => {

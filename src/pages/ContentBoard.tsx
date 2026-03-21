@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Bookmark, Share2, Play, Instagram, X, ChevronLeft, ChevronRight, Sparkles, Filter } from "lucide-react";
+import { Heart, Bookmark, Share2, Play, Instagram, X, ChevronLeft, ChevronRight, Sparkles, Filter, Upload, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { creators } from "@/lib/data";
+
+const SUPABASE_URL = "https://xbgdynlutmosupfqafap.supabase.co";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiZ2R5bmx1dG1vc3VwZnFhZmFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkzODQsImV4cCI6MjA4OTA4NTM4NH0.TFModn0Tm_eZDR9NpDTzxn7Yq1aAiNCc-qSAnMtADys";
+const SVC_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiZ2R5bmx1dG1vc3VwZnFhZmFwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MzUwOTM4NCwiZXhwIjoyMDg5MDg1Mzg0fQ.zfdL0QkL_5nmZeuC-LAsd50-UsAIgqiCsJiDY5rklXs";
 
 // ── Curated content grid — editorial luxury aesthetic
 const CONTENT = [
@@ -193,14 +198,122 @@ const Lightbox = ({ item, onClose, onPrev, onNext }: {
   </motion.div>
 );
 
+// ── Upload modal
+const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded: (post: any) => void }) => {
+  const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [form, setForm] = useState({ creator_name: "", handle: "", caption: "", category: "Fashion", brand: "" });
+  const [uploading, setUploading] = useState(false);
+  const [done, setDone] = useState(false);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
+    const reader = new FileReader();
+    reader.onload = ev => setPreview(ev.target?.result as string);
+    reader.readAsDataURL(f);
+  };
+
+  const handleSubmit = async () => {
+    if (!file || !form.creator_name) return;
+    setUploading(true);
+    try {
+      // Upload image to creator-portfolio bucket
+      const filename = `feed/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, "_")}`;
+      const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/creator-portfolio/${filename}`, {
+        method: "POST",
+        headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, "Content-Type": file.type },
+        body: file,
+      });
+      const imageUrl = uploadRes.ok
+        ? `${SUPABASE_URL}/storage/v1/object/public/creator-portfolio/${filename}`
+        : preview!;
+
+      // Insert into feed_posts
+      const post = { ...form, image_url: imageUrl, type: "photo", likes: "0", saves: "0" };
+      await fetch(`${SUPABASE_URL}/rest/v1/feed_posts`, {
+        method: "POST",
+        headers: { apikey: SVC_KEY, Authorization: `Bearer ${SVC_KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
+        body: JSON.stringify(post),
+      });
+      setDone(true);
+      setTimeout(() => { onUploaded(post); onClose(); }, 1200);
+    } catch { setUploading(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="bg-background rounded-2xl border border-border w-full max-w-md p-6 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl">Add to Feed</h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={16} /></button>
+        </div>
+
+        {done ? (
+          <p className="text-center text-emerald-600 py-8 text-sm font-medium">✓ Post added to the Feed!</p>
+        ) : (
+          <>
+            {/* Image upload */}
+            <label className="block cursor-pointer">
+              <input type="file" accept="image/*,video/*" className="hidden" onChange={handleFile} />
+              {preview ? (
+                <img src={preview} className="w-full aspect-square object-cover rounded-xl" />
+              ) : (
+                <div className="w-full aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary/40 transition-colors">
+                  <Upload size={24} />
+                  <span className="text-xs">Tap to upload photo or video</span>
+                </div>
+              )}
+            </label>
+
+            <div className="space-y-2.5">
+              <Input placeholder="Your name" value={form.creator_name} onChange={e => setForm(f => ({...f, creator_name: e.target.value}))} />
+              <Input placeholder="@handle" value={form.handle} onChange={e => setForm(f => ({...f, handle: e.target.value}))} />
+              <Input placeholder="Caption..." value={form.caption} onChange={e => setForm(f => ({...f, caption: e.target.value}))} />
+              <div className="grid grid-cols-2 gap-2">
+                <select value={form.category} onChange={e => setForm(f => ({...f, category: e.target.value}))}
+                  className="rounded-md border border-input bg-background px-3 py-2 text-sm">
+                  {CATEGORIES.filter(c => c !== "All").map(c => <option key={c}>{c}</option>)}
+                </select>
+                <Input placeholder="Brand (optional)" value={form.brand} onChange={e => setForm(f => ({...f, brand: e.target.value}))} />
+              </div>
+            </div>
+
+            <Button className="w-full rounded-full" onClick={handleSubmit} disabled={!file || !form.creator_name || uploading}>
+              {uploading ? "Uploading..." : "Post to Feed"}
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // ── Main page
 const ContentBoard = () => {
   const [category, setCategory] = useState("All");
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [saved, setSaved] = useState<Set<number>>(new Set());
   const [liked, setLiked] = useState<Set<number>>(new Set());
+  const [showUpload, setShowUpload] = useState(false);
+  const [dbPosts, setDbPosts] = useState<any[]>([]);
 
-  const filtered = category === "All" ? CONTENT : CONTENT.filter(c => c.category === category);
+  useEffect(() => {
+    fetch(`${SUPABASE_URL}/rest/v1/feed_posts?order=created_at.desc`, {
+      headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }
+    }).then(r => r.json()).then(rows => {
+      if (Array.isArray(rows)) setDbPosts(rows.map((r, i) => ({
+        id: 10000 + i, creator: r.creator_name || "", handle: r.handle || "",
+        avatar: r.avatar_url || "", image: r.image_url, type: r.type || "photo",
+        category: r.category || "Fashion", brand: r.brand || "", caption: r.caption || "",
+        likes: r.likes || "0", saves: r.saves || "0", span: "",
+      })));
+    }).catch(() => {});
+  }, []);
+
+  const allContent = [...dbPosts, ...CONTENT];
+  const filtered = category === "All" ? allContent : allContent.filter(c => c.category === category);
   const lbIndex = lightbox !== null ? filtered.findIndex(c => c.id === lightbox) : -1;
 
   const toggleSave = (id: number, e: React.MouseEvent) => {
@@ -246,9 +359,17 @@ const ContentBoard = () => {
               {cat}
             </button>
           ))}
-          <div className="ml-auto shrink-0 text-xs text-muted-foreground">{filtered.length} posts</div>
+          <div className="ml-auto shrink-0 flex items-center gap-3">
+            <span className="text-xs text-muted-foreground">{filtered.length} posts</span>
+            <button onClick={() => setShowUpload(true)}
+              className="flex items-center gap-1.5 rounded-full bg-foreground text-background px-3 py-1.5 text-xs font-medium hover:opacity-80 transition-opacity">
+              <Plus size={11} /> Add post
+            </button>
+          </div>
         </div>
       </div>
+
+      {showUpload && <UploadModal onClose={() => setShowUpload(false)} onUploaded={p => setDbPosts(prev => [{ id: 10000 + prev.length, creator: p.creator_name, handle: p.handle, avatar: "", image: p.image_url, type: "photo", category: p.category, brand: p.brand, caption: p.caption, likes: "0", saves: "0", span: "" }, ...prev])} />}
 
       {/* Masonry grid */}
       <div className="container py-8">

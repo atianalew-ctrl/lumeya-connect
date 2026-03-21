@@ -4,15 +4,19 @@ import {
   MapPin, Star, ArrowLeft, MessageCircle, Send, DollarSign,
   Play, Building2, Languages, Globe, Wifi, Video, Users,
   TrendingUp, Clock, CheckCircle, RefreshCw, Instagram,
-  ChevronLeft, ChevronRight, X, Heart, Bookmark, Sparkles, Shield,
+  ChevronLeft, ChevronRight, X, Heart, Bookmark, Sparkles, Shield, Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { creators } from "@/lib/data";
 import { useCreatorVideos } from "@/hooks/use-creator-videos";
 import { useRef, useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
+const ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhiZ2R5bmx1dG1vc3VwZnFhZmFwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1MDkzODQsImV4cCI6MjA4OTA4NTM4NH0.TFModn0Tm_eZDR9NpDTzxn7Yq1aAiNCc-qSAnMtADys";
 
 const fmtFollowers = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
 
@@ -30,6 +34,15 @@ const CreatorProfile = () => {
   const [activeTab, setActiveTab] = useState<"portfolio" | "videos" | "reviews">("portfolio");
   const [dbCreator, setDbCreator] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  // Collab request state
+  const [collabOpen, setCollabOpen] = useState(false);
+  const [collabEmail, setCollabEmail] = useState("");
+  const [collabBrand, setCollabBrand] = useState("");
+  const [collabMessage, setCollabMessage] = useState("");
+  const [collabLoading, setCollabLoading] = useState(false);
+  const [collabSent, setCollabSent] = useState(false);
+  const [collabError, setCollabError] = useState("");
 
   // Try static first, then DB
   const staticCreator = creators.find((c) => c.id === Number(id));
@@ -113,6 +126,42 @@ const CreatorProfile = () => {
     setRevisionSent(true);
     toast.success("Revision request sent to " + creator.name.split(" ")[0] + "!");
     setTimeout(() => { setShowRevision(false); setRevisionSent(false); setRevisionNote(""); }, 2000);
+  };
+
+  const sendCollabRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCollabError("");
+    if (!collabEmail) return;
+    setCollabLoading(true);
+    try {
+      const res = await fetch(
+        "https://xbgdynlutmosupfqafap.supabase.co/rest/v1/collab_requests",
+        {
+          method: "POST",
+          headers: {
+            apikey: ANON_KEY,
+            Authorization: `Bearer ${ANON_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify({
+            creator_id: String(creator.id),
+            brand_email: collabEmail,
+            brand_name: collabBrand,
+            message: collabMessage,
+          }),
+        }
+      );
+      if (res.status === 201 || res.status === 200) {
+        setCollabSent(true);
+      } else {
+        setCollabError("Something went wrong. Please try again.");
+      }
+    } catch {
+      setCollabError("Something went wrong. Please try again.");
+    } finally {
+      setCollabLoading(false);
+    }
   };
 
   const REVIEWS = [
@@ -285,7 +334,86 @@ const CreatorProfile = () => {
               </div>
             )}
 
-            <Button className="w-full rounded-full gap-1.5" asChild>
+            {/* Request to Collab */}
+            <div>
+              <Button
+                className="w-full rounded-full gap-1.5"
+                onClick={() => setCollabOpen(!collabOpen)}
+              >
+                <Mail size={13} /> ✉️ Request to Collab
+              </Button>
+
+              <AnimatePresence>
+                {collabOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="mt-3 rounded-xl border border-border bg-card p-4">
+                      {collabSent ? (
+                        <p className="text-sm text-emerald-600 font-medium text-center py-2">
+                          ✓ Request sent! The creator will be in touch.
+                        </p>
+                      ) : (
+                        <form onSubmit={sendCollabRequest} className="space-y-3">
+                          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                            Collab Request
+                          </p>
+                          <Input
+                            type="email"
+                            placeholder="Your email *"
+                            value={collabEmail}
+                            onChange={(e) => setCollabEmail(e.target.value)}
+                            required
+                            className="h-9 text-sm"
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Your brand name"
+                            value={collabBrand}
+                            onChange={(e) => setCollabBrand(e.target.value)}
+                            className="h-9 text-sm"
+                          />
+                          <Textarea
+                            placeholder="Message (optional) — tell them what you have in mind"
+                            value={collabMessage}
+                            onChange={(e) => setCollabMessage(e.target.value)}
+                            rows={3}
+                            className="resize-none text-sm"
+                          />
+                          {collabError && (
+                            <p className="text-xs text-red-500">{collabError}</p>
+                          )}
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              className="flex-1 rounded-full text-xs"
+                              onClick={() => setCollabOpen(false)}
+                            >
+                              Cancel
+                            </Button>
+                            <Button
+                              type="submit"
+                              size="sm"
+                              className="flex-1 rounded-full text-xs"
+                              disabled={collabLoading || !collabEmail}
+                            >
+                              {collabLoading ? "Sending…" : "Send Request"}
+                            </Button>
+                          </div>
+                        </form>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <Button className="w-full rounded-full gap-1.5" variant="outline" asChild>
               <Link to="/post-opportunity"><Send size={13} /> Invite to Opportunity</Link>
             </Button>
           </aside>

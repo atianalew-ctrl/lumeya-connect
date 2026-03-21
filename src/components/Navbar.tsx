@@ -114,6 +114,14 @@ const Navbar = () => {
             {t("nav_black")}
           </Link>
 
+          {/* Join Waitlist pill */}
+          <Link
+            to="/waitlist"
+            className="inline-flex items-center rounded-full border border-border bg-muted/40 px-3.5 py-1.5 text-[11px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors whitespace-nowrap"
+          >
+            Join Waitlist
+          </Link>
+
           {user ? (
             <>
               <span className="text-xs text-muted-foreground capitalize">{role}</span>
@@ -173,6 +181,10 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="mt-3 flex flex-col gap-2">
+            <Link to="/waitlist" onClick={() => setMobileOpen(false)}
+              className="flex items-center justify-center px-3 py-2.5 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+              Join Waitlist
+            </Link>
             {user ? (
               <Button variant="ghost" size="sm" className="rounded-full gap-1.5" onClick={handleSignOut}>
                 <LogOut size={13} /> {t("nav_sign_out")}
