@@ -24,6 +24,7 @@ type Creator = {
   engagement_rate?: number;
   bio: string;
   instagram: string;
+  tiktok?: string;
   rates: string;
   tags: string[];
   avatar_url: string | null;
@@ -39,7 +40,7 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   display_name: "", tagline: "UGC Creator", location: "", bio: "",
   country: "", region: "Europe", languages: ["English"], content_types: [],
   available_for_remote: true, followers: 0, engagement_rate: 5.0,
-  instagram: "", rates: "", tags: [], avatar_url: null,
+  instagram: "", tiktok: "", rates: "", tags: [], avatar_url: null,
   portfolio_images: [], video_url: null, video_urls: [], brands: [], rating: 5.0,
 };
 
@@ -259,11 +260,13 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
       </div>
 
       {/* Info */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <div><label className="text-xs text-muted-foreground block mb-1.5">Location (city)</label>
           <Input placeholder="Copenhagen, Denmark" value={form.location} onChange={e => set("location", e.target.value)} /></div>
         <div><label className="text-xs text-muted-foreground block mb-1.5">Instagram</label>
           <Input placeholder="@handle" value={form.instagram} onChange={e => set("instagram", e.target.value)} /></div>
+        <div><label className="text-xs text-muted-foreground block mb-1.5">TikTok</label>
+          <Input placeholder="@handle" value={form.tiktok || ""} onChange={e => set("tiktok", e.target.value)} /></div>
       </div>
 
       {/* Filter fields */}
@@ -455,6 +458,7 @@ const Admin = () => {
     location: data.location,
     bio: data.bio,
     instagram: data.instagram,
+    tiktok: data.tiktok || null,
     rates: data.rates,
     tags: data.tags,
     avatar_url: data.avatar_url,
@@ -490,7 +494,7 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], brands: c.brands || [], country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], brands: c.brands || [], tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
     setShowForm(false);
   };
 
