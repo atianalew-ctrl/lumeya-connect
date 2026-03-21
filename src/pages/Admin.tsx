@@ -319,11 +319,17 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
       <div className="grid grid-cols-3 gap-4 items-end">
         <div>
           <label className="text-xs text-muted-foreground block mb-1.5">Followers</label>
-          <Input type="number" placeholder="10000" value={form.followers || ""} onChange={e => set("followers", Number(e.target.value))} />
+          <Input type="text" inputMode="numeric" placeholder="10000" value={form.followers || ""} onChange={e => {
+            const clean = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0;
+            set("followers", clean);
+          }} />
         </div>
         <div>
           <label className="text-xs text-muted-foreground block mb-1.5">Engagement %</label>
-          <Input type="number" step="0.1" placeholder="5.0" value={form.engagement_rate || ""} onChange={e => set("engagement_rate", Number(e.target.value))} />
+          <Input type="text" inputMode="decimal" placeholder="5.0" value={form.engagement_rate || ""} onChange={e => {
+            const clean = parseFloat(e.target.value.replace(",", ".").replace(/[^0-9.]/g, "")) || 0;
+            set("engagement_rate", clean);
+          }} />
         </div>
         <div className="flex items-center gap-2 pb-2">
           <button type="button" onClick={() => set("available_for_remote", !form.available_for_remote)}
@@ -384,8 +390,8 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
       </div>
 
       <div><label className="text-xs text-muted-foreground block mb-1.5">Rating (0–5)</label>
-        <Input type="number" step="0.1" min="0" max="5" placeholder="4.9" value={form.rating || ""}
-          onChange={e => set("rating", Number(e.target.value))} className="w-32" /></div>
+        <Input type="text" inputMode="decimal" placeholder="4.9" value={form.rating || ""}
+          onChange={e => set("rating", parseFloat(e.target.value.replace(",", ".")) || 5)} className="w-32" /></div>
 
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={saving} className="flex-1">
