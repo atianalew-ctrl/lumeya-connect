@@ -84,8 +84,12 @@ const CreatorProfile = () => {
       followers: c.followers || 10000,
       engagementRate: c.engagement_rate || 5.0,
       completedCampaigns: 0,
-      responseTime: "Same day",
+      responseTime: c.response_time || "Same day",
       availableForRemote: c.available_for_remote ?? true,
+      isVerified: c.is_verified || false,
+      isTrending: c.is_trending || false,
+      availability: c.availability || "available",
+      packages: c.packages || [],
       color: c.color || "from-violet-200 to-pink-100",
       region: c.region || "Europe",
       languages: c.languages?.length ? c.languages : ["English"],
@@ -142,7 +146,14 @@ const CreatorProfile = () => {
             </div>
             <div className="pb-1">
               <h1 className="text-2xl font-display tracking-tight">{creator.name}</h1>
-              <p className="text-sm text-muted-foreground mt-0.5">{creator.role} · {creator.location}</p>
+              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                <p className="text-sm text-muted-foreground">{creator.role} · {creator.location}</p>
+                {(creator as any).isVerified && <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2 py-0.5 text-[10px] text-blue-600 font-medium">✓ Verified</span>}
+                {(creator as any).isTrending && <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200 px-2 py-0.5 text-[10px] text-orange-600 font-medium">🔥 Trending</span>}
+                {(creator as any).availability === "available" && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] text-emerald-600 font-medium">● Available now</span>}
+                {(creator as any).availability === "busy" && <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] text-red-500 font-medium">● Busy</span>}
+                {(creator as any).availability === "limited" && <span className="inline-flex items-center gap-1 rounded-full bg-yellow-50 border border-yellow-200 px-2 py-0.5 text-[10px] text-yellow-600 font-medium">● Limited spots</span>}
+              </div>
               {/* Social handles — clean text links */}
               <div className="flex items-center gap-3 mt-2">
                 {creator.instagram && (
@@ -255,6 +266,25 @@ const CreatorProfile = () => {
                 ))}
               </div>
             </div>
+
+            {/* Packages */}
+            {(creator as any).packages?.filter((p: any) => p.price).length > 0 && (
+              <div className="rounded-xl border border-border bg-card p-5">
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">Packages</p>
+                <div className="space-y-2.5">
+                  {(creator as any).packages.filter((p: any) => p.price).map((pkg: any, i: number) => (
+                    <div key={i} className={`rounded-lg p-3 border ${i === 1 ? "border-primary bg-primary/5" : "border-border"}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs font-semibold">{pkg.name}</span>
+                        <span className="text-xs font-bold text-primary">{pkg.price}</span>
+                      </div>
+                      {pkg.desc && <p className="text-[10px] text-muted-foreground">{pkg.desc}</p>}
+                      {i === 1 && <span className="text-[9px] text-primary font-medium">Most popular</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <Button className="w-full rounded-full gap-1.5" asChild>
               <Link to="/post-opportunity"><Send size={13} /> Invite to Opportunity</Link>

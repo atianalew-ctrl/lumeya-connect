@@ -52,10 +52,24 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
         )}
 
         {/* Badges */}
-        <div className="absolute top-7 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
-          {creator.availableForRemote
-            ? <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80"><Wifi size={8} /> Remote</span>
-            : <span />}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
+          <div className="flex flex-col gap-1">
+            {(creator as any).is_verified && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">✓ Verified</span>
+            )}
+            {(creator as any).is_trending && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">🔥 Trending</span>
+            )}
+            {(creator as any).availability === "available" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Available</span>
+            )}
+            {(creator as any).availability === "busy" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Busy</span>
+            )}
+            {(creator as any).availability === "limited" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Limited</span>
+            )}
+          </div>
           <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
             <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
           </span>

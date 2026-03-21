@@ -47,6 +47,11 @@ type Creator = {
   videos_meta?: { caption?: string; collab?: string }[];
   brands?: string[];
   color?: string;
+  is_verified?: boolean;
+  is_trending?: boolean;
+  availability?: string;
+  response_time?: string;
+  packages?: { name: string; price: string; desc: string }[];
   rating: number;
   created_at?: string;
 };
@@ -56,7 +61,14 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   country: "", region: "Europe", languages: ["English"], content_types: [],
   available_for_remote: true, followers: 0, engagement_rate: 5.0,
   instagram: "", tiktok: "", rates: "", tags: [], avatar_url: null,
-  portfolio_images: [], video_url: null, video_urls: [], videos_meta: [], brands: [], color: "from-violet-200 to-pink-100", rating: 5.0,
+  portfolio_images: [], video_url: null, video_urls: [], videos_meta: [], brands: [], color: "from-violet-200 to-pink-100",
+  is_verified: false, is_trending: false, availability: "available", response_time: "Same day",
+  packages: [
+    { name: "Basic", price: "", desc: "" },
+    { name: "Standard", price: "", desc: "" },
+    { name: "Premium", price: "", desc: "" },
+  ],
+  rating: 5.0,
 };
 
 // Call admin edge function (for DB operations only)
@@ -432,6 +444,59 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
         <Input type="text" inputMode="decimal" placeholder="4.9" value={form.rating || ""}
           onChange={e => set("rating", parseFloat(e.target.value.replace(",", ".")) || 5)} className="w-32" /></div>
 
+      {/* Status toggles */}
+      <div className="flex flex-wrap gap-4">
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={() => set("is_verified", !form.is_verified)}
+            className={`relative w-10 h-5 rounded-full transition-colors ${form.is_verified ? "bg-blue-500" : "bg-muted-foreground/30"}`}>
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.is_verified ? "translate-x-5" : "translate-x-0.5"}`} />
+          </button>
+          <label className="text-xs text-muted-foreground">✓ Lumeya Verified</label>
+        </div>
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={() => set("is_trending", !form.is_trending)}
+            className={`relative w-10 h-5 rounded-full transition-colors ${form.is_trending ? "bg-orange-500" : "bg-muted-foreground/30"}`}>
+            <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${form.is_trending ? "translate-x-5" : "translate-x-0.5"}`} />
+          </button>
+          <label className="text-xs text-muted-foreground">🔥 Trending</label>
+        </div>
+      </div>
+
+      {/* Availability + response time */}
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">Availability</label>
+          <select value={form.availability || "available"} onChange={e => set("availability", e.target.value)}
+            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+            <option value="available">✅ Available</option>
+            <option value="busy">🔴 Busy</option>
+            <option value="limited">🟡 Limited spots</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">Response Time</label>
+          <Input placeholder="e.g. Same day" value={form.response_time || ""} onChange={e => set("response_time", e.target.value)} />
+        </div>
+      </div>
+
+      {/* Packages */}
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-3">Packages</label>
+        <div className="space-y-3">
+          {(form.packages || []).map((pkg, i) => (
+            <div key={i} className="rounded-lg border border-border p-3 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">{pkg.name}</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Input placeholder="Price (e.g. €299)" value={pkg.price}
+                  onChange={e => { const p = [...(form.packages||[])]; p[i] = {...p[i], price: e.target.value}; set("packages", p); }} />
+                <Input placeholder="What's included..." value={pkg.desc}
+                  onChange={e => { const p = [...(form.packages||[])]; p[i] = {...p[i], desc: e.target.value}; set("packages", p); }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Profile banner colour */}
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Profile Banner Colour</label>
@@ -520,6 +585,11 @@ const Admin = () => {
     videos_meta: data.videos_meta || [],
     brands: data.brands || [],
     color: data.color || "from-violet-200 to-pink-100",
+    is_verified: data.is_verified || false,
+    is_trending: data.is_trending || false,
+    availability: data.availability || "available",
+    response_time: data.response_time || "Same day",
+    packages: data.packages || [],
     country: data.country || null,
     region: data.region || "Europe",
     languages: data.languages || [],
@@ -548,7 +618,10 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], videos_meta: c.videos_meta || [], brands: c.brands || [], color: c.color || "from-violet-200 to-pink-100", tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], videos_meta: c.videos_meta || [], brands: c.brands || [], color: c.color,
+      is_verified: c.is_verified || false, is_trending: c.is_trending || false,
+      availability: c.availability || "available", response_time: c.response_time || "Same day",
+      packages: c.packages || [{ name: "Basic", price: "", desc: "" }, { name: "Standard", price: "", desc: "" }, { name: "Premium", price: "", desc: "" }] || "from-violet-200 to-pink-100", tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
     setShowForm(false);
   };
 
