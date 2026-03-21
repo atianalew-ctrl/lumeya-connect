@@ -150,7 +150,6 @@ const CreatorProfile = () => {
                 <p className="text-sm text-muted-foreground">{creator.role} · {creator.location}</p>
                 {(creator as any).isVerified && <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2 py-0.5 text-[10px] text-blue-600 font-medium">✓ Verified</span>}
                 {(creator as any).isTrending && <span className="inline-flex items-center gap-1 rounded-full bg-orange-50 border border-orange-200 px-2 py-0.5 text-[10px] text-orange-600 font-medium">🔥 Trending</span>}
-                {(creator as any).availability === "available" && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] text-emerald-600 font-medium">● Available now</span>}
                 {(creator as any).availability === "busy" && <span className="inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2 py-0.5 text-[10px] text-red-500 font-medium">● Busy</span>}
                 {(creator as any).availability === "limited" && <span className="inline-flex items-center gap-1 rounded-full bg-yellow-50 border border-yellow-200 px-2 py-0.5 text-[10px] text-yellow-600 font-medium">● Limited spots</span>}
               </div>

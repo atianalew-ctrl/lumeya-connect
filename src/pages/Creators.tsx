@@ -60,9 +60,6 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
             {(creator as any).is_trending && (
               <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">🔥 Trending</span>
             )}
-            {(creator as any).availability === "available" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Available</span>
-            )}
             {(creator as any).availability === "busy" && (
               <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 backdrop-blur-sm px-2 py-0.5 text-[9px] text-white font-medium">● Busy</span>
             )}
