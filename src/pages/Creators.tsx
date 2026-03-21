@@ -13,55 +13,62 @@ import { supabase } from "@/integrations/supabase/client";
 
 const fmtNum = (n: any) => { const f = Number(n); if (!f || f < 100) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
 
-// Swipeable gallery using touch handlers — shows one image at a time
+// Swipeable gallery — native non-passive touch listeners for Safari compat
 const CreatorCardGallery = ({ creator }: { creator: any }) => {
   const photos = [creator.avatar, ...(creator.portfolioImages || [])].filter(Boolean).slice(0, 6);
   const [idx, setIdx] = useState(0);
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const isDragging = useRef(false);
-  const navigating = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const swiped = useRef(false);
+  const idxRef = useRef(0);
+  idxRef.current = idx;
 
-  const goTo = (n: number) => setIdx(Math.max(0, Math.min(photos.length - 1, n)));
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-    isDragging.current = false;
-    navigating.current = false;
-  };
+    const onStart = (e: TouchEvent) => {
+      startX.current = e.touches[0].clientX;
+      startY.current = e.touches[0].clientY;
+      swiped.current = false;
+    };
+    const onMove = (e: TouchEvent) => {
+      const dx = e.touches[0].clientX - startX.current;
+      const dy = e.touches[0].clientY - startY.current;
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+        e.preventDefault(); // stops page scroll — only works with passive:false
+        swiped.current = true;
+      }
+    };
+    const onEnd = (e: TouchEvent) => {
+      const dx = e.changedTouches[0].clientX - startX.current;
+      const dy = Math.abs(e.changedTouches[0].clientY - startY.current);
+      if (Math.abs(dx) > 40 && Math.abs(dx) > dy) {
+        swiped.current = true;
+        const next = dx < 0
+          ? Math.min(idxRef.current + 1, photos.length - 1)
+          : Math.max(idxRef.current - 1, 0);
+        setIdx(next);
+      }
+    };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const dx = Math.abs(e.touches[0].clientX - touchStartX.current);
-    const dy = Math.abs(e.touches[0].clientY - touchStartY.current);
-    if (dx > 8 && dx > dy) {
-      isDragging.current = true;
-      e.stopPropagation();
-    }
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-    if (Math.abs(dx) > 40 && Math.abs(dx) > dy) {
-      navigating.current = true;
-      goTo(dx < 0 ? idx + 1 : idx - 1);
-    }
-  };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+    };
+  }, [photos.length]);
 
   const handleClick = (e: React.MouseEvent) => {
-    if (navigating.current || isDragging.current) {
-      e.preventDefault();
-      navigating.current = false;
-      isDragging.current = false;
-    }
+    if (swiped.current) { e.preventDefault(); swiped.current = false; }
   };
 
   return (
-    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}>
+    <div ref={containerRef} className="relative aspect-[3/4] overflow-hidden bg-accent select-none">
 
       {/* Images — instant switch, no scroll */}
       {photos.map((src, i) => (
