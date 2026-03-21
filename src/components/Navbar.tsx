@@ -119,6 +119,10 @@ const Navbar = () => {
             className="inline-flex items-center rounded-full border border-border bg-muted/40 px-3.5 py-1.5 text-[11px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors whitespace-nowrap">
             Apply as Creator
           </Link>
+          <Link to="/ai-likeness"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted/40 px-3.5 py-1.5 text-[11px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors whitespace-nowrap">
+            ✨ AI Likeness
+          </Link>
           <Link to="/brand-login"
             className="inline-flex items-center rounded-full border border-foreground bg-foreground text-background px-3.5 py-1.5 text-[11px] hover:opacity-80 transition-opacity whitespace-nowrap">
             Brand Login
