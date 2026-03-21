@@ -8,7 +8,20 @@ import { toast } from "sonner";
 
 const REGIONS = ["Scandinavia", "Europe", "North America", "Latin America", "Asia Pacific", "Southeast Asia", "Middle East", "Africa", "Global"];
 const LANGUAGES = ["English", "Danish", "Swedish", "Norwegian", "French", "German", "Spanish", "Italian", "Dutch", "Portuguese", "Japanese", "Korean", "Arabic", "Chinese"];
-const UGC_TYPES = ["Product Review", "Product Demo", "Testimonial", "Unboxing", "Lifestyle Content", "Problem → Solution Ad", "Voiceover / B-roll", "Vlog / Day-in-the-life", "TikTok Trend / Social Trend"];
+const UGC_TYPES = ["Product Review", "Product Demo", "Testimonial", "Unboxing", "Lifestyle Content", "Problem → Solution Ad", "Voiceover / B-roll", "Vlog / Day-in-the-life", "TikTok Trend / Social Trend", "Social Media Management"];
+
+const GRADIENTS = [
+  { label: "Violet Pink", value: "from-violet-200 to-pink-100" },
+  { label: "Rose Pink", value: "from-pink-300 to-rose-200" },
+  { label: "Amber Orange", value: "from-amber-200 to-orange-200" },
+  { label: "Emerald Teal", value: "from-emerald-200 to-teal-200" },
+  { label: "Cyan Blue", value: "from-cyan-200 to-blue-200" },
+  { label: "Violet Indigo", value: "from-violet-200 to-indigo-200" },
+  { label: "Sky Cyan", value: "from-sky-200 to-cyan-200" },
+  { label: "Yellow Amber", value: "from-yellow-200 to-amber-200" },
+  { label: "Rose Gold", value: "from-rose-100 to-pink-200" },
+  { label: "Mint Green", value: "from-green-100 to-emerald-200" },
+];
 
 type Creator = {
   id: string;
@@ -32,6 +45,7 @@ type Creator = {
   video_url?: string | null;
   video_urls?: string[];
   brands?: string[];
+  color?: string;
   rating: number;
   created_at?: string;
 };
@@ -41,7 +55,7 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   country: "", region: "Europe", languages: ["English"], content_types: [],
   available_for_remote: true, followers: 0, engagement_rate: 5.0,
   instagram: "", tiktok: "", rates: "", tags: [], avatar_url: null,
-  portfolio_images: [], video_url: null, video_urls: [], brands: [], rating: 5.0,
+  portfolio_images: [], video_url: null, video_urls: [], brands: [], color: "from-violet-200 to-pink-100", rating: 5.0,
 };
 
 // Call admin edge function (for DB operations only)
@@ -396,6 +410,22 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
         <Input type="text" inputMode="decimal" placeholder="4.9" value={form.rating || ""}
           onChange={e => set("rating", parseFloat(e.target.value.replace(",", ".")) || 5)} className="w-32" /></div>
 
+      {/* Profile banner colour */}
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Profile Banner Colour</label>
+        <div className="flex flex-wrap gap-2">
+          {GRADIENTS.map(g => (
+            <button key={g.value} type="button" onClick={() => set("color", g.value)}
+              className={`relative h-10 w-16 rounded-lg bg-gradient-to-br ${g.value} border-2 transition-all ${form.color === g.value ? "border-foreground scale-110" : "border-transparent hover:scale-105"}`}
+              title={g.label}>
+              {form.color === g.value && (
+                <span className="absolute inset-0 flex items-center justify-center text-xs">✓</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="flex gap-3 pt-2">
         <Button type="submit" disabled={saving} className="flex-1">
           {saving ? <><Loader2 size={14} className="animate-spin mr-2" />Saving...</> : <><Save size={14} className="mr-2" />Save Creator</>}
@@ -466,6 +496,7 @@ const Admin = () => {
     video_url: data.video_url || null,
     video_urls: data.video_urls || [],
     brands: data.brands || [],
+    color: data.color || "from-violet-200 to-pink-100",
     country: data.country || null,
     region: data.region || "Europe",
     languages: data.languages || [],
@@ -494,7 +525,7 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], brands: c.brands || [], tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], brands: c.brands || [], color: c.color || "from-violet-200 to-pink-100", tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
     setShowForm(false);
   };
 

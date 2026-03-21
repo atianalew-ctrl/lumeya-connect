@@ -86,7 +86,7 @@ const CreatorProfile = () => {
       completedCampaigns: 0,
       responseTime: "Same day",
       availableForRemote: c.available_for_remote ?? true,
-      color: "from-violet-200 to-pink-100",
+      color: c.color || "from-violet-200 to-pink-100",
       region: c.region || "Europe",
       languages: c.languages?.length ? c.languages : ["English"],
       contentTypes: c.content_types || [],
