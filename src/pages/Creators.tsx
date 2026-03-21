@@ -834,23 +834,32 @@ const Creators = () => {
                 {creator.bio && (
                   <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">{creator.bio}</p>
                 )}
-                {/* Socials + view */}
-                <div className="flex items-center justify-between pt-0.5">
-                  <div className="flex items-center gap-2">
-                    {creator.instagram && (
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <svg viewBox="0 0 24 24" className="w-3 h-3 shrink-0"><defs><radialGradient id={`ig-${creator.id}`} cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill={`url(#ig-${creator.id})`}/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="2"/><circle cx="17.2" cy="6.8" r="1.3" fill="white"/></svg>
-                        @{String(creator.instagram).replace("@","")}
-                      </span>
-                    )}
-                    {(creator as any).tiktok && (
-                      <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                        <svg viewBox="0 0 24 24" className="w-3 h-3 shrink-0 bg-black rounded-sm" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.28 8.28 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
-                        @{String((creator as any).tiktok).replace("@","")}
-                      </span>
-                    )}
-                  </div>
-                  <Link to={`/creators/${creator.id}`} className="text-[10px] font-medium text-primary hover:underline">View →</Link>
+                {/* Socials row */}
+                <div className="flex items-center gap-2">
+                  {creator.instagram && (
+                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <svg viewBox="0 0 24 24" className="w-3 h-3 shrink-0"><defs><radialGradient id={`ig-${creator.id}`} cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill={`url(#ig-${creator.id})`}/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="2"/><circle cx="17.2" cy="6.8" r="1.3" fill="white"/></svg>
+                      @{String(creator.instagram).replace("@","")}
+                    </span>
+                  )}
+                  {(creator as any).tiktok && (
+                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <svg viewBox="0 0 24 24" className="w-3 h-3 shrink-0 bg-black rounded-sm" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.28 8.28 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
+                      @{String((creator as any).tiktok).replace("@","")}
+                    </span>
+                  )}
+                </div>
+
+                {/* CTA buttons */}
+                <div className="flex items-center gap-2 pt-1">
+                  <Link to={`/creators/${creator.id}`}
+                    className="flex-1 text-center rounded-full bg-foreground text-background text-[11px] font-medium py-2 hover:opacity-80 transition-opacity">
+                    Hire
+                  </Link>
+                  <Link to={`/creators/${creator.id}`}
+                    className="flex-1 text-center rounded-full border border-border text-[11px] text-muted-foreground py-2 hover:border-muted-foreground/60 hover:text-foreground transition-colors">
+                    View profile
+                  </Link>
                 </div>
               </div>
             </div>
