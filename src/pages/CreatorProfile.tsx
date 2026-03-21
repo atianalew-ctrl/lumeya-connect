@@ -1,4 +1,4 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MapPin, Star, ArrowLeft, MessageCircle, Send, DollarSign,
@@ -25,6 +25,7 @@ const isUUID = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-
 
 const CreatorProfile = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [lightbox, setLightbox] = useState<number | null>(null);
   const [saved, setSaved] = useState(false);
   const [liked, setLiked] = useState(false);
@@ -350,7 +351,7 @@ const CreatorProfile = () => {
               </div>
               <Button
                 className="w-full rounded-full gap-1.5 bg-foreground text-background hover:opacity-80"
-                onClick={() => window.location.href = `/ai-studio?creator=${creator.id}&name=${encodeURIComponent(creator.display_name || "")}&avatar=${encodeURIComponent(creator.avatar_url || "")}`}
+                onClick={() => navigate(`/ai-studio?creator=${creator.id}&name=${encodeURIComponent(creator.display_name || "")}&avatar=${encodeURIComponent(creator.avatar_url || "")}`)}
               >
                 <Sparkles size={13} /> Generate AI content
               </Button>
