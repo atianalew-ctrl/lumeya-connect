@@ -95,7 +95,7 @@ const CreatorProfile = () => {
       portfolioImages: c.portfolio_images || [],
       videoUrl: c.video_url || "",
       videoUrls: c.video_urls || [],
-      brands: [],
+      brands: c.brands || [],
       portfolio: (c.portfolio_images || []).length,
     };
   })();

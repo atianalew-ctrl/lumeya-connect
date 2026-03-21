@@ -30,6 +30,7 @@ type Creator = {
   portfolio_images?: string[];
   video_url?: string | null;
   video_urls?: string[];
+  brands?: string[];
   rating: number;
   created_at?: string;
 };
@@ -39,7 +40,7 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   country: "", region: "Europe", languages: ["English"], content_types: [],
   available_for_remote: true, followers: 0, engagement_rate: 5.0,
   instagram: "", rates: "", tags: [], avatar_url: null,
-  portfolio_images: [], video_url: null, video_urls: [], rating: 5.0,
+  portfolio_images: [], video_url: null, video_urls: [], brands: [], rating: 5.0,
 };
 
 // Call admin edge function (for DB operations only)
@@ -71,6 +72,7 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
   const [uploadingPortfolio, setUploadingPortfolio] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
   const [tagInput, setTagInput] = useState(initial.tags?.join(", ") || "");
+  const [brandInput, setBrandInput] = useState("");
   const avatarRef = useRef<HTMLInputElement>(null);
   const portfolioRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -342,6 +344,43 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
           <Input placeholder="€200–€500 per video" value={form.rates} onChange={e => set("rates", e.target.value)} /></div>
         <div><label className="text-xs text-muted-foreground block mb-1.5">Tags (comma separated)</label>
           <Input placeholder="Beauty, Lifestyle, UGC" value={tagInput} onChange={e => setTagInput(e.target.value)} /></div>
+
+      {/* Previous brand deals */}
+      <div>
+        <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Previous Brand Deals</label>
+        <div className="flex gap-2 mb-2">
+          <Input placeholder="e.g. Nike, Glossier, H&M" value={brandInput} onChange={e => setBrandInput(e.target.value)}
+            onKeyDown={e => {
+              if ((e.key === "Enter" || e.key === ",") && brandInput.trim()) {
+                e.preventDefault();
+                const brand = brandInput.trim().replace(/,$/, "");
+                if (brand && !(form.brands || []).includes(brand)) {
+                  set("brands", [...(form.brands || []), brand]);
+                }
+                setBrandInput("");
+              }
+            }} />
+          <Button type="button" variant="outline" size="sm" onClick={() => {
+            const brand = brandInput.trim();
+            if (brand && !(form.brands || []).includes(brand)) {
+              set("brands", [...(form.brands || []), brand]);
+            }
+            setBrandInput("");
+          }}>Add</Button>
+        </div>
+        {(form.brands || []).length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {(form.brands || []).map((brand, i) => (
+              <span key={i} className="flex items-center gap-1 bg-accent px-3 py-1 rounded-full text-xs">
+                {brand}
+                <button type="button" onClick={() => set("brands", (form.brands || []).filter((_, idx) => idx !== i))}>
+                  <X size={10} className="text-muted-foreground hover:text-foreground" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
       </div>
 
       <div><label className="text-xs text-muted-foreground block mb-1.5">Rating (0–5)</label>
@@ -416,6 +455,7 @@ const Admin = () => {
     portfolio_images: data.portfolio_images || [],
     video_url: data.video_url || null,
     video_urls: data.video_urls || [],
+    brands: data.brands || [],
     country: data.country || null,
     region: data.region || "Europe",
     languages: data.languages || [],
@@ -444,7 +484,7 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], brands: c.brands || [], country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
     setShowForm(false);
   };
 
