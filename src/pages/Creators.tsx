@@ -11,56 +11,48 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 
-const fmtNum = (n: any) => { const f = Number(n); if (!f || f <= 0) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
+const fmtNum = (n: any) => { const f = Number(n); if (!f || f < 100) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
 
-// Swipeable photo gallery for creator card
+// Swipeable photo gallery — CSS scroll snap for reliable mobile swiping
 const CreatorCardGallery = ({ creator }: { creator: any }) => {
   const photos = [creator.avatar, ...(creator.portfolioImages || [])].filter(Boolean).slice(0, 6);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [idx, setIdx] = useState(0);
-  const startX = useRef<number | null>(null);
 
-  const prev = (e: React.MouseEvent) => { e.preventDefault(); setIdx(i => (i - 1 + photos.length) % photos.length); };
-  const next = (e: React.MouseEvent) => { e.preventDefault(); setIdx(i => (i + 1) % photos.length); };
-
-  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; };
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (startX.current === null) return;
-    const diff = startX.current - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) setIdx(i => diff > 0 ? (i + 1) % photos.length : (i - 1 + photos.length) % photos.length);
-    startX.current = null;
+  const onScroll = () => {
+    if (!scrollRef.current) return;
+    const i = Math.round(scrollRef.current.scrollLeft / scrollRef.current.offsetWidth);
+    setIdx(i);
   };
 
   return (
-    <Link to={`/creators/${creator.id}`}>
-      <div className="relative aspect-[3/4] overflow-hidden bg-accent"
-        onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
-        <img src={photos[idx]} alt={creator.name}
-          className="w-full h-full object-cover transition-opacity duration-300" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+    <Link to={`/creators/${creator.id}`} className="block">
+      <div className="relative aspect-[3/4] overflow-hidden bg-accent">
+        {/* Scrollable strip */}
+        <div ref={scrollRef} onScroll={onScroll}
+          className="flex h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          {photos.map((src, i) => (
+            <div key={i} className="relative shrink-0 w-full h-full snap-start">
+              <img src={src} alt={creator.name} className="w-full h-full object-cover" />
+            </div>
+          ))}
+        </div>
 
-        {/* Prev/Next arrows — desktop only */}
-        {photos.length > 1 && (
-          <>
-            <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-black/40 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <span className="text-white text-xs">‹</span>
-            </button>
-            <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-black/40 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <span className="text-white text-xs">›</span>
-            </button>
-          </>
-        )}
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
 
         {/* Dot indicators */}
         {photos.length > 1 && (
-          <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10">
+          <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10 pointer-events-none">
             {photos.map((_, i) => (
-              <span key={i} className={`h-0.5 rounded-full transition-all ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/40"}`} />
+              <span key={i} className={`h-0.5 rounded-full transition-all duration-300 ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/40"}`} />
             ))}
           </div>
         )}
 
         {/* Badges */}
-        <div className="absolute top-7 left-3 right-3 flex items-center justify-between z-10">
+        <div className="absolute top-7 left-3 right-3 flex items-center justify-between z-10 pointer-events-none">
           {creator.availableForRemote
             ? <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80"><Wifi size={8} /> Remote</span>
             : <span />}
@@ -70,7 +62,7 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
         </div>
 
         {/* Name + location */}
-        <div className="absolute bottom-3 left-3 right-3">
+        <div className="absolute bottom-3 left-3 right-3 pointer-events-none">
           <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
           <div className="flex items-center gap-1 mt-0.5">
             <MapPin size={9} className="text-white/50" />

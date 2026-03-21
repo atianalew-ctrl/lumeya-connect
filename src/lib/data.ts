@@ -21,6 +21,7 @@ export const UGC_CONTENT_TYPES: UGCContentType[] = [
   "Voiceover / B-roll",
   "Vlog / Day-in-the-life",
   "TikTok Trend / Social Trend",
+  "Social Media Management",
 ];
 
 export interface Creator {
