@@ -195,6 +195,7 @@ const Creators = () => {
         rates: c.rates || "",
         rating: c.rating || 5.0,
         followers: c.followers || 10000,
+        tiktokFollowers: c.tiktok_followers || 0,
         engagementRate: c.engagement_rate || 5.0,
         completedCampaigns: 0,
         portfolio: (c.portfolio_images || []).length,
@@ -622,18 +623,22 @@ const Creators = () => {
               {/* Stats row */}
               <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
                 <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold">
-                    {fmtNum(creator.followers)}
+                  <p className="text-xs font-semibold">{fmtNum(creator.followers)}</p>
+                  <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5">
+                    <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 shrink-0"><defs><radialGradient id="ig-stat" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig-stat)"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="2"/><circle cx="17.2" cy="6.8" r="1.3" fill="white"/></svg>
+                    IG
                   </p>
-                  <p className="text-[9px] text-muted-foreground">Followers</p>
+                </div>
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-semibold">{fmtNum((creator as any).tiktokFollowers)}</p>
+                  <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5">
+                    <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 shrink-0" fill="none"><rect width="24" height="24" rx="4" fill="black"/><path d="M16.5 5.5a3.5 3.5 0 0 0 2 .5V9a5.5 5.5 0 0 1-2-.4v5.4a5 5 0 1 1-3-4.6V12a2.5 2.5 0 1 0 1.5 2.3V5.5h1.5Z" fill="white"/></svg>
+                    TikTok
+                  </p>
                 </div>
                 <div className="px-3 py-2.5 text-center">
                   <p className="text-xs font-semibold text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
                   <p className="text-[9px] text-muted-foreground">Engagement</p>
-                </div>
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold">{creator.completedCampaigns || creator.portfolio || "—"}</p>
-                  <p className="text-[9px] text-muted-foreground">Campaigns</p>
                 </div>
               </div>
 

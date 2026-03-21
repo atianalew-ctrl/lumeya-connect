@@ -35,6 +35,7 @@ type Creator = {
   available_for_remote?: boolean;
   followers?: number;
   engagement_rate?: number;
+  tiktok_followers?: number;
   bio: string;
   instagram: string;
   tiktok?: string;
@@ -59,7 +60,7 @@ type Creator = {
 const EMPTY: Omit<Creator, "id" | "created_at"> = {
   display_name: "", tagline: "UGC Creator", location: "", bio: "",
   country: "", region: "Europe", languages: ["English"], content_types: [],
-  available_for_remote: true, followers: 0, engagement_rate: 5.0,
+  available_for_remote: true, followers: 0, tiktok_followers: 0, engagement_rate: 5.0,
   instagram: "", tiktok: "", rates: "", tags: [], avatar_url: null,
   portfolio_images: [], video_url: null, video_urls: [], videos_meta: [], brands: [], color: "from-violet-200 to-pink-100",
   is_verified: false, is_trending: false, availability: "available", response_time: "Same day",
@@ -369,12 +370,21 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
       {/* Remote + stats */}
       <div className="grid grid-cols-3 gap-4 items-end">
         <div>
-          <label className="text-xs text-muted-foreground block mb-1.5">Followers</label>
+          <label className="text-xs text-muted-foreground block mb-1.5">📸 IG Followers</label>
           <Input type="text" inputMode="numeric" placeholder="10000" value={form.followers || ""} onChange={e => {
             const clean = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0;
             set("followers", clean);
           }} />
         </div>
+        <div>
+          <label className="text-xs text-muted-foreground block mb-1.5">♪ TikTok Followers</label>
+          <Input type="text" inputMode="numeric" placeholder="5000" value={form.tiktok_followers || ""} onChange={e => {
+            const clean = parseInt(e.target.value.replace(/[^0-9]/g, "")) || 0;
+            set("tiktok_followers", clean);
+          }} />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-4 items-end">
         <div>
           <label className="text-xs text-muted-foreground block mb-1.5">Engagement %</label>
           <Input type="text" inputMode="decimal" placeholder="5.0" value={form.engagement_rate || ""} onChange={e => {
@@ -597,6 +607,7 @@ const Admin = () => {
     available_for_remote: data.available_for_remote ?? true,
     followers: data.followers || 0,
     engagement_rate: data.engagement_rate || 5.0,
+    tiktok_followers: data.tiktok_followers || 0,
     rating: data.rating,
   });
 
