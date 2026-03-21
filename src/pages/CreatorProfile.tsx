@@ -95,6 +95,7 @@ const CreatorProfile = () => {
       portfolioImages: c.portfolio_images || [],
       videoUrl: c.video_url || "",
       videoUrls: c.video_urls || [],
+      videosMeta: c.videos_meta || [],
       brands: c.brands || [],
       portfolio: (c.portfolio_images || []).length,
     };
@@ -296,11 +297,15 @@ const CreatorProfile = () => {
             {activeTab === "videos" && (
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  ...(creator.videoUrl ? [{ src: creator.videoUrl, label: "Featured" }] : []),
-                  ...((creator as any).videoUrls?.map((src: string) => ({ src, label: "Video" })) || []),
-                  ...(uploadedVideos?.map(v => ({ src: v.video_url, label: v.title || "Video" })) || []),
+                  ...(creator.videoUrl ? [{ src: creator.videoUrl, caption: "Featured", collab: "" }] : []),
+                  ...((creator as any).videoUrls?.map((src: string, i: number) => ({
+                    src,
+                    caption: (creator as any).videosMeta?.[i]?.caption || "",
+                    collab: (creator as any).videosMeta?.[i]?.collab || "",
+                  })) || []),
+                  ...(uploadedVideos?.map(v => ({ src: v.video_url, caption: v.title || "", collab: "" })) || []),
                 ].map((v, i) => (
-                  <VideoTile key={i} src={v.src} label={v.label} />
+                  <VideoTile key={i} src={v.src} caption={v.caption} collab={v.collab} avatar={creator.avatar} name={creator.name} />
                 ))}
                 {/* Empty state */}
                 {!creator.videoUrl && (!uploadedVideos || uploadedVideos.length === 0) && (
@@ -437,8 +442,8 @@ const VideoPlayer = ({ src, label }: { src: string; label?: string }) => {
   );
 };
 
-// TikTok-style portrait grid tile — hover to play
-const VideoTile = ({ src, label }: { src: string; label?: string }) => {
+// TikTok-style portrait grid tile
+const VideoTile = ({ src, caption, collab, avatar, name }: { src: string; caption?: string; collab?: string; avatar?: string; name?: string }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const handleMouseEnter = () => { videoRef.current?.play(); setPlaying(true); };
@@ -452,16 +457,38 @@ const VideoTile = ({ src, label }: { src: string; label?: string }) => {
       onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} onClick={handleClick}>
       <video ref={videoRef} src={src} muted loop playsInline preload="metadata"
         className="absolute inset-0 h-full w-full object-cover" />
-      {/* Overlay with play icon when paused */}
-      <div className={`absolute inset-0 flex items-end justify-start p-2 bg-gradient-to-t from-black/50 to-transparent transition-opacity ${playing ? "opacity-0 group-hover:opacity-100" : "opacity-100"}`}>
-        {!playing && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
-              <Play size={16} className="text-white ml-0.5" />
-            </div>
+      {/* Dark gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+
+      {/* Top — creator info */}
+      <div className="absolute top-2 left-2 right-2 flex items-center gap-1.5">
+        {avatar && <img src={avatar} alt="" className="h-6 w-6 rounded-full object-cover border border-white/30" />}
+        <div className="min-w-0">
+          <p className="text-[10px] text-white font-medium leading-tight truncate">{name}</p>
+          <p className="text-[8px] text-white/60">2d ago</p>
+        </div>
+        <span className="ml-auto text-[9px] text-white border border-white/40 rounded px-1.5 py-0.5">Follow</span>
+      </div>
+
+      {/* Play icon */}
+      {!playing && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center">
+            <Play size={16} className="text-white ml-0.5" />
+          </div>
+        </div>
+      )}
+
+      {/* Bottom — caption + collab */}
+      <div className="absolute bottom-0 left-0 right-0 p-2">
+        {collab && (
+          <div className="flex items-center gap-1 mb-1">
+            <span className="text-[9px] text-white/70">Collaboration</span>
+            <span className="text-[9px] text-white font-semibold">× {collab}</span>
           </div>
         )}
-        {label && <span className="text-[10px] text-white/80 font-medium relative z-10">{label}</span>}
+        {caption && <p className="text-[10px] text-white leading-tight line-clamp-2">{caption}</p>}
+        <p className="text-[8px] text-white/50 mt-0.5">Video</p>
       </div>
     </div>
   );

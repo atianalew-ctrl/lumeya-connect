@@ -44,6 +44,7 @@ type Creator = {
   portfolio_images?: string[];
   video_url?: string | null;
   video_urls?: string[];
+  videos_meta?: { caption?: string; collab?: string }[];
   brands?: string[];
   color?: string;
   rating: number;
@@ -55,7 +56,7 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   country: "", region: "Europe", languages: ["English"], content_types: [],
   available_for_remote: true, followers: 0, engagement_rate: 5.0,
   instagram: "", tiktok: "", rates: "", tags: [], avatar_url: null,
-  portfolio_images: [], video_url: null, video_urls: [], brands: [], color: "from-violet-200 to-pink-100", rating: 5.0,
+  portfolio_images: [], video_url: null, video_urls: [], videos_meta: [], brands: [], color: "from-violet-200 to-pink-100", rating: 5.0,
 };
 
 // Call admin edge function (for DB operations only)
@@ -131,9 +132,11 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
     setUploadingVideo(true);
     try {
       const current = form.video_urls || [];
+      const currentMeta = form.videos_meta || [];
       const toUpload = Array.from(files).slice(0, 9 - current.length);
       const urls = await Promise.all(toUpload.map(f => uploadFile(f, "creator-videos")));
       set("video_urls", [...current, ...urls]);
+      set("videos_meta", [...currentMeta, ...urls.map(() => ({ caption: "", collab: "" }))]);
       toast.success(`${urls.length} video${urls.length > 1 ? "s" : ""} uploaded! ✓`);
     } catch { toast.error("Video upload failed."); }
     finally { setUploadingVideo(false); }
@@ -248,16 +251,35 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
           )}
           {/* Multiple videos */}
           {(form.video_urls || []).map((vid, idx) => (
-            <div key={idx} className="relative aspect-[9/16] rounded-xl overflow-hidden bg-black group">
-              <video src={vid} className="w-full h-full object-cover" muted playsInline />
-              <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                <Play size={18} className="text-white/80" />
+            <div key={idx} className="flex flex-col gap-1">
+              <div className="relative aspect-[9/16] rounded-xl overflow-hidden bg-black group">
+                <video src={vid} className="w-full h-full object-cover" muted playsInline />
+                <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                  <Play size={18} className="text-white/80" />
+                </div>
+                <button type="button"
+                  onClick={() => {
+                    set("video_urls", (form.video_urls || []).filter((_, i) => i !== idx));
+                    set("videos_meta", (form.videos_meta || []).filter((_, i) => i !== idx));
+                  }}
+                  className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center">
+                  <X size={10} className="text-white" />
+                </button>
               </div>
-              <button type="button"
-                onClick={() => set("video_urls", (form.video_urls || []).filter((_, i) => i !== idx))}
-                className="absolute top-1.5 right-1.5 h-5 w-5 rounded-full bg-black/70 flex items-center justify-center">
-                <X size={10} className="text-white" />
-              </button>
+              <Input placeholder="Caption..." className="text-[10px] h-7 px-2"
+                value={(form.videos_meta || [])[idx]?.caption || ""}
+                onChange={e => {
+                  const meta = [...(form.videos_meta || [])];
+                  meta[idx] = { ...meta[idx], caption: e.target.value };
+                  set("videos_meta", meta);
+                }} />
+              <Input placeholder="Collab brand (e.g. Nike)" className="text-[10px] h-7 px-2"
+                value={(form.videos_meta || [])[idx]?.collab || ""}
+                onChange={e => {
+                  const meta = [...(form.videos_meta || [])];
+                  meta[idx] = { ...meta[idx], collab: e.target.value };
+                  set("videos_meta", meta);
+                }} />
             </div>
           ))}
           {/* Add more slot — label wraps input directly for mobile compatibility */}
@@ -495,6 +517,7 @@ const Admin = () => {
     portfolio_images: data.portfolio_images || [],
     video_url: data.video_url || null,
     video_urls: data.video_urls || [],
+    videos_meta: data.videos_meta || [],
     brands: data.brands || [],
     color: data.color || "from-violet-200 to-pink-100",
     country: data.country || null,
@@ -525,7 +548,7 @@ const Admin = () => {
 
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
-    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], brands: c.brands || [], color: c.color || "from-violet-200 to-pink-100", tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
+    setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], videos_meta: c.videos_meta || [], brands: c.brands || [], color: c.color || "from-violet-200 to-pink-100", tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
     setShowForm(false);
   };
 
