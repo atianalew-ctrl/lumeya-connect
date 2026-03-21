@@ -128,7 +128,7 @@ const Creators = () => {
         c.role.toLowerCase().includes(search.toLowerCase()) ||
         c.tags.some((t) => t.toLowerCase().includes(search.toLowerCase())) ||
         c.location.toLowerCase().includes(search.toLowerCase()) ||
-        c.country.toLowerCase().includes(search.toLowerCase());
+        (c.country || "").toLowerCase().includes(search.toLowerCase());
 
       const matchesRegion = selectedRegions.length === 0 || selectedRegions.includes(c.region);
 
