@@ -11,6 +11,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { supabase } from "@/integrations/supabase/client";
 
+const fmtNum = (n: any) => { const f = Number(n); if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; if (f >= 1000) return `${Math.round(f/1000)}K`; return f > 0 ? String(f) : "—"; };
+
 const allCountries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
   "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
@@ -540,23 +542,25 @@ const Creators = () => {
 
               {/* Stats row */}
               <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
-                {[
-                  { label: "Followers", value: (() => { const f = Number(creator.followers); return f >= 1000000 ? `${(f/1000000).toFixed(1)}M` : f >= 1000 ? `${Math.round(f/1000)}K` : f > 0 ? String(f) : "—"; })() },
-                  { label: "Engagement", value: creator.engagementRate ? `${creator.engagementRate}%` : "—", green: true },
-                  { label: "Niches", value: creator.tags?.length ? String(creator.tags.length) : "—" },
-                ].map(({ label, value, green }) => (
-                  <div key={label} className="px-3 py-2.5 text-center">
-                    <p className={`text-xs font-semibold ${green ? "text-emerald-500" : ""}`}>{value}</p>
-                    <p className="text-[9px] text-muted-foreground">{label}</p>
-                  </div>
-                ))}
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-semibold">{fmtNum(creator.followers)}</p>
+                  <p className="text-[9px] text-muted-foreground">Followers</p>
+                </div>
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-semibold text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
+                  <p className="text-[9px] text-muted-foreground">Engagement</p>
+                </div>
+                <div className="px-3 py-2.5 text-center">
+                  <p className="text-xs font-semibold">{creator.tags?.length || "—"}</p>
+                  <p className="text-[9px] text-muted-foreground">Niches</p>
+                </div>
               </div>
 
               {/* Tags + rate */}
               <div className="p-3">
                 <div className="flex flex-wrap gap-1.5 mb-2.5">
                   {creator.tags.slice(0, 3).map(tag => (
-                    <span key={tag} className="rounded-full bg-primary/8 border border-primary/15 px-2.5 py-0.5 text-[10px] text-primary/80">{tag}</span>
+                    <span key={tag} className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-[10px] text-primary">{tag}</span>
                   ))}
                 </div>
                 <div className="flex items-center justify-between">
