@@ -28,6 +28,8 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
     t0ms.current = Date.now();
   };
 
+  const touchHandled = useRef(false);
+
   const onTouchEnd = (e: React.TouchEvent) => {
     const dx = e.changedTouches[0].clientX - t0x.current;
     const dy = Math.abs(e.changedTouches[0].clientY - t0y.current);
@@ -35,22 +37,29 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
     const tapX = e.changedTouches[0].clientX;
     const w = (e.currentTarget as HTMLElement).offsetWidth;
     const isTap = dt < 250 && Math.abs(dx) < 10 && dy < 10;
+    touchHandled.current = true;
     if (!isTap) return;
-    if (photos.length > 1 && tapX < w * 0.45) {
-      e.preventDefault();
-      setIdx(i => Math.max(0, i - 1));
+    if (photos.length > 1 && tapX < w * 0.45 && idx > 0) {
+      setIdx(i => i - 1);
     } else if (photos.length > 1 && tapX > w * 0.55 && idx < photos.length - 1) {
-      e.preventDefault();
       setIdx(i => i + 1);
     } else {
       navigate(`/creators/${creator.id}`);
     }
   };
 
+  const onClickPhoto = () => {
+    if (touchHandled.current) { touchHandled.current = false; return; }
+    navigate(`/creators/${creator.id}`);
+  };
+
+  const prevPhoto = (e: React.MouseEvent) => { e.stopPropagation(); setIdx(i => Math.max(0, i - 1)); };
+  const nextPhoto = (e: React.MouseEvent) => { e.stopPropagation(); setIdx(i => Math.min(photos.length - 1, i + 1)); };
+
   return (
-    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none"
+    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none group/gallery"
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-      onClick={() => navigate(`/creators/${creator.id}`)}>
+      onClick={onClickPhoto}>
 
       {/* Images */}
       {photos.map((src, i) => (
@@ -58,6 +67,20 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${i === idx ? "opacity-100" : "opacity-0"}`}
           draggable={false} />
       ))}
+
+      {/* Desktop arrow buttons */}
+      {photos.length > 1 && idx > 0 && (
+        <button onClick={prevPhoto}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-30 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity text-lg">
+          ‹
+        </button>
+      )}
+      {photos.length > 1 && idx < photos.length - 1 && (
+        <button onClick={nextPhoto}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-30 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover/gallery:opacity-100 transition-opacity text-lg">
+          ›
+        </button>
+      )}
 
       {/* Gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none z-20" />
