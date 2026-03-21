@@ -1,7 +1,7 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check, Heart, XCircle } from "lucide-react";
 import { useState, useMemo, useRef, useEffect, useRef as useRefAlias } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,31 +13,51 @@ import { supabase } from "@/integrations/supabase/client";
 
 const fmtNum = (n: any) => { const f = Number(n); if (!f || f < 100) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
 
-// Photo gallery — tap left/right halves to browse, tap bottom to open profile
+// Photo gallery — single touch handler, no overlapping click zones
 const CreatorCardGallery = ({ creator }: { creator: any }) => {
   const photos = [creator.avatar, ...(creator.portfolioImages || [])].filter(Boolean).slice(0, 6);
   const [idx, setIdx] = useState(0);
+  const navigate = useNavigate();
+  const t0x = useRef(0);
+  const t0y = useRef(0);
+  const t0ms = useRef(0);
 
-  const prev = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setIdx(i => Math.max(0, i - 1)); };
-  const next = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setIdx(i => Math.min(photos.length - 1, i + 1)); };
+  const onTouchStart = (e: React.TouchEvent) => {
+    t0x.current = e.touches[0].clientX;
+    t0y.current = e.touches[0].clientY;
+    t0ms.current = Date.now();
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const dx = e.changedTouches[0].clientX - t0x.current;
+    const dy = Math.abs(e.changedTouches[0].clientY - t0y.current);
+    const dt = Date.now() - t0ms.current;
+    const tapX = e.changedTouches[0].clientX;
+    const w = (e.currentTarget as HTMLElement).offsetWidth;
+    const isTap = dt < 250 && Math.abs(dx) < 10 && dy < 10;
+    if (!isTap) return;
+    if (photos.length > 1 && tapX < w * 0.45) {
+      e.preventDefault();
+      setIdx(i => Math.max(0, i - 1));
+    } else if (photos.length > 1 && tapX > w * 0.55 && idx < photos.length - 1) {
+      e.preventDefault();
+      setIdx(i => i + 1);
+    } else {
+      navigate(`/creators/${creator.id}`);
+    }
+  };
 
   return (
-    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none">
+    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none"
+      onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+      onClick={() => navigate(`/creators/${creator.id}`)}>
 
-      {/* Images — instant switch, no scroll */}
+      {/* Images */}
       {photos.map((src, i) => (
         <img key={i} src={src} alt={creator.name}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${i === idx ? "opacity-100" : "opacity-0"}`}
           draggable={false} />
       ))}
-
-      {/* Tap left half = prev, tap right half = next */}
-      {photos.length > 1 && <>
-        <div className="absolute inset-y-0 left-0 w-1/2 z-20 cursor-pointer" onClick={prev} />
-        <div className="absolute inset-y-0 right-0 w-1/2 z-20 cursor-pointer" onClick={next} />
-      </>}
-      {/* Tap bottom strip = go to profile */}
-      <Link to={`/creators/${creator.id}`} className="absolute bottom-0 inset-x-0 h-1/4 z-20" />
 
       {/* Gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none z-20" />
