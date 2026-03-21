@@ -114,11 +114,13 @@ const Navbar = () => {
             {t("nav_black")}
           </Link>
 
-          {/* Join Waitlist pill */}
-          <Link
-            to="/waitlist"
-            className="inline-flex items-center rounded-full border border-border bg-muted/40 px-3.5 py-1.5 text-[11px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors whitespace-nowrap"
-          >
+          {/* Nav pills */}
+          <Link to="/creator-signup"
+            className="inline-flex items-center rounded-full border border-border bg-muted/40 px-3.5 py-1.5 text-[11px] text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors whitespace-nowrap">
+            Apply as Creator
+          </Link>
+          <Link to="/waitlist"
+            className="inline-flex items-center rounded-full border border-foreground bg-foreground text-background px-3.5 py-1.5 text-[11px] hover:opacity-80 transition-opacity whitespace-nowrap">
             Join Waitlist
           </Link>
 

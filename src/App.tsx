@@ -40,6 +40,7 @@ import BrandLogin from "./pages/BrandLogin";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Waitlist from "./pages/Waitlist";
+import CreatorSignup from "./pages/CreatorSignup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -87,6 +88,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/waitlist" element={<Waitlist />} />
+            <Route path="/creator-signup" element={<CreatorSignup />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
