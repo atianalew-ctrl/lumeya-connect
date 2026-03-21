@@ -13,62 +13,16 @@ import { supabase } from "@/integrations/supabase/client";
 
 const fmtNum = (n: any) => { const f = Number(n); if (!f || f < 100) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
 
-// Swipeable gallery — native non-passive touch listeners for Safari compat
+// Photo gallery — tap left/right halves to browse, tap bottom to open profile
 const CreatorCardGallery = ({ creator }: { creator: any }) => {
   const photos = [creator.avatar, ...(creator.portfolioImages || [])].filter(Boolean).slice(0, 6);
   const [idx, setIdx] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const swiped = useRef(false);
-  const idxRef = useRef(0);
-  idxRef.current = idx;
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const onStart = (e: TouchEvent) => {
-      startX.current = e.touches[0].clientX;
-      startY.current = e.touches[0].clientY;
-      swiped.current = false;
-    };
-    const onMove = (e: TouchEvent) => {
-      const dx = e.touches[0].clientX - startX.current;
-      const dy = e.touches[0].clientY - startY.current;
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
-        e.preventDefault(); // stops page scroll — only works with passive:false
-        swiped.current = true;
-      }
-    };
-    const onEnd = (e: TouchEvent) => {
-      const dx = e.changedTouches[0].clientX - startX.current;
-      const dy = Math.abs(e.changedTouches[0].clientY - startY.current);
-      if (Math.abs(dx) > 40 && Math.abs(dx) > dy) {
-        swiped.current = true;
-        const next = dx < 0
-          ? Math.min(idxRef.current + 1, photos.length - 1)
-          : Math.max(idxRef.current - 1, 0);
-        setIdx(next);
-      }
-    };
-
-    el.addEventListener("touchstart", onStart, { passive: true });
-    el.addEventListener("touchmove", onMove, { passive: false });
-    el.addEventListener("touchend", onEnd, { passive: true });
-    return () => {
-      el.removeEventListener("touchstart", onStart);
-      el.removeEventListener("touchmove", onMove);
-      el.removeEventListener("touchend", onEnd);
-    };
-  }, [photos.length]);
-
-  const handleClick = (e: React.MouseEvent) => {
-    if (swiped.current) { e.preventDefault(); swiped.current = false; }
-  };
+  const prev = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setIdx(i => Math.max(0, i - 1)); };
+  const next = (e: React.MouseEvent) => { e.preventDefault(); e.stopPropagation(); setIdx(i => Math.min(photos.length - 1, i + 1)); };
 
   return (
-    <div ref={containerRef} className="relative aspect-[3/4] overflow-hidden bg-accent select-none">
+    <div className="relative aspect-[3/4] overflow-hidden bg-accent select-none">
 
       {/* Images — instant switch, no scroll */}
       {photos.map((src, i) => (
@@ -77,8 +31,13 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
           draggable={false} />
       ))}
 
-      {/* Tap to go to profile */}
-      <Link to={`/creators/${creator.id}`} className="absolute inset-0 z-10" onClick={handleClick} />
+      {/* Tap left half = prev, tap right half = next */}
+      {photos.length > 1 && <>
+        <div className="absolute inset-y-0 left-0 w-1/2 z-20 cursor-pointer" onClick={prev} />
+        <div className="absolute inset-y-0 right-0 w-1/2 z-20 cursor-pointer" onClick={next} />
+      </>}
+      {/* Tap bottom strip = go to profile */}
+      <Link to={`/creators/${creator.id}`} className="absolute bottom-0 inset-x-0 h-1/4 z-20" />
 
       {/* Gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none z-20" />
