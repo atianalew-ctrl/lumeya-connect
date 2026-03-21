@@ -26,18 +26,20 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
   };
 
   return (
-    <Link to={`/creators/${creator.id}`} className="block">
-      <div className="relative aspect-[3/4] overflow-hidden bg-accent">
-        {/* Scrollable strip */}
+    <div className="relative aspect-[3/4] overflow-hidden bg-accent">
+        {/* Scrollable strip — pointer-events-auto so swipe works */}
         <div ref={scrollRef} onScroll={onScroll}
-          className="flex h-full overflow-x-auto snap-x snap-mandatory scrollbar-hide"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          className="flex h-full overflow-x-auto snap-x snap-mandatory"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none", WebkitOverflowScrolling: "touch" } as any}>
           {photos.map((src, i) => (
             <div key={i} className="relative shrink-0 w-full h-full snap-start">
-              <img src={src} alt={creator.name} className="w-full h-full object-cover" />
+              <img src={src} alt={creator.name} className="w-full h-full object-cover" draggable={false} />
             </div>
           ))}
         </div>
+
+        {/* Tap-to-navigate overlay — covers the area but lets scroll through */}
+        <Link to={`/creators/${creator.id}`} className="absolute inset-0 z-0" aria-label={creator.name} />
 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none" />
@@ -80,8 +82,7 @@ const CreatorCardGallery = ({ creator }: { creator: any }) => {
             <span className="text-[10px] text-white/50">{creator.location}{creator.country && creator.country !== creator.location ? `, ${creator.country}` : ""}</span>
           </div>
         </div>
-      </div>
-    </Link>
+    </div>
   );
 };
 
