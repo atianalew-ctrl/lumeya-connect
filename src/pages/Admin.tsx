@@ -48,6 +48,7 @@ type Creator = {
   videos_meta?: { caption?: string; collab?: string }[];
   brands?: string[];
   color?: string;
+  creator_type?: string;
   is_verified?: boolean;
   is_trending?: boolean;
   availability?: string;
@@ -63,7 +64,7 @@ const EMPTY: Omit<Creator, "id" | "created_at"> = {
   available_for_remote: true, followers: 0, tiktok_followers: 0, engagement_rate: 5.0,
   instagram: "", tiktok: "", rates: "", tags: [], avatar_url: null,
   portfolio_images: [], video_url: null, video_urls: [], videos_meta: [], brands: [], color: "from-violet-200 to-pink-100",
-  is_verified: false, is_trending: false, availability: "available", response_time: "Same day",
+  creator_type: "ugc", is_verified: false, is_trending: false, availability: "available", response_time: "Same day",
   packages: [
     { name: "Basic", price: "", desc: "" },
     { name: "Standard", price: "", desc: "" },
@@ -454,6 +455,21 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
         <Input type="text" inputMode="decimal" placeholder="4.9" value={form.rating || ""}
           onChange={e => set("rating", parseFloat(e.target.value.replace(",", ".")) || 5)} className="w-32" /></div>
 
+      {/* Creator type */}
+      <div>
+        <label className="text-xs text-muted-foreground block mb-2">Creator Type</label>
+        <div className="flex rounded-lg border border-border overflow-hidden">
+          <button type="button" onClick={() => set("creator_type", "ugc")}
+            className={`flex-1 py-2 text-xs font-medium transition-colors ${form.creator_type === "ugc" ? "bg-foreground text-background" : "text-muted-foreground"}`}>
+            UGC Creator
+          </button>
+          <button type="button" onClick={() => set("creator_type", "influencer")}
+            className={`flex-1 py-2 text-xs font-medium transition-colors ${form.creator_type === "influencer" ? "bg-foreground text-background" : "text-muted-foreground"}`}>
+            Influencer
+          </button>
+        </div>
+      </div>
+
       {/* Status toggles */}
       <div className="flex flex-wrap gap-4">
         <div className="flex items-center gap-2">
@@ -595,6 +611,7 @@ const Admin = () => {
     videos_meta: data.videos_meta || [],
     brands: data.brands || [],
     color: data.color || "from-violet-200 to-pink-100",
+    creator_type: data.creator_type || "ugc",
     is_verified: data.is_verified || false,
     is_trending: data.is_trending || false,
     availability: data.availability || "available",

@@ -204,6 +204,7 @@ const Creators = () => {
   const [savedIds, setSavedIds] = useState<string[]>(() => getSavedData().saved);
   const [savedEmail, setSavedEmail] = useState<string>(() => getSavedEmail());
   const [activeTab, setActiveTab] = useState<"all" | "saved">("all");
+  const [creatorType, setCreatorType] = useState<"ugc" | "influencer">("ugc");
   // For inline email prompt: tracks which creatorId is pending heart click
   const [pendingHeartId, setPendingHeartId] = useState<string | null>(null);
   const [emailPromptValue, setEmailPromptValue] = useState("");
@@ -238,6 +239,7 @@ const Creators = () => {
         is_verified: c.is_verified || false,
         is_trending: c.is_trending || false,
         availability: c.availability || "available",
+        creator_type: c.creator_type || "ugc",
         region: (c.region || "Europe") as Region,
         languages: c.languages?.length ? c.languages : ["English"],
         contentTypes: (c.content_types || []) as UGCContentType[],
@@ -334,34 +336,48 @@ const Creators = () => {
       const matchesRemote = !remoteOnly || c.availableForRemote;
 
       const matchesSavedTab =
-        activeTab === "all" || savedIds.includes(String(c.id));
+        (activeTab === "all" || savedIds.includes(String(c.id))) &&
+        ((c as any).creator_type === creatorType || (creatorType === "ugc" && !(c as any).creator_type));
 
       return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote && matchesSavedTab;
     });
-  }, [creators, search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly, activeTab, savedIds]);
+  }, [creators, search, selectedRegions, selectedCountries, selectedLanguages, selectedContentTypes, remoteOnly, activeTab, savedIds, creatorType]);
 
   return (
     <div className="container py-12">
       {/* Hub Header */}
       <div className="mb-10">
-        <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground mb-3">Creator Hub</p>
+        <p className="text-[10px] uppercase tracking-[0.4em] text-muted-foreground mb-5">Creator Hub</p>
+
+        {/* Big type switcher */}
+        <div className="flex rounded-2xl border border-border overflow-hidden mb-8 max-w-lg">
+          <button
+            onClick={() => setCreatorType("ugc")}
+            className={`flex-1 py-4 px-6 text-left transition-all ${creatorType === "ugc" ? "bg-foreground text-background" : "bg-background text-muted-foreground hover:text-foreground"}`}
+          >
+            <p className="text-sm font-semibold mb-0.5">UGC Creators</p>
+            <p className={`text-xs ${creatorType === "ugc" ? "text-background/60" : "text-muted-foreground"}`}>Buy content. No followers needed.</p>
+          </button>
+          <div className="w-px bg-border" />
+          <button
+            onClick={() => setCreatorType("influencer")}
+            className={`flex-1 py-4 px-6 text-left transition-all ${creatorType === "influencer" ? "bg-foreground text-background" : "bg-background text-muted-foreground hover:text-foreground"}`}
+          >
+            <p className="text-sm font-semibold mb-0.5">Influencers</p>
+            <p className={`text-xs ${creatorType === "influencer" ? "text-background/60" : "text-muted-foreground"}`}>Buy reach. Follower-based pricing.</p>
+          </button>
+        </div>
+
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
           <div>
-            <h1 className="text-4xl md:text-5xl font-display font-normal">
-              Find your perfect
-              <em className="text-primary/60"> creator.</em>
+            <h1 className="text-3xl md:text-4xl font-display font-normal">
+              {creatorType === "ugc" ? <>Find a <em className="text-primary/60">UGC Creator.</em></> : <>Find an <em className="text-primary/60">Influencer.</em></>}
             </h1>
             <p className="mt-2 text-sm text-muted-foreground max-w-md">
-              2,400+ vetted creators across 40+ countries. Filter by niche, location, engagement and more.
+              {creatorType === "ugc"
+                ? "Creators who make scroll-stopping content for your brand. Pay per deliverable — no follower count, just quality."
+                : "Creators with real audiences. Buy reach, awareness and trust with their followers."}
             </p>
-          </div>
-          <div className="flex gap-6 shrink-0">
-            {[["14", "Countries"], ["2.4K+", "Creators"], ["94%", "Satisfaction"]].map(([v, l]) => (
-              <div key={l} className="text-center">
-                <p className="text-2xl font-light">{v}</p>
-                <p className="text-[10px] text-muted-foreground tracking-wider">{l}</p>
-              </div>
-            ))}
           </div>
         </div>
       </div>
@@ -765,27 +781,44 @@ const Creators = () => {
 
               <CreatorCardGallery creator={creator} />
 
-              {/* Stats row */}
-              <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold">{fmtNum(creator.followers)}</p>
-                  <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5">
-                    <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 shrink-0"><defs><radialGradient id="ig-stat" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig-stat)"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="2"/><circle cx="17.2" cy="6.8" r="1.3" fill="white"/></svg>
-                    IG
-                  </p>
+              {/* Stats row — different for UGC vs Influencer */}
+              {(creator as any).creator_type === "influencer" ? (
+                <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
+                  <div className="px-3 py-2.5 text-center">
+                    <p className="text-xs font-semibold">{fmtNum(creator.followers)}</p>
+                    <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5">
+                      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 shrink-0"><defs><radialGradient id="ig-stat-inf" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig-stat-inf)"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="2"/><circle cx="17.2" cy="6.8" r="1.3" fill="white"/></svg>
+                      IG
+                    </p>
+                  </div>
+                  <div className="px-3 py-2.5 text-center">
+                    <p className="text-xs font-semibold">{fmtNum((creator as any).tiktokFollowers)}</p>
+                    <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5">
+                      <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 shrink-0" fill="none"><rect width="24" height="24" rx="4" fill="black"/><path d="M16.5 5.5a3.5 3.5 0 0 0 2 .5V9a5.5 5.5 0 0 1-2-.4v5.4a5 5 0 1 1-3-4.6V12a2.5 2.5 0 1 0 1.5 2.3V5.5h1.5Z" fill="white"/></svg>
+                      TikTok
+                    </p>
+                  </div>
+                  <div className="px-3 py-2.5 text-center">
+                    <p className="text-xs font-semibold text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
+                    <p className="text-[9px] text-muted-foreground">Engagement</p>
+                  </div>
                 </div>
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold">{fmtNum((creator as any).tiktokFollowers)}</p>
-                  <p className="text-[9px] text-muted-foreground flex items-center justify-center gap-0.5">
-                    <svg viewBox="0 0 24 24" className="w-2.5 h-2.5 shrink-0" fill="none"><rect width="24" height="24" rx="4" fill="black"/><path d="M16.5 5.5a3.5 3.5 0 0 0 2 .5V9a5.5 5.5 0 0 1-2-.4v5.4a5 5 0 1 1-3-4.6V12a2.5 2.5 0 1 0 1.5 2.3V5.5h1.5Z" fill="white"/></svg>
-                    TikTok
-                  </p>
+              ) : (
+                <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
+                  <div className="px-3 py-2.5 text-center">
+                    <p className="text-xs font-semibold">{creator.rates ? creator.rates.split("–")[0] : "—"}</p>
+                    <p className="text-[9px] text-muted-foreground">Starting from</p>
+                  </div>
+                  <div className="px-3 py-2.5 text-center">
+                    <p className="text-xs font-semibold">{creator.completedCampaigns || creator.portfolio || "—"}</p>
+                    <p className="text-[9px] text-muted-foreground">Campaigns</p>
+                  </div>
+                  <div className="px-3 py-2.5 text-center">
+                    <p className="text-xs font-semibold text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
+                    <p className="text-[9px] text-muted-foreground">Engagement</p>
+                  </div>
                 </div>
-                <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-semibold text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
-                  <p className="text-[9px] text-muted-foreground">Engagement</p>
-                </div>
-              </div>
+              )}
 
               {/* Tags + bio + socials */}
               <div className="p-3 space-y-2.5">
