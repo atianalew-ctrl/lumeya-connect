@@ -130,47 +130,50 @@ const CreatorProfile = () => {
       </div>
 
       <div className="container relative">
-        {/* Avatar — overlapping hero */}
-        <div className="flex items-end justify-between -mt-10 mb-6 flex-wrap gap-4">
-          <div className="flex items-end gap-4">
+        {/* Avatar — overlapping hero, Scandinavian minimal */}
+        <div className="flex items-end justify-between -mt-10 mb-8 flex-wrap gap-4">
+          <div className="flex items-end gap-5">
             <div className="relative">
               <img src={creator.avatar} alt={creator.name}
-                className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg" />
+                className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-md" />
               {creator.availableForRemote && (
-                <span className="absolute bottom-1 right-1 h-4 w-4 rounded-full bg-emerald-500 border-2 border-background" />
+                <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-background" />
               )}
             </div>
             <div className="pb-1">
-              <h1 className="text-2xl font-display">{creator.name}</h1>
-              <p className="text-sm text-muted-foreground">{creator.role} · {creator.location}</p>
+              <h1 className="text-2xl font-display tracking-tight">{creator.name}</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">{creator.role} · {creator.location}</p>
+              {/* Social handles — clean text links */}
+              <div className="flex items-center gap-3 mt-2">
+                {creator.instagram && (
+                  <a href={`https://instagram.com/${String(creator.instagram).replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors group">
+                    <Instagram size={11} className="group-hover:text-pink-500 transition-colors" />
+                    <span>@{String(creator.instagram).replace("@","")}</span>
+                  </a>
+                )}
+                {(creator as any).tiktok && (
+                  <a href={`https://tiktok.com/@${String((creator as any).tiktok).replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors">
+                    <span className="text-[10px] font-bold">♪</span>
+                    <span>@{String((creator as any).tiktok).replace("@","")}</span>
+                  </a>
+                )}
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2 pb-1">
-            <button onClick={() => setLiked(!liked)} className={`h-9 w-9 rounded-full border flex items-center justify-center transition-all ${liked ? "border-rose-300 bg-rose-50 text-rose-500" : "border-border hover:bg-accent text-muted-foreground"}`}>
-              <Heart size={14} className={liked ? "fill-rose-500" : ""} />
+            <button onClick={() => setLiked(!liked)} className={`h-8 w-8 rounded-full border flex items-center justify-center transition-all ${liked ? "border-rose-300 bg-rose-50 text-rose-500" : "border-border hover:bg-accent text-muted-foreground"}`}>
+              <Heart size={13} className={liked ? "fill-rose-500" : ""} />
             </button>
-            <button onClick={() => { setSaved(!saved); toast.success(saved ? "Removed from saved" : "Saved to your list ✦"); }} className={`h-9 w-9 rounded-full border flex items-center justify-center transition-all ${saved ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-accent text-muted-foreground"}`}>
-              <Bookmark size={14} className={saved ? "fill-primary" : ""} />
+            <button onClick={() => { setSaved(!saved); toast.success(saved ? "Removed from saved" : "Saved ✦"); }} className={`h-8 w-8 rounded-full border flex items-center justify-center transition-all ${saved ? "border-primary bg-primary/10 text-primary" : "border-border hover:bg-accent text-muted-foreground"}`}>
+              <Bookmark size={13} className={saved ? "fill-primary" : ""} />
             </button>
-            {creator.instagram && (
-              <a href={`https://instagram.com/${String(creator.instagram).replace("@","")}`} target="_blank" rel="noopener noreferrer"
-                className="h-9 w-9 rounded-xl overflow-hidden flex items-center justify-center transition-transform hover:scale-110 hover:shadow-lg"
-                title={`@${String(creator.instagram).replace("@","")}`}>
-                <svg viewBox="0 0 24 24" className="w-9 h-9"><defs><radialGradient id="ig" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="5%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="5" fill="url(#ig)"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="1.5"/><circle cx="17.2" cy="6.8" r="1.2" fill="white"/><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="white" strokeWidth="1.5"/></svg>
-              </a>
-            )}
-            {(creator as any).tiktok && (
-              <a href={`https://tiktok.com/@${String((creator as any).tiktok).replace("@","")}`} target="_blank" rel="noopener noreferrer"
-                className="h-9 w-9 rounded-xl overflow-hidden flex items-center justify-center bg-black transition-transform hover:scale-110 hover:shadow-lg"
-                title={`@${String((creator as any).tiktok).replace("@","")}`}>
-                <svg viewBox="0 0 24 24" className="w-6 h-6" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.28 8.28 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
-              </a>
-            )}
-            <Button size="sm" variant="outline" className="rounded-full" onClick={() => setShowRevision(true)}>
-              <RefreshCw size={12} className="mr-1.5" /> Request Revision
+            <Button size="sm" variant="outline" className="rounded-full text-xs h-8" onClick={() => setShowRevision(true)}>
+              <RefreshCw size={11} className="mr-1.5" /> Revision
             </Button>
-            <Button size="sm" className="rounded-full" asChild>
-              <Link to="/messages"><MessageCircle size={12} className="mr-1.5" /> Message</Link>
+            <Button size="sm" className="rounded-full text-xs h-8" asChild>
+              <Link to="/messages"><MessageCircle size={11} className="mr-1.5" /> Message</Link>
             </Button>
           </div>
         </div>
