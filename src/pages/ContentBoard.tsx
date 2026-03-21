@@ -106,6 +106,8 @@ const Lightbox = ({ item, onClose, onPrev, onNext }: {
 const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded: (post: any) => void }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [form, setForm] = useState({ creator_name: "", handle: "", caption: "", category: "Fashion", brand: "" });
   const [uploading, setUploading] = useState(false);
   const [done, setDone] = useState(false);
@@ -119,11 +121,20 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
     reader.readAsDataURL(f);
   };
 
+  const handleAvatar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setAvatarFile(f);
+    const reader = new FileReader();
+    reader.onload = ev => setAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(f);
+  };
+
   const handleSubmit = async () => {
     if (!file || !form.creator_name) return;
     setUploading(true);
     try {
-      // Upload image to creator-portfolio bucket
+      // Upload main image
       const filename = `feed/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, "_")}`;
       const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/creator-portfolio/${filename}`, {
         method: "POST",
@@ -134,8 +145,20 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
         ? `${SUPABASE_URL}/storage/v1/object/public/creator-portfolio/${filename}`
         : preview!;
 
+      // Upload avatar if provided
+      let avatarUrl = null;
+      if (avatarFile) {
+        const avatarFilename = `feed/avatar-${Date.now()}-${avatarFile.name.replace(/[^a-z0-9.]/gi, "_")}`;
+        const avatarRes = await fetch(`${SUPABASE_URL}/storage/v1/object/creator-avatars/${avatarFilename}`, {
+          method: "POST",
+          headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, "Content-Type": avatarFile.type },
+          body: avatarFile,
+        });
+        if (avatarRes.ok) avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/creator-avatars/${avatarFilename}`;
+      }
+
       // Insert into feed_posts
-      const post = { ...form, image_url: imageUrl, type: "photo", likes: "0", saves: "0" };
+      const post = { ...form, image_url: imageUrl, avatar_url: avatarUrl, type: "photo", likes: "0", saves: "0" };
       await fetch(`${SUPABASE_URL}/rest/v1/feed_posts`, {
         method: "POST",
         headers: { apikey: SVC_KEY, Authorization: `Bearer ${SVC_KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
@@ -172,7 +195,20 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
             </label>
 
             <div className="space-y-2.5">
-              <Input placeholder="Your name" value={form.creator_name} onChange={e => setForm(f => ({...f, creator_name: e.target.value}))} />
+              {/* Name + avatar picker row */}
+              <div className="flex items-center gap-3">
+                <label className="cursor-pointer shrink-0">
+                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatar} />
+                  {avatarPreview ? (
+                    <img src={avatarPreview} className="h-12 w-12 rounded-full object-cover border-2 border-primary/30" />
+                  ) : (
+                    <div className="h-12 w-12 rounded-full bg-accent border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary/40 transition-colors">
+                      <Upload size={14} />
+                    </div>
+                  )}
+                </label>
+                <Input placeholder="Your name" value={form.creator_name} onChange={e => setForm(f => ({...f, creator_name: e.target.value}))} />
+              </div>
               <Input placeholder="@handle" value={form.handle} onChange={e => setForm(f => ({...f, handle: e.target.value}))} />
               <Input placeholder="Caption..." value={form.caption} onChange={e => setForm(f => ({...f, caption: e.target.value}))} />
               <div className="grid grid-cols-2 gap-2">
