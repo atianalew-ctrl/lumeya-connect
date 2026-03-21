@@ -81,6 +81,7 @@ const Creators = () => {
         followers: c.followers || 10000,
         engagementRate: c.engagement_rate || 5.0,
         completedCampaigns: 0,
+        portfolio: (c.portfolio_images || []).length,
         responseTime: "Same day",
         availableForRemote: c.available_for_remote ?? true,
         available_for_remote: c.available_for_remote ?? true,
@@ -536,22 +537,22 @@ const Creators = () => {
               {/* Stats row */}
               <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
                 <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-medium">
-                    {creator.followers >= 1000000
-                      ? `${(creator.followers / 1000000).toFixed(1)}M`
-                      : creator.followers >= 1000
-                      ? `${(creator.followers / 1000).toFixed(1)}K`
-                      : creator.followers || "—"}
+                  <p className="text-xs font-semibold">
+                    {(creator.followers as any) >= 1000000
+                      ? `${((creator.followers as any) / 1000000).toFixed(1)}M`
+                      : (creator.followers as any) >= 1000
+                      ? `${((creator.followers as any) / 1000).toFixed(1)}K`
+                      : (creator.followers as any) > 0 ? String(creator.followers) : "—"}
                   </p>
                   <p className="text-[9px] text-muted-foreground">Followers</p>
                 </div>
                 <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-medium text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
+                  <p className="text-xs font-semibold text-emerald-500">{creator.engagementRate ? `${creator.engagementRate}%` : "—"}</p>
                   <p className="text-[9px] text-muted-foreground">Engagement</p>
                 </div>
                 <div className="px-3 py-2.5 text-center">
-                  <p className="text-xs font-medium">{creator.portfolio}</p>
-                  <p className="text-[9px] text-muted-foreground">Works</p>
+                  <p className="text-xs font-semibold">{creator.completedCampaigns || creator.portfolio || "—"}</p>
+                  <p className="text-[9px] text-muted-foreground">Campaigns</p>
                 </div>
               </div>
 
