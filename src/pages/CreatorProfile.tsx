@@ -153,9 +153,17 @@ const CreatorProfile = () => {
               <Bookmark size={14} className={saved ? "fill-primary" : ""} />
             </button>
             {creator.instagram && (
-              <a href={`https://instagram.com/${creator.instagram}`} target="_blank" rel="noopener noreferrer"
-                className="h-9 w-9 rounded-full border border-border flex items-center justify-center text-muted-foreground hover:bg-accent transition-colors">
-                <Instagram size={14} />
+              <a href={`https://instagram.com/${String(creator.instagram).replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                className="h-9 w-9 rounded-xl overflow-hidden flex items-center justify-center transition-transform hover:scale-110 hover:shadow-lg"
+                title={`@${String(creator.instagram).replace("@","")}`}>
+                <svg viewBox="0 0 24 24" className="w-9 h-9"><defs><radialGradient id="ig" cx="30%" cy="107%" r="150%"><stop offset="0%" stopColor="#fdf497"/><stop offset="5%" stopColor="#fdf497"/><stop offset="45%" stopColor="#fd5949"/><stop offset="60%" stopColor="#d6249f"/><stop offset="90%" stopColor="#285AEB"/></radialGradient></defs><rect width="24" height="24" rx="5" fill="url(#ig)"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" strokeWidth="1.5"/><circle cx="17.2" cy="6.8" r="1.2" fill="white"/><rect x="3.5" y="3.5" width="17" height="17" rx="4" fill="none" stroke="white" strokeWidth="1.5"/></svg>
+              </a>
+            )}
+            {(creator as any).tiktok && (
+              <a href={`https://tiktok.com/@${String((creator as any).tiktok).replace("@","")}`} target="_blank" rel="noopener noreferrer"
+                className="h-9 w-9 rounded-xl overflow-hidden flex items-center justify-center bg-black transition-transform hover:scale-110 hover:shadow-lg"
+                title={`@${String((creator as any).tiktok).replace("@","")}`}>
+                <svg viewBox="0 0 24 24" className="w-6 h-6" fill="white"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.34 6.34 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.28 8.28 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
               </a>
             )}
             <Button size="sm" variant="outline" className="rounded-full" onClick={() => setShowRevision(true)}>
