@@ -244,7 +244,7 @@ const ContentBoard = () => {
       headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }
     }).then(r => r.json()).then(rows => {
       if (Array.isArray(rows)) setDbPosts(rows.map((r, i) => ({
-        id: 10000 + i, creator: r.creator_name || "", handle: r.handle || "",
+        id: 10000 + i, _dbId: r.id, creator: r.creator_name || "", handle: r.handle || "",
         avatar: r.avatar_url || "", image: r.image_url, type: r.type || "photo",
         category: r.category || "Fashion", brand: r.brand || "", caption: r.caption || "",
         likes: r.likes || "0", saves: r.saves || "0", span: "",
@@ -360,6 +360,25 @@ const ContentBoard = () => {
                       >
                         <Bookmark size={13} className={saved.has(item.id) ? "text-primary fill-primary" : "text-white"} />
                       </button>
+                      {item.id >= 10000 && (
+                        <button
+                          onClick={async e => {
+                            e.stopPropagation();
+                            if (!confirm("Delete this post?")) return;
+                            const dbPost = dbPosts.find(p => p.id === item.id);
+                            if (dbPost) {
+                              await fetch(`${SUPABASE_URL}/rest/v1/feed_posts?id=eq.${(dbPost as any)._dbId}`, {
+                                method: "DELETE",
+                                headers: { apikey: SVC_KEY, Authorization: `Bearer ${SVC_KEY}` }
+                              });
+                              setDbPosts(prev => prev.filter(p => p.id !== item.id));
+                            }
+                          }}
+                          className="h-8 w-8 rounded-full bg-red-500/70 backdrop-blur flex items-center justify-center"
+                        >
+                          <X size={13} className="text-white" />
+                        </button>
+                      )}
                     </div>
 
                     {/* Bottom info */}
