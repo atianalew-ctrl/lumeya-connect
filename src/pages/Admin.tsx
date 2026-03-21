@@ -662,6 +662,7 @@ const Admin = () => {
   const startEdit = (c: Creator) => {
     setEditingId(c.id);
     setEditInitial({ display_name: c.display_name, tagline: c.tagline, location: c.location, bio: c.bio, instagram: c.instagram, rates: c.rates, tags: c.tags, avatar_url: c.avatar_url, portfolio_images: c.portfolio_images || [], video_url: c.video_url || null, video_urls: c.video_urls || [], videos_meta: c.videos_meta || [], brands: c.brands || [], color: c.color,
+      creator_type: (c as any).creator_type || "ugc",
       is_verified: c.is_verified || false, is_trending: c.is_trending || false,
       availability: c.availability || "available", response_time: c.response_time || "Same day",
       packages: c.packages || [{ name: "Basic", price: "", desc: "" }, { name: "Standard", price: "", desc: "" }, { name: "Premium", price: "", desc: "" }] || "from-violet-200 to-pink-100", tiktok: c.tiktok || "", country: c.country || "", region: c.region || "Europe", languages: c.languages || [], content_types: c.content_types || [], available_for_remote: c.available_for_remote ?? true, followers: c.followers || 0, engagement_rate: c.engagement_rate || 5.0, rating: c.rating });
