@@ -538,11 +538,7 @@ const Creators = () => {
               <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
                 <div className="px-3 py-2.5 text-center">
                   <p className="text-xs font-semibold">
-                    {(creator.followers as any) >= 1000000
-                      ? `${((creator.followers as any) / 1000000).toFixed(1)}M`
-                      : (creator.followers as any) >= 1000
-                      ? `${((creator.followers as any) / 1000).toFixed(1)}K`
-                      : (creator.followers as any) > 0 ? String(creator.followers) : "—"}
+                    {(() => { const f = Number(creator.followers); if (!f || f <= 0) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; })()}
                   </p>
                   <p className="text-[9px] text-muted-foreground">Followers</p>
                 </div>
