@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { Search, MapPin, Star, Globe, Languages, Filter, X, Wifi, Video, ChevronDown, Check, Heart, XCircle } from "lucide-react";
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef, useEffect, useRef as useRefAlias } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,75 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { supabase } from "@/integrations/supabase/client";
 
 const fmtNum = (n: any) => { const f = Number(n); if (!f || f <= 0) return "—"; if (f >= 1000000) return `${(f/1000000).toFixed(1)}M`; return `${(f/1000).toFixed(1)}K`; };
+
+// Swipeable photo gallery for creator card
+const CreatorCardGallery = ({ creator }: { creator: any }) => {
+  const photos = [creator.avatar, ...(creator.portfolioImages || [])].filter(Boolean).slice(0, 6);
+  const [idx, setIdx] = useState(0);
+  const startX = useRef<number | null>(null);
+
+  const prev = (e: React.MouseEvent) => { e.preventDefault(); setIdx(i => (i - 1 + photos.length) % photos.length); };
+  const next = (e: React.MouseEvent) => { e.preventDefault(); setIdx(i => (i + 1) % photos.length); };
+
+  const onTouchStart = (e: React.TouchEvent) => { startX.current = e.touches[0].clientX; };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (startX.current === null) return;
+    const diff = startX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) setIdx(i => diff > 0 ? (i + 1) % photos.length : (i - 1 + photos.length) % photos.length);
+    startX.current = null;
+  };
+
+  return (
+    <Link to={`/creators/${creator.id}`}>
+      <div className="relative aspect-[3/4] overflow-hidden bg-accent"
+        onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+        <img src={photos[idx]} alt={creator.name}
+          className="w-full h-full object-cover transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+        {/* Prev/Next arrows — desktop only */}
+        {photos.length > 1 && (
+          <>
+            <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-black/40 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="text-white text-xs">‹</span>
+            </button>
+            <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-black/40 backdrop-blur flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+              <span className="text-white text-xs">›</span>
+            </button>
+          </>
+        )}
+
+        {/* Dot indicators */}
+        {photos.length > 1 && (
+          <div className="absolute top-3 left-0 right-0 flex justify-center gap-1 z-10">
+            {photos.map((_, i) => (
+              <span key={i} className={`h-0.5 rounded-full transition-all ${i === idx ? "w-4 bg-white" : "w-1.5 bg-white/40"}`} />
+            ))}
+          </div>
+        )}
+
+        {/* Badges */}
+        <div className="absolute top-7 left-3 right-3 flex items-center justify-between z-10">
+          {creator.availableForRemote
+            ? <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80"><Wifi size={8} /> Remote</span>
+            : <span />}
+          <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
+            <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
+          </span>
+        </div>
+
+        {/* Name + location */}
+        <div className="absolute bottom-3 left-3 right-3">
+          <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
+          <div className="flex items-center gap-1 mt-0.5">
+            <MapPin size={9} className="text-white/50" />
+            <span className="text-[10px] text-white/50">{creator.location}{creator.country && creator.country !== creator.location ? `, ${creator.country}` : ""}</span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 const allCountries = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
@@ -499,42 +568,8 @@ const Creators = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.04 }}
           >
-            <Link to={`/creators/${creator.id}`} className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg">
-              {/* Big hero photo */}
-              <div className="relative aspect-[3/4] overflow-hidden bg-accent">
-                <img
-                  src={creator.avatar}
-                  alt={creator.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-
-                {/* Remote badge */}
-                {creator.availableForRemote && (
-                  <div className="absolute top-3 left-3">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
-                      <Wifi size={8} /> Remote
-                    </span>
-                  </div>
-                )}
-
-                {/* Rating badge */}
-                <div className="absolute top-3 right-3">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/15 px-2.5 py-1 text-[9px] text-white/80">
-                    <Star size={8} className="text-yellow-400 fill-yellow-400" /> {creator.rating}
-                  </span>
-                </div>
-
-                {/* Name + location overlay */}
-                <div className="absolute bottom-3 left-3 right-3">
-                  <h3 className="text-white font-medium text-sm leading-tight">{creator.name}</h3>
-                  <div className="flex items-center gap-1 mt-0.5">
-                    <MapPin size={9} className="text-white/50" />
-                    <span className="text-[10px] text-white/50">{creator.location}{(creator as any).country && (creator as any).country !== creator.location ? `, ${(creator as any).country}` : ""}</span>
-                  </div>
-                </div>
-              </div>
+            <div className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-lg">
+              <CreatorCardGallery creator={creator} />
 
               {/* Stats row */}
               <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
@@ -584,10 +619,10 @@ const Creators = () => {
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] font-medium text-primary group-hover:underline">View →</span>
+                  <Link to={`/creators/${creator.id}`} className="text-[10px] font-medium text-primary hover:underline">View →</Link>
                 </div>
               </div>
-            </Link>
+            </div>
           </motion.div>
         ))}
       </div>}
