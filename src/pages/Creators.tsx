@@ -337,7 +337,7 @@ const Creators = () => {
 
       const matchesSavedTab =
         (activeTab === "all" || savedIds.includes(String(c.id))) &&
-        ((c as any).creator_type === creatorType || (creatorType === "ugc" && !(c as any).creator_type));
+        ((c as any).creator_type === creatorType || (c as any).creator_type === "both" || (creatorType === "ugc" && !(c as any).creator_type));
 
       return matchesSearch && matchesRegion && matchesCountry && matchesLanguage && matchesContentType && matchesRemote && matchesSavedTab;
     });
@@ -782,7 +782,7 @@ const Creators = () => {
               <CreatorCardGallery creator={creator} />
 
               {/* Stats row — different for UGC vs Influencer */}
-              {(creator as any).creator_type === "influencer" ? (
+              {((creator as any).creator_type === "influencer" || ((creator as any).creator_type === "both" && creatorType === "influencer")) ? (
                 <div className="grid grid-cols-3 divide-x divide-border border-b border-border">
                   <div className="px-3 py-2.5 text-center">
                     <p className="text-xs font-semibold">{fmtNum(creator.followers)}</p>

@@ -461,7 +461,11 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
         <div className="flex rounded-lg border border-border overflow-hidden">
           <button type="button" onClick={() => set("creator_type", "ugc")}
             className={`flex-1 py-2 text-xs font-medium transition-colors ${form.creator_type === "ugc" ? "bg-foreground text-background" : "text-muted-foreground"}`}>
-            UGC Creator
+            UGC Only
+          </button>
+          <button type="button" onClick={() => set("creator_type", "both")}
+            className={`flex-1 py-2 text-xs font-medium transition-colors ${form.creator_type === "both" ? "bg-foreground text-background" : "text-muted-foreground"}`}>
+            Both
           </button>
           <button type="button" onClick={() => set("creator_type", "influencer")}
             className={`flex-1 py-2 text-xs font-medium transition-colors ${form.creator_type === "influencer" ? "bg-foreground text-background" : "text-muted-foreground"}`}>
