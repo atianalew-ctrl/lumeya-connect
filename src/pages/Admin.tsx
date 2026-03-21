@@ -334,20 +334,31 @@ const CreatorForm = ({ initial, onSave, onCancel }: {
         </div>
       </div>
 
-      {/* Languages */}
+      {/* Languages — free-type input */}
       <div>
         <label className="text-xs text-muted-foreground uppercase tracking-widest block mb-2">Languages</label>
-        <div className="flex flex-wrap gap-2">
-          {LANGUAGES.map(lang => {
-            const selected = (form.languages || []).includes(lang);
-            return (
-              <button key={lang} type="button"
-                onClick={() => set("languages", selected ? (form.languages || []).filter(l => l !== lang) : [...(form.languages || []), lang])}
-                className={`px-3 py-1 rounded-full text-xs border transition-colors ${selected ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary/40"}`}>
-                {lang}
-              </button>
-            );
-          })}
+        <div className="flex flex-wrap gap-2 mb-2">
+          {(form.languages || []).map(lang => (
+            <span key={lang} className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs bg-primary text-primary-foreground">
+              {lang}
+              <button type="button" onClick={() => set("languages", (form.languages || []).filter(l => l !== lang))} className="ml-1 opacity-70 hover:opacity-100">×</button>
+            </span>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Input
+            placeholder="Type a language and press Enter (e.g. English, Danish...)"
+            onKeyDown={e => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const val = (e.target as HTMLInputElement).value.trim();
+                if (val && !(form.languages || []).includes(val)) {
+                  set("languages", [...(form.languages || []), val]);
+                }
+                (e.target as HTMLInputElement).value = "";
+              }
+            }}
+          />
         </div>
       </div>
 
