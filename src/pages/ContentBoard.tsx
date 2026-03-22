@@ -103,14 +103,36 @@ const Lightbox = ({ item, onClose, onPrev, onNext }: {
 );
 
 // ── Upload modal
+type CreatorOption = { id: string; display_name: string; instagram: string; avatar_url: string; source: "db" | "static" };
+
 const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded: (post: any) => void }) => {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [form, setForm] = useState({ creator_name: "", handle: "", caption: "", category: "Fashion", brand: "" });
+  const [selectedCreator, setSelectedCreator] = useState<CreatorOption | null>(null);
+  const [creatorOptions, setCreatorOptions] = useState<CreatorOption[]>([]);
+  const [showPicker, setShowPicker] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    // Load DB creators
+    fetch(`${SUPABASE_URL}/rest/v1/lumeya_creators?select=id,display_name,instagram,avatar_url&order=display_name`, {
+      headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` }
+    }).then(r => r.json()).then((db: any[]) => {
+      const dbOpts: CreatorOption[] = (Array.isArray(db) ? db : []).map(c => ({
+        id: c.id, display_name: c.display_name, instagram: c.instagram || "", avatar_url: c.avatar_url || "", source: "db"
+      }));
+      // Also add static creators from data.ts
+      const staticOpts: CreatorOption[] = creators.map(c => ({
+        id: String(c.id), display_name: c.name, instagram: c.instagram || "", avatar_url: c.avatar || "", source: "static"
+      }));
+      // Merge, deduplicate by name
+      const names = new Set(dbOpts.map(c => c.display_name));
+      const merged = [...dbOpts, ...staticOpts.filter(c => !names.has(c.display_name))];
+      setCreatorOptions(merged);
+    });
+  }, []);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -131,10 +153,9 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
   };
 
   const handleSubmit = async () => {
-    if (!file || !form.creator_name) return;
+    if (!file || (!form.creator_name && !selectedCreator)) return;
     setUploading(true);
     try {
-      // Upload main image
       const filename = `feed/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi, "_")}`;
       const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/creator-portfolio/${filename}`, {
         method: "POST",
@@ -145,20 +166,12 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
         ? `${SUPABASE_URL}/storage/v1/object/public/creator-portfolio/${filename}`
         : preview!;
 
-      // Upload avatar if provided
-      let avatarUrl = null;
-      if (avatarFile) {
-        const avatarFilename = `feed/avatar-${Date.now()}-${avatarFile.name.replace(/[^a-z0-9.]/gi, "_")}`;
-        const avatarRes = await fetch(`${SUPABASE_URL}/storage/v1/object/creator-avatars/${avatarFilename}`, {
-          method: "POST",
-          headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, "Content-Type": avatarFile.type },
-          body: avatarFile,
-        });
-        if (avatarRes.ok) avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/creator-avatars/${avatarFilename}`;
-      }
+      const creatorName = selectedCreator ? selectedCreator.display_name : form.creator_name;
+      const handle = selectedCreator ? selectedCreator.instagram : form.handle;
+      const avatarUrl = selectedCreator ? selectedCreator.avatar_url : null;
 
       // Insert into feed_posts
-      const post = { ...form, image_url: imageUrl, avatar_url: avatarUrl, type: "photo", likes: "0", saves: "0" };
+      const post = { ...form, creator_name: creatorName, handle, image_url: imageUrl, avatar_url: avatarUrl, type: "photo", likes: "0", saves: "0" };
       await fetch(`${SUPABASE_URL}/rest/v1/feed_posts`, {
         method: "POST",
         headers: { apikey: SVC_KEY, Authorization: `Bearer ${SVC_KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
@@ -195,21 +208,42 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
             </label>
 
             <div className="space-y-2.5">
-              {/* Name + avatar picker row */}
-              <div className="flex items-center gap-3">
-                <label className="cursor-pointer shrink-0">
-                  <input type="file" accept="image/*" className="hidden" onChange={handleAvatar} />
-                  {avatarPreview ? (
-                    <img src={avatarPreview} className="h-12 w-12 rounded-full object-cover border-2 border-primary/30" />
+              {/* Creator picker */}
+              <div className="relative">
+                <button type="button" onClick={() => setShowPicker(!showPicker)}
+                  className="w-full flex items-center gap-3 rounded-xl border border-border bg-background px-3 py-2.5 text-left hover:border-primary/40 transition-colors">
+                  {selectedCreator ? (
+                    <>
+                      <img src={selectedCreator.avatar_url} className="h-8 w-8 rounded-full object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{selectedCreator.display_name}</p>
+                        <p className="text-xs text-muted-foreground">@{String(selectedCreator.instagram).replace("@","")}</p>
+                      </div>
+                      <button onClick={e => { e.stopPropagation(); setSelectedCreator(null); }} className="text-muted-foreground hover:text-foreground"><X size={14} /></button>
+                    </>
                   ) : (
-                    <div className="h-12 w-12 rounded-full bg-accent border-2 border-dashed border-border flex items-center justify-center text-muted-foreground hover:border-primary/40 transition-colors">
-                      <Upload size={14} />
-                    </div>
+                    <span className="text-sm text-muted-foreground">Select a creator…</span>
                   )}
-                </label>
-                <Input placeholder="Your name" value={form.creator_name} onChange={e => setForm(f => ({...f, creator_name: e.target.value}))} />
+                </button>
+                {showPicker && (
+                  <div className="absolute top-full left-0 right-0 z-20 mt-1 rounded-xl border border-border bg-background shadow-xl max-h-52 overflow-y-auto">
+                    {creatorOptions.map(c => (
+                      <button key={c.id} type="button" onClick={() => { setSelectedCreator(c); setShowPicker(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent transition-colors text-left">
+                        {c.avatar_url ? (
+                          <img src={c.avatar_url} className="h-8 w-8 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-accent shrink-0" />
+                        )}
+                        <div>
+                          <p className="text-sm font-medium">{c.display_name}</p>
+                          {c.instagram && <p className="text-xs text-muted-foreground">@{String(c.instagram).replace("@","")}</p>}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              <Input placeholder="@handle" value={form.handle} onChange={e => setForm(f => ({...f, handle: e.target.value}))} />
               <Input placeholder="Caption..." value={form.caption} onChange={e => setForm(f => ({...f, caption: e.target.value}))} />
               <div className="grid grid-cols-2 gap-2">
                 <select value={form.category} onChange={e => setForm(f => ({...f, category: e.target.value}))}
@@ -220,7 +254,7 @@ const UploadModal = ({ onClose, onUploaded }: { onClose: () => void; onUploaded:
               </div>
             </div>
 
-            <Button className="w-full rounded-full" onClick={handleSubmit} disabled={!file || !form.creator_name || uploading}>
+            <Button className="w-full rounded-full" onClick={handleSubmit} disabled={!file || (!selectedCreator && !form.creator_name) || uploading}>
               {uploading ? "Uploading..." : "Post to Feed"}
             </Button>
           </>

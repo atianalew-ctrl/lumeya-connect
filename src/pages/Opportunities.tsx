@@ -124,42 +124,56 @@ const Opportunities = () => {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <div className="mt-8 flex flex-col gap-3">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((opp, i) => (
             <motion.div
               key={opp.id}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
-              className="group rounded-lg border border-border bg-card p-6 transition-all hover:border-primary/30"
+              className="group rounded-2xl border border-border bg-card overflow-hidden transition-all hover:border-primary/30 hover:shadow-md"
             >
-              <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <Link to={`/opportunities/${opp.id}`} className="flex-1">
-                  <h3 className="font-body text-base font-semibold group-hover:text-primary transition-colors">
+              {/* Cover image — category-based gradient with label */}
+              <Link to={`/opportunities/${opp.id}`}>
+                <div className={`relative h-32 w-full flex items-end p-4 ${
+                  opp.category === "Beauty" ? "bg-gradient-to-br from-pink-100 to-rose-200" :
+                  opp.category === "Fashion" ? "bg-gradient-to-br from-slate-200 to-zinc-300" :
+                  opp.category === "Lifestyle" ? "bg-gradient-to-br from-amber-100 to-orange-200" :
+                  opp.category === "Food" ? "bg-gradient-to-br from-yellow-100 to-amber-200" :
+                  opp.category === "Fitness" ? "bg-gradient-to-br from-emerald-100 to-teal-200" :
+                  opp.category === "Travel" ? "bg-gradient-to-br from-sky-100 to-blue-200" :
+                  opp.category === "Tech" ? "bg-gradient-to-br from-violet-100 to-indigo-200" :
+                  "bg-gradient-to-br from-accent to-muted"
+                }`}>
+                  <div className="absolute top-3 right-3">
+                    <span className="rounded-full bg-white/80 backdrop-blur px-2.5 py-1 text-[10px] font-medium text-foreground">{opp.category}</span>
+                  </div>
+                  <p className="text-xs font-medium text-foreground/60">by {opp.brand}</p>
+                </div>
+              </Link>
+
+              <div className="p-4">
+                <Link to={`/opportunities/${opp.id}`}>
+                  <h3 className="font-body text-sm font-semibold group-hover:text-primary transition-colors mb-1">
                     {opp.title}
                   </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">by {opp.brand}</p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{opp.desc}</p>
-                  <div className="mt-3 flex flex-wrap gap-2">
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-3">{opp.desc}</p>
+                  <div className="flex flex-wrap gap-1.5 mb-3">
                     {opp.tags.map((tag) => (
-                      <span key={tag} className="text-xs text-muted-foreground">
-                        {tag}
-                      </span>
+                      <span key={tag} className="rounded-full bg-accent px-2 py-0.5 text-[10px] text-muted-foreground">{tag}</span>
                     ))}
                   </div>
                 </Link>
-                <div className="flex flex-col items-end gap-2 md:min-w-[140px]">
-                  <span className="flex items-center gap-1 text-sm font-medium">
-                    <DollarSign size={13} className="text-primary" />
-                    {opp.budget}
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Clock size={11} />
-                    {opp.deadline}
-                  </span>
-                  <Button size="sm" className="mt-2 text-xs h-8" onClick={() => setApplyOpp(opp)}>
-                    Apply
-                  </Button>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="flex items-center gap-1 text-sm font-semibold">
+                      <DollarSign size={12} className="text-primary" />{opp.budget}
+                    </span>
+                    <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <Clock size={10} />{opp.deadline}
+                    </span>
+                  </div>
+                  <Button size="sm" className="text-xs h-7 rounded-full" onClick={() => setApplyOpp(opp)}>Apply</Button>
                 </div>
               </div>
             </motion.div>
