@@ -838,16 +838,18 @@ const Creators = () => {
 
               {/* Tags + bio + socials */}
               <div className="p-3 space-y-2.5">
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1.5">
-                  {creator.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] text-muted-foreground">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                {/* Short bio */}
-                {creator.bio && (
+                {/* Tags always as pills */}
+                {creator.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {creator.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="rounded-full bg-accent px-2.5 py-0.5 text-[10px] text-muted-foreground capitalize">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {/* Bio — only if it adds info beyond the tags */}
+                {creator.bio && creator.tags.length === 0 && (
                   <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">{creator.bio}</p>
                 )}
                 {/* Socials row */}
